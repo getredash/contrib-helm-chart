@@ -5,7 +5,7 @@
 ##
 image:
   repository: redash/redash
-  tag: 6.0.0.b8537
+  tag: 8.0.0.b32245
   pullPolicy: IfNotPresent
 
 ## Override the name of the chart
@@ -22,11 +22,12 @@ env:
 ## Configuration for Redash web server
 ##
 server:
-  ## Server container port (only useful if you are using a customized image)
   httpPort: 5000
-
   ## Secure value for session cookie secret - if not set a random value will be generated
-  # cookieSecret:
+  #cookieSecret:
+  ## Redash Secret key - if not set a random value will be generated
+  #secretKey:
+
 
   ## Redash server specific envrionment variables
   ## Add any environment variables from https://redash.io/help-onpremise/setup/settings-environment-variables.html
@@ -160,13 +161,11 @@ postgresql:
   ## To use an external PostgreSQL set this to false and configure the externalPostgreSQL parameter.
   enabled: true
   image:
-    ## Bitnami supported version closest to the one specified in Redash docker-compose.yml
-    ##
-    tag: "9.6.11-debian-9-r66"
+    tag: "9.6.16"
   postgresqlUsername: redash
   ## If the password is not specified, a random password will be generated
   ##
-  # postgresqlPassword:
+  #postgresqlPassword: redash
   postgresqlDatabase: redash
   service:
     type: ClusterIP
@@ -192,7 +191,7 @@ postgresql:
 redis:
   ## If the password is not specified, a random password will be generated
   ##
-  # password:
+  #password: redis
   databaseNumber: 0
   master:
     port: 6379

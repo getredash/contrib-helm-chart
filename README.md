@@ -2,10 +2,17 @@
 
 [Redash](http://redash.io/) is an open source tool built for teams to query, visualize and collaborate. Redash is quick to setup and works with any data source you might need so you can query from anywhere in no time.
 
+## Kubernetes version
+For Kubernetes v. 1.16+ use master branch, for version 1.15, or possible earlier, use branch 1.15.
+
+
 ## TL;DR
 
 ```bash
-$ helm install stable/redash
+git clone https://github.com/getredash/contrib-helm-chart.git
+cd contrib-helm-chart$
+helm dep up
+helm install --name=redash .
 ```
 
 ## Introduction
@@ -15,7 +22,7 @@ This chart bootstraps a [Redash](https://github.com/getredash/redash) deployment
 ## Prerequisites
 
 - At least 3 GB of RAM available on your cluster
-- Kubernetes 1.9+ with Beta APIs enabled
+- Kubernetes 1.16+ (for earlier version, use branch 1.15, that could possible work with earlier versions also)
 - PV provisioner support in the underlying infrastructure
 
 ## Installing the Chart
@@ -23,7 +30,7 @@ This chart bootstraps a [Redash](https://github.com/getredash/redash) deployment
 To install the chart with the release name `my-release`:
 
 ```bash
-$ helm install --name my-release stable/redash
+$ helm install --name my-release .
 ```
 
 The command deploys Redash on the Kubernetes cluster in the default configuration. The [configuration](#configuration) section lists the parameters that can be configured during installation.
@@ -50,6 +57,7 @@ The following table lists the configurable parameters of the Redash chart and th
 | `image.tag`                            | Redash Image tag                                      | `{VERSION}`        |
 | `image.pullPolicy`                     | Image pull policy                                     | `IfNotPresent`     |
 | `image.pullSecrets`                    | Specify docker-ragistry secret names as an array      | `nil`              |
+| `secretKey`                         | Secret used for encryption of data sources             | Randomly generated |
 | `cookieSecret`                         | Secret used for cookie session management             | Randomly generated |
 | `env`                                  | Environment variables from [Redash settings](https://redash.io/help-onpremise/setup/settings-environment-variables.html) and [example Docker Compose](https://github.com/getredash/redash/blob/master/docker-compose.production.yml). Variables applied to both server and worker containers. | `PYTHONUNBUFFERED: 0`<br>`REDASH_LOG_LEVEL: "INFO"` |
 | `server.name`                          | Name used for Redash server deployment                | `redash`           |
@@ -101,7 +109,7 @@ Specify each parameter using the `--set key=value[,key=value]` argument to `helm
 ```bash
 $ helm install --name my-release \
   --set cookieSecret=verysecret \
-    stable/redash
+    .
 ```
 
 The above command sets the Redash cookie secret to `verysecret`.
@@ -109,6 +117,6 @@ The above command sets the Redash cookie secret to `verysecret`.
 Alternatively, a YAML file that specifies the values for the parameters can be provided while installing the chart. For example,
 
 ```bash
-$ helm install --name my-release -f values.yaml stable/redash
+$ helm install --name my-release -f values.yaml .
 ```
 > **Tip**: You can use the default [values.yaml](values.yaml)
