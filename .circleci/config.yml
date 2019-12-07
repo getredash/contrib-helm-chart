@@ -66,12 +66,27 @@ jobs:
             helm init --wait
 
       - run:
+          name: Install chart dependencies
+          command: |
+            helm dependency build \
+                ./charts/redash
+
+      - run:
           name: Install chart
           command: |
             helm install \
                 ./charts/redash \
                 --name redash \
                 --wait
+
+      - run:
+          name: Show status and key logs
+          command: |
+            helm status redash
+            kubectl get all
+            export POD_NAME=$(kubectl get pods --namespace default -l "app.kubernetes.io/name=redash,app.kubernetes.io/instance=redash" -o jsonpath="{.items[0].metadata.name}") \
+              && kubectl logs -c redash-server-createdb "${POD_NAME}"
+              && kubectl logs "${POD_NAME}"
 
 workflows:
   version: 2
