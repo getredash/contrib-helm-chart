@@ -1,10 +1,5 @@
 version: 2.1
 
-# This is based broadly on https://github.com/banzaicloud/bank-vaults/blob/master/.circleci/config.yml
-
-orbs:
-  helm: banzaicloud/helm@0.0.5
-
 jobs:
   test:
     machine:
@@ -61,52 +56,45 @@ jobs:
       - run:
           name: Install helm
           command: |
-            # helm
             curl -L https://git.io/get_helm.sh | bash
             helm init --wait
 
       - run:
           name: Install chart dependencies
           command: |
-            helm dependency build \
-                ./charts/redash
+            helm dependency build .
 
       - run:
           name: Install chart
           command: |
-            helm install \
-                ./charts/redash \
+            helm install . \
                 --name redash \
-                --wait
+                --wait \
+                || \
+                (
+                  # In case of error, try to display some debug logs
+                  kubectl get all
+                  export POD_NAME=$(kubectl get pods --namespace default -l "app.kubernetes.io/name=redash,app.kubernetes.io/instance=redash" -o jsonpath="{.items[0].metadata.name}")
+                  echo "INSTALL LOGS"
+                  echo "############"
+                  kubectl logs --tail=40 -c redash-server-createdb "${POD_NAME}"
+                  echo "SERVER LOGS"
+                  echo "###########"
+                  kubectl logs --tail=20 "${POD_NAME}"
+                )
+            helm status redash
 
       - run:
-          name: Show status and key logs
+          name: Smoke test
+          # TODO: Look into moving this into helm test and reusing offical front-end tests
           command: |
-            helm status redash
-            kubectl get all
-            export POD_NAME=$(kubectl get pods --namespace default -l "app.kubernetes.io/name=redash,app.kubernetes.io/instance=redash" -o jsonpath="{.items[0].metadata.name}") \
-              && kubectl logs -c redash-server-createdb "${POD_NAME}"
-              && kubectl logs "${POD_NAME}"
+            export POD_NAME=$(kubectl get pods --namespace default -l "app.kubernetes.io/name=redash,app.kubernetes.io/instance=redash" -o jsonpath="{.items[0].metadata.name}")
+            kubectl port-forward "${POD_NAME}" 8080:5000 &
+            curl -sL http://127.0.0.1:8080 | fgrep 'Welcome to Redash'
+            kill $(jobs -pr)
 
 workflows:
   version: 2
   ci:
     jobs:
       - test
-
-  helm-chart:
-    jobs:
-      - helm/lint-chart:
-          charts-dir: charts
-          filters:
-            tags:
-              ignore: /.*/
-
-      - helm/publish-chart:
-          context: helm
-          charts-dir: charts
-          filters:
-            tags:
-              only: /chart\/\S+\/\d+.\d+.\d+/
-            branches:
-              ignore: /.*/
