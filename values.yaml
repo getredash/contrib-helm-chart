@@ -5,7 +5,7 @@
 ##
 image:
   repository: redash/redash
-  tag: 6.0.0.b8537
+  tag: 8.0.1.b33387
   pullPolicy: IfNotPresent
 
 ## Override the name of the chart
@@ -26,7 +26,10 @@ server:
   httpPort: 5000
 
   ## Secure value for session cookie secret - if not set a random value will be generated
-  # cookieSecret:
+  # cookieSecret: ""
+
+  ## Secure value for encryption your data sources configuration - if not set a random value will be generated
+  # secretKey: ""
 
   ## Redash server specific envrionment variables
   ## Add any environment variables from https://redash.io/help-onpremise/setup/settings-environment-variables.html
@@ -185,11 +188,22 @@ postgresql:
     size: 10Gi
     # existingClaim: ""
 
+##
+## External Redis configuration
+## To use an external Redis instead of the automatically deployed
+## redis chart: set redis.enabled to false then uncomment and
+## configure the externalRedis connection URL.
+##
+# externalRedis: redis://user:pass@host:6379/database
+
 ## Configuration values for the redis dependency
 ## This Redis instance is used for caching and temporary storage
 ## ref: https://github.com/kubernetes/charts/blob/master/stable/redis/README.md
 ##
 redis:
+  ## Whether to deploy a Redis server to satisfy the applications database requirements.
+  ## To use an external Redis set this to false and configure the externalRedis parameter.
+  enabled: true
   ## If the password is not specified, a random password will be generated
   ##
   # password:
