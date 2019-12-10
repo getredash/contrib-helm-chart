@@ -6,6 +6,7 @@ jobs:
       image: circleci/classic:201808-01
 
     environment:
+      HELM_VERSION: v2.16.1
       K8S_VERSION: v1.15.3
       KUBECONFIG: /home/circleci/.kube/config
       MINIKUBE_VERSION: v1.4.0
@@ -15,7 +16,24 @@ jobs:
       CHANGE_MINIKUBE_NONE_USER: true
       DOCKER_LATEST: 1
 
+    # Working directory needs to match to pass helm lint.
+    working_directory: ~/redash
+
     steps:
+      - checkout
+
+      - run:
+          name: Install helm
+          command: |
+            curl -Lo get-helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get && chmod +x get-helm.sh
+            ./get-helm.sh --version "${HELM_VERSION}"
+            rm get-helm.sh
+
+      - run:
+          name: Lint chart
+          command: |
+            helm lint .
+
       - run:
           name: Setup minikube
           command: |
@@ -33,8 +51,6 @@ jobs:
             curl -Lo kubectl https://storage.googleapis.com/kubernetes-release/release/${K8S_VERSION}/bin/linux/amd64/kubectl && chmod +x kubectl && sudo mv kubectl /usr/local/bin/
             mkdir -p ${HOME}/.kube
             touch ${HOME}/.kube/config
-
-      - checkout
 
       - run:
           name: Wait for minikube
@@ -54,9 +70,8 @@ jobs:
             EOT
 
       - run:
-          name: Install helm
+          name: Install Tiller
           command: |
-            curl -L https://git.io/get_helm.sh | bash
             helm init --wait
 
       - run:
@@ -86,10 +101,11 @@ jobs:
 
       - run:
           name: Smoke test
-          # TODO: Look into moving this into helm test and reusing offical front-end tests
           command: |
+            # TODO: Look into moving this into helm test and reusing offical front-end tests
             export POD_NAME=$(kubectl get pods --namespace default -l "app.kubernetes.io/name=redash,app.kubernetes.io/instance=redash" -o jsonpath="{.items[0].metadata.name}")
             kubectl port-forward "${POD_NAME}" 8080:5000 &
+            sleep 1
             curl -sL http://127.0.0.1:8080 | fgrep 'Welcome to Redash'
             kill $(jobs -pr)
 
