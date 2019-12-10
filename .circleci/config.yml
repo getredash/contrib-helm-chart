@@ -20,6 +20,11 @@ jobs:
     working_directory: ~/redash
 
     steps:
+      # Add read-only SSH deploy key
+      - add_ssh_keys:
+          fingerprints:
+            - "1a:be:96:4d:6b:be:57:8e:ba:83:66:43:99:f7:96:bc"
+
       - checkout
 
       - run:
@@ -109,8 +114,66 @@ jobs:
             curl -sL http://127.0.0.1:8080 | fgrep 'Welcome to Redash'
             kill $(jobs -pr)
 
+  publish:
+    machine:
+      image: circleci/classic:201808-01
+
+    environment:
+      HELM_VERSION: v2.16.1
+      GITHUB_PAGES_BRANCH: gh-pages
+
+    working_directory: ~/redash
+
+    steps:
+      # Add read-write SSH deploy key
+      - add_ssh_keys:
+          fingerprints:
+            - "36:04:b4:4a:31:a6:16:a1:e8:75:da:ee:b7:05:f4:34"
+
+      - checkout
+
+      - run:
+          name: Install helm
+          command: |
+            curl -Lo get-helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get && chmod +x get-helm.sh
+            ./get-helm.sh --version "${HELM_VERSION}"
+            rm get-helm.sh
+
+      - run:
+          name: Checking out Github Pages branch
+          command: |
+            # use git+ssh instead of https
+            git config --global url."ssh://git@github.com".insteadOf "https://github.com" || true
+            git config --global gc.auto 0 || true
+            mkdir -p /tmp/helm
+            git clone -b "${GITHUB_PAGES_BRANCH}" "${CIRCLE_REPOSITORY_URL}" /tmp/helm/publish
+
+      - run:
+          name: Package chart and update chart index
+          command: |
+            helm init --client-only
+            helm package --destination /tmp/helm/publish --dependency-update .
+            helm repo index /tmp/helm/publish
+
+      - run:
+          name: Pushing Github Pages branch
+          command: |
+            cd /tmp/helm/publish
+            git config user.email "${CIRCLE_USERNAME}@users.noreply.github.com"
+            git config user.name CircleCI
+            git add .
+            git status
+            git commit -m "Published by CircleCI ${CIRCLE_BUILD_URL} [skip ci]"
+            git push origin "${GITHUB_PAGES_BRANCH}"
+
 workflows:
   version: 2
   ci:
     jobs:
       - test
+      - publish:
+          requires:
+            - test
+          filters:
+            branches:
+              only: master
