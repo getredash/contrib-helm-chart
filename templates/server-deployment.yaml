@@ -3,27 +3,31 @@ kind: Deployment
 metadata:
   name: {{ include "redash.fullname" . }}
   labels:
-    app.kubernetes.io/name: {{ include "redash.name" . }}
+    {{- include "redash.labels" . | nindent 4 }}
     app.kubernetes.io/component: server
-    helm.sh/chart: {{ include "redash.chart" . }}
-    app.kubernetes.io/instance: {{ .Release.Name }}
-    app.kubernetes.io/managed-by: {{ .Release.Service }}
 spec:
   replicas: {{ .Values.server.replicaCount }}
   selector:
     matchLabels:
-      app.kubernetes.io/name: {{ include "redash.name" . }}
+      {{- include "redash.selectorLabels" . | nindent 6 }}
       app.kubernetes.io/component: server
-      app.kubernetes.io/instance: {{ .Release.Name }}
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: {{ include "redash.name" . }}
+        {{- include "redash.selectorLabels" . | nindent 8 }}
         app.kubernetes.io/component: server
-        app.kubernetes.io/instance: {{ .Release.Name }}
     spec:
+    {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      serviceAccountName: {{ include "redash.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
       initContainers:
         - name: {{ include "redash.name" . }}-server-createdb
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command: ["bash", "/config/createdb.sh"]
