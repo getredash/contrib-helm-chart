@@ -103,8 +103,14 @@ jobs:
       - run:
           name: Install chart
           command: |
-            helm install . \
-                --name redash \
+            # Helm 3 doesn't use name flag.
+            NAME=""
+            if [[ $HELM_VERSION == v2* ]]; then
+              NAME="--name"
+            fi
+            helm install \
+                "${NAME}" redash \
+                . \
                 --wait \
                 || \
                 (
