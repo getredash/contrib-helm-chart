@@ -2,12 +2,21 @@ version: 2.1
 
 jobs:
   test:
+    parameters:
+      helm:
+        description: "Helm version to test with"
+        default: "v2.16.1"
+        type: string
+      k8s:
+        description: "Kubernetes version to test with"
+        default: "v1.15.3"
+        type: string
     machine:
       image: circleci/classic:201808-01
 
     environment:
-      HELM_VERSION: v2.16.1
-      K8S_VERSION: v1.15.3
+      HELM_VERSION: << parameters.helm >>
+      K8S_VERSION: << parameters.k8s >>
       KUBECONFIG: /home/circleci/.kube/config
       MINIKUBE_VERSION: v1.4.0
       MINIKUBE_WANTUPDATENOTIFICATION: false
