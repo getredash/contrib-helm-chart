@@ -131,7 +131,7 @@ jobs:
       image: circleci/classic:201808-01
 
     environment:
-      HELM_VERSION: v2.16.1
+      HELM_VERSION: v3.1.0
       GITHUB_PAGES_BRANCH: gh-pages
 
     working_directory: ~/redash
@@ -163,7 +163,6 @@ jobs:
       - run:
           name: Package chart and update chart index
           command: |
-            helm init --client-only
             helm package --destination /tmp/helm/publish --dependency-update .
             helm repo index /tmp/helm/publish
 
