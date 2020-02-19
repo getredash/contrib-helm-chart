@@ -1,9 +1,9 @@
 dependencies:
-- name: redis
-  version: "^5.0.0"
-  repository: "@stable"
-  condition: redis.enabled
-- name: postgresql
-  version: "^3.0.0"
-  repository: "@stable"
-  condition: postgresql.enabled
+  - name: redis
+    version: "^10.5.3"
+    repository: "@stable"
+    condition: redis.enabled
+  - name: postgresql
+    version: "^8.3.4"
+    repository: "@stable"
+    condition: postgresql.enabled
