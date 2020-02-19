@@ -191,11 +191,26 @@ workflows:
           name: h2k17
           helm: v2.16.3
           k8s: v1.17.3
+      - test:
+          name: h3k15
+          helm: v3.1.0
+          k8s: v1.15.10
+      - test:
+          name: h3k16
+          helm: v3.1.0
+          k8s: v1.16.7
+      - test:
+          name: h3k17
+          helm: v3.1.0
+          k8s: v1.17.3
       - publish:
           requires:
             - h2k15
             - h2k16
             - h2k17
+            - h3k15
+            - h3k16
+            - h3k17
           filters:
             branches:
               only: master
