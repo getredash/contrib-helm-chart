@@ -61,18 +61,29 @@ Create a default fully qualified redis name.
 {{- end -}}
 
 {{/*
+Get the secret name.
+*/}}
+{{- define "redash.secretName" -}}
+{{- if .Values.server.existingSecret }}
+    {{- printf "%s" .Values.server.existingSecret -}}
+{{- else -}}
+    {{- printf "%s" (include "redash.fullname" .) -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
 Shared environment block used across each component.
 */}}
 {{- define "redash.env" -}}
 - name: REDASH_SECRET_KEY
   valueFrom:
     secretKeyRef:
-      name: {{ include "redash.fullname" . }}
+      name: {{ include "redash.secretName" . }}
       key: secretKey
 - name: REDASH_COOKIE_SECRET
   valueFrom:
     secretKeyRef:
-      name: {{ include "redash.fullname" . }}
+      name: {{ include "redash.secretName" . }}
       key: cookieSecret
 {{- if not .Values.postgresql.enabled }}
 - name: REDASH_DATABASE_URL
