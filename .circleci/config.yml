@@ -94,6 +94,10 @@ jobs:
       - run:
           name: Install chart dependencies
           command: |
+            # Need to add stable repo for Helm v3+
+            if [[ $HELM_VERSION != v2* ]]; then
+              helm repo add stable https://kubernetes-charts.storage.googleapis.com
+            fi
             helm dependency build .
 
       - run:
@@ -163,6 +167,7 @@ jobs:
       - run:
           name: Package chart and update chart index
           command: |
+            helm repo add stable https://kubernetes-charts.storage.googleapis.com
             helm package --destination /tmp/helm/publish --dependency-update .
             helm repo index /tmp/helm/publish
 
