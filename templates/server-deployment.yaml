@@ -24,22 +24,6 @@ spec:
       serviceAccountName: {{ include "redash.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
-      initContainers:
-        - name: {{ include "redash.name" . }}-server-createdb
-          securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
-          command: ["bash", "/config/createdb.sh"]
-          volumeMounts:
-            - name: config
-              mountPath: /config
-          env:
-          {{- include "redash.env" . | nindent 12 }}
-          {{- range $key, $value := .Values.server.env }}
-            - name: "{{ $key }}"
-              value: "{{ $value }}"
-          {{- end }}
       containers:
         - name: {{ include "redash.name" . }}-server
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"

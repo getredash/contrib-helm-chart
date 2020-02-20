@@ -2,16 +2,11 @@
 
 [Redash](http://redash.io/) is an open source tool built for teams to query, visualize and collaborate. Redash is quick to setup and works with any data source you might need so you can query from anywhere in no time.
 
-## TL;DR
-
-```bash
-$ helm repo add redash https://getredash.github.io/contrib-helm-chart/
-$ helm install redash/redash
-```
-
 ## Introduction
 
 This chart bootstraps a [Redash](https://github.com/getredash/redash) deployment on a [Kubernetes](http://kubernetes.io) cluster using the [Helm](https://helm.sh) package manager.
+
+This is a contributed project developed by volunteers and not officially supported by Redash.
 
 ## Prerequisites
 
@@ -22,14 +17,31 @@ This chart bootstraps a [Redash](https://github.com/getredash/redash) deployment
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release`:
+To install the chart with the release name `my-release`, add the chart repository:
 
 ```bash
 $ helm repo add redash https://getredash.github.io/contrib-helm-chart/
-$ helm install --name my-release redash/redash
 ```
 
-The command deploys Redash on the Kubernetes cluster in the default configuration. The [configuration](#configuration) section lists the parameters that can be configured during installation.
+Create a values file with required secrets (store this securely!):
+
+```bash
+$ cat > my-values.yaml \<<- EOM
+server:
+  cookieSecret: $(openssl rand -base64 32)
+  secretKey: $(openssl rand -base64 32)
+postgresql:
+  postgresqlPassword: $(openssl rand -base64 32)
+EOM
+```
+
+Install the chart:
+
+```bash
+$ helm upgrade --install -f my-values.yaml my-release redash/redash
+```
+
+The command deploys Redash on the Kubernetes cluster in the default configuration. The [configuration](#configuration) section and and default [values.yaml](values.yaml) lists the parameters that can be configured during installation.
 
 > **Tip**: List all releases using `helm list`
 
@@ -99,28 +111,25 @@ The following table lists the configurable parameters of the Redash chart and th
 | `redis.name`                           | Name used for Redis deployment                                                                                                                                                                                                                                                                                                                           | `redis`                                             |
 | `redis.redisPassword`                  | Redis Password to use                                                                                                                                                                                                                                                                                                                                    | random 10 character long alphanumeric string        |
 
-Specify each parameter using the `--set key=value[,key=value]` argument to `helm install`. For example,
-
-```bash
-$ helm install --name my-release \
-  --set cookieSecret=verysecret \
-    stable/redash
-```
-
-The above command sets the Redash cookie secret to `verysecret`.
-
-Alternatively, a YAML file that specifies the values for the parameters can be provided while installing the chart. For example,
-
-```bash
-$ helm install --name my-release -f values.yaml stable/redash
-```
-
-> **Tip**: You can use the default [values.yaml](values.yaml)
-
 ## Upgrading
+
+- See [the changelog](CHANGELOG.md) for major changes in each release
+- The project will use the [semver specification](http://semver.org) for chart version numbers (chart versions will not match Redash versions, since we may need to update the chart more than once for the same Redash release)
+- Always back up your database before upgrading!
+- Schema migrations will be run automatically after each upgrade
+
+To upgrade a release named `my-release`:
+
+```bash
+helm repo update
+helm upgrade --reuse-values my-release redash/redash
+```
+
+Below are notes on manual configuration changes or steps needed for major chart version updates.
 
 ### From pre-release to 1.x
 
+- The values.yaml structure has several changes
 - The Redash, PostgreSQL and Redis versions have all been updated
-- Due to PostgreSQL major version upgrade you will likely need to dump the database and reload it into a fresh install
+- Due to these changes you will likely need to dump the database and reload it into a fresh install
 - The chart now has it's own repo: https://getredash.github.io/contrib-helm-chart/

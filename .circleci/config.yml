@@ -17,6 +17,7 @@ jobs:
     environment:
       HELM_VERSION: << parameters.helm >>
       K8S_VERSION: << parameters.k8s >>
+      REDASH_UPGRADE_SOURCE: 7.0.0.b18042
       KUBECONFIG: /home/circleci/.kube/config
       MINIKUBE_VERSION: v1.7.2
       MINIKUBE_WANTUPDATENOTIFICATION: false
@@ -101,40 +102,41 @@ jobs:
             helm dependency build .
 
       - run:
+          name: Generate test configuration
+          command: |
+            cat > test-values.yaml \<<- EOM
+            server:
+              cookieSecret: $(openssl rand -base64 32)
+              secretKey: $(openssl rand -base64 32)
+            postgresql:
+              postgresqlPassword: $(openssl rand -base64 32)
+            EOM
+
+      - run:
           name: Install chart
           command: |
-            # Helm 3 doesn't use name flag.
-            NAME=""
-            if [[ $HELM_VERSION == v2* ]]; then
-              NAME="--name"
-            fi
-            helm install \
-                ${NAME} redash \
-                . \
-                --wait \
+            helm upgrade --install redash . --wait -f test-values.yaml \
                 || \
                 (
                   # In case of error, try to display some debug logs
                   kubectl get all
-                  export POD_NAME=$(kubectl get pods --namespace default -l "app.kubernetes.io/name=redash,app.kubernetes.io/instance=redash" -o jsonpath="{.items[0].metadata.name}")
                   echo "INSTALL LOGS"
-                  echo "############"
-                  kubectl logs --tail=40 -c redash-server-createdb "${POD_NAME}"
+                  kubectl logs --tail=40 -l "app.kubernetes.io/instance=redash,job-name=redash-install"
                   echo "SERVER LOGS"
-                  echo "###########"
-                  kubectl logs --tail=20 "${POD_NAME}"
+                  kubectl logs --tail=20 -l "app.kubernetes.io/instance=redash,app.kubernetes.io/component=server"
                 )
-            helm status redash
+            helm test --cleanup redash
+            helm delete redash
 
       - run:
-          name: Smoke test
+          name: Test chart upgrade
           command: |
-            # TODO: Look into moving this into helm test and reusing offical front-end tests
-            export POD_NAME=$(kubectl get pods --namespace default -l "app.kubernetes.io/name=redash,app.kubernetes.io/instance=redash" -o jsonpath="{.items[0].metadata.name}")
-            kubectl port-forward "${POD_NAME}" 8080:5000 &
-            sleep 1
-            curl -sL http://127.0.0.1:8080 | fgrep 'Welcome to Redash'
-            kill $(jobs -pr)
+            helm upgrade --install redashup . --wait --set image.tag="${REDASH_UPGRADE_SOURCE}" -f test-values.yaml
+            kubectl get pod -l "app.kubernetes.io/instance=redashup,app.kubernetes.io/component=server" -o jsonpath="{..image}" | fgrep "${REDASH_UPGRADE_SOURCE}"
+            helm test --cleanup redashup
+            helm upgrade --install redashup . --wait --reset-values -f test-values.yaml
+            kubectl get pod -l "app.kubernetes.io/instance=redashup,app.kubernetes.io/component=server" -o jsonpath="{..image}" | fgrep -v "${REDASH_UPGRADE_SOURCE}"
+            helm test --cleanup redashup
 
   publish:
     machine:

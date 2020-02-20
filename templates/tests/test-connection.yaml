@@ -10,6 +10,6 @@ spec:
   containers:
     - name: wget
       image: busybox
-      command: ['wget']
-      args: ['{{ include "redash.fullname" . }}:{{ .Values.service.port }}']
+      command: ['sh']
+      args: ['-c', 'wget -O- "{{ include "redash.fullname" . }}:{{ .Values.service.port }}" | fgrep "Welcome to Redash"']
   restartPolicy: Never
