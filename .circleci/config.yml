@@ -134,7 +134,7 @@ jobs:
             helm upgrade --install redashup . --wait --set image.tag="${REDASH_UPGRADE_SOURCE}" -f test-values.yaml
             kubectl get pod -l "app.kubernetes.io/instance=redashup,app.kubernetes.io/component=server" -o jsonpath="{..image}" | fgrep "${REDASH_UPGRADE_SOURCE}"
             helm test redashup
-            kubectl delete pod redashup-redash-test-connection
+            kubectl delete pod redashup-redash-test-connection || true
             helm upgrade --install redashup . --wait --reset-values -f test-values.yaml
             kubectl get pod -l "app.kubernetes.io/instance=redashup,app.kubernetes.io/component=server" -o jsonpath="{..image}" | fgrep -v "${REDASH_UPGRADE_SOURCE}"
             helm test redashup
