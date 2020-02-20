@@ -197,9 +197,9 @@ postgresql:
   ## To use an external PostgreSQL set this to false and configure the externalPostgreSQL parameter.
   enabled: true
   image:
-    ## Bitnami supported version closest to the one specified in Redash docker-compose.yml
+    ## Bitnami supported version closest to the one specified in Redash setup repo docker-compose.yml
     ##
-    tag: "9.6.11-debian-9-r66"
+    tag: "9.6.17-debian-10-r3"
   postgresqlUsername: redash
   ## If the password is not specified, a random password will be generated
   ##
