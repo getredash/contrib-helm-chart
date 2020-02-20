@@ -4,6 +4,7 @@ metadata:
   name: "{{ .Release.Name }}-upgrade"
   labels:
     {{- include "redash.labels" . | nindent 4 }}
+    app.kubernetes.io/component: upgrade
   annotations:
     # This is what defines this resource as a hook.
     "helm.sh/hook": post-upgrade

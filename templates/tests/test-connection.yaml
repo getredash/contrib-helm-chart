@@ -4,6 +4,7 @@ metadata:
   name: "{{ include "redash.fullname" . }}-test-connection"
   labels:
     {{- include "redash.labels" . | nindent 4 }}
+    app.kubernetes.io/component: test-connection
   annotations:
     "helm.sh/hook": test-success
 spec:

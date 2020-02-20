@@ -4,6 +4,7 @@ metadata:
   name: "{{ .Release.Name }}-install"
   labels:
     {{- include "redash.labels" . | nindent 4 }}
+    app.kubernetes.io/component: install
   annotations:
     # This is what defines this resource as a hook.
     "helm.sh/hook": post-install
