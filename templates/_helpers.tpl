@@ -159,3 +159,6 @@ Create the name of the service account to use
     {{ default "default" .Values.serviceAccount.name }}
 {{- end -}}
 {{- end -}}
+
+# This ensures a random value is provided for postgresqlPassword:
+required "A secure random value for .postgresql.postgresqlPassword is required" .Values.postgresql.postgresqlPassword
