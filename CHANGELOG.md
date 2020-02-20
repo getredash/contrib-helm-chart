@@ -7,6 +7,7 @@
 - Extended CI testing for multiple k8s and Helm versions
 - Extended CI testing for testing major version upgrades
 - Moved install and upgrade logic to Helm hooks
+- Added basic connectivity test hook for `helm test`
 
 ## 1.2.0
 
