@@ -125,7 +125,7 @@ jobs:
                   echo "SERVER LOGS"
                   kubectl logs --tail=20 -l "app.kubernetes.io/instance=redash,app.kubernetes.io/component=server"
                 )
-            helm test --cleanup redash
+            helm test redash
             helm delete redash
 
       - run:
@@ -133,10 +133,11 @@ jobs:
           command: |
             helm upgrade --install redashup . --wait --set image.tag="${REDASH_UPGRADE_SOURCE}" -f test-values.yaml
             kubectl get pod -l "app.kubernetes.io/instance=redashup,app.kubernetes.io/component=server" -o jsonpath="{..image}" | fgrep "${REDASH_UPGRADE_SOURCE}"
-            helm test --cleanup redashup
+            helm test redashup
+            kubectl delete pod redashup-redash-test-connection
             helm upgrade --install redashup . --wait --reset-values -f test-values.yaml
             kubectl get pod -l "app.kubernetes.io/instance=redashup,app.kubernetes.io/component=server" -o jsonpath="{..image}" | fgrep -v "${REDASH_UPGRADE_SOURCE}"
-            helm test --cleanup redashup
+            helm test redashup
 
   publish:
     machine:
