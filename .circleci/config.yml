@@ -136,11 +136,17 @@ jobs:
           when: on_fail
           command: |
             # In case of error, try to display some resource usage and debug logs
-            kubectl top node || kubectl top pod -A || kubectl get all -A || true
-            echo "TEST LOGS" || kubectl logs --tail=20 -l "app.kubernetes.io/instance=redashup,app.kubernetes.io/component=test-connection" || true
-            echo "INSTALL LOGS" || kubectl logs --tail=40 -l "app.kubernetes.io/instance=redash,job-name=redash-install" || true
-            echo "SERVER LOGS" || kubectl logs --tail=20 -l "app.kubernetes.io/instance=redash,app.kubernetes.io/component=server" || true
-            echo "MINIKUBE LOGS" || minikube logs -n10
+            kubectl top node || true
+            kubectl top pod -A || true
+            kubectl get all -A || true
+            echo "TEST LOGS"
+            kubectl logs --tail=20 -l "app.kubernetes.io/instance=redashup,app.kubernetes.io/component=test-connection" || true
+            echo "INSTALL LOGS"
+            kubectl logs --tail=40 -l "app.kubernetes.io/instance=redash,job-name=redash-install" || true
+            echo "SERVER LOGS"
+            kubectl logs --tail=20 -l "app.kubernetes.io/instance=redash,app.kubernetes.io/component=server" || true
+            echo "MINIKUBE LOGS"
+            minikube logs -n10 || true
 
   publish:
     machine:
