@@ -1,7 +1,8 @@
 # Changelog
 
-## 1.3.0
+## 2.0.0
 
+- Made secrets required, rather than auto-generating to avoid them [changing on upgrade](https://github.com/helm/charts/issues/5167)
 - Variable additions and template updates to bring in line with Helm 3 chart template
 - Add support for external secrets
 - Extended CI testing for multiple k8s and Helm versions
