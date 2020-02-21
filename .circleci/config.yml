@@ -116,7 +116,7 @@ jobs:
       - run:
           name: Install chart
           command: |
-            helm upgrade --install redash . --wait -f test-values.yaml \
+            helm upgrade --install redash . --wait -f test-values.yaml
             helm test redash
             helm delete redash
 
