@@ -117,15 +117,6 @@ jobs:
           name: Install chart
           command: |
             helm upgrade --install redash . --wait -f test-values.yaml \
-                || \
-                (
-                  # In case of error, try to display some resource usage and debug logs
-                  kubectl top node || kubectl top pod -A || kubectl get all -A || true
-                  echo "INSTALL LOGS" || kubectl logs --tail=40 -l "app.kubernetes.io/instance=redash,job-name=redash-install" || true
-                  echo "SERVER LOGS" || kubectl logs --tail=20 -l "app.kubernetes.io/instance=redash,app.kubernetes.io/component=server" || true
-                  echo "MINIKUBE LOGS" || minikube logs -n10
-                  exit 1
-                )
             helm test redash
             helm delete redash
 
@@ -139,6 +130,17 @@ jobs:
             helm upgrade --install redashup . --wait --reset-values -f test-values.yaml
             kubectl get pod -l "app.kubernetes.io/instance=redashup,app.kubernetes.io/component=server" -o jsonpath="{..image}"
             helm test redashup
+
+      - run:
+          name: Debug outout
+          when: on_fail
+          command: |
+            # In case of error, try to display some resource usage and debug logs
+            kubectl top node || kubectl top pod -A || kubectl get all -A || true
+            echo "TEST LOGS" || kubectl logs --tail=20 -l "app.kubernetes.io/instance=redashup,app.kubernetes.io/component=test-connection" || true
+            echo "INSTALL LOGS" || kubectl logs --tail=40 -l "app.kubernetes.io/instance=redash,job-name=redash-install" || true
+            echo "SERVER LOGS" || kubectl logs --tail=20 -l "app.kubernetes.io/instance=redash,app.kubernetes.io/component=server" || true
+            echo "MINIKUBE LOGS" || minikube logs -n10
 
   publish:
     machine:
