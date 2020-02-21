@@ -105,18 +105,28 @@ jobs:
       - run:
           name: Generate test configuration
           command: |
+            # As well a setting secrets we also reduce resource usage a bit by dropping the worker count.
             cat > test-values.yaml \<<- EOM
             server:
               cookieSecret: $(openssl rand -base64 32)
               secretKey: $(openssl rand -base64 32)
+              env:
+                REDASH_WEB_WORKERS: 1
             postgresql:
               postgresqlPassword: $(openssl rand -base64 32)
+            adhocWorker:
+              env:
+                WORKERS_COUNT: 1
+            scheduledWorker:
+              env:
+                WORKERS_COUNT: 1
             EOM
 
       - run:
           name: Install chart
           command: |
             helm upgrade --install redash . --wait -f test-values.yaml
+            sleep 10
             helm test redash
             helm delete redash
 
@@ -125,10 +135,12 @@ jobs:
           command: |
             helm upgrade --install redashup . --wait --set image.tag="${REDASH_UPGRADE_SOURCE}" -f test-values.yaml
             kubectl get pod -l "app.kubernetes.io/instance=redashup,app.kubernetes.io/component=server" -o jsonpath="{..image}"
+            sleep 10
             helm test redashup
             kubectl delete pod -l "app.kubernetes.io/instance=redashup,app.kubernetes.io/component=test-connection"
             helm upgrade --install redashup . --wait --reset-values -f test-values.yaml
             kubectl get pod -l "app.kubernetes.io/instance=redashup,app.kubernetes.io/component=server" -o jsonpath="{..image}"
+            sleep 10
             helm test redashup
 
       - run:
