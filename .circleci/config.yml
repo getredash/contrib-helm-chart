@@ -118,12 +118,10 @@ jobs:
             helm upgrade --install redash . --wait -f test-values.yaml \
                 || \
                 (
-                  # In case of error, try to display some debug logs
-                  kubectl get all
-                  echo "INSTALL LOGS"
-                  kubectl logs --tail=40 -l "app.kubernetes.io/instance=redash,job-name=redash-install"
-                  echo "SERVER LOGS"
-                  kubectl logs --tail=20 -l "app.kubernetes.io/instance=redash,app.kubernetes.io/component=server"
+                  # In case of error, try to display some resource usage and debug logs
+                  kubectl top node; kubectl top pod -A; kubectl get all -A
+                  echo "INSTALL LOGS"; kubectl logs --tail=40 -l "app.kubernetes.io/instance=redash,job-name=redash-install"
+                  echo "SERVER LOGS"; kubectl logs --tail=20 -l "app.kubernetes.io/instance=redash,app.kubernetes.io/component=server"
                 )
             helm test redash
             helm delete redash
