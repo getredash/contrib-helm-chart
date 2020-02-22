@@ -34,6 +34,363 @@ spec:
             - name: config
               mountPath: /config
           env:
+            ## Start primary Redash configuration
+            {{- if .Values.server.secretKey }}
+            - name: REDASH_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "redash.secretName" . }}
+                  key: secretKey
+            {{- end }}
+            {{- if .Values.server.proxiesCount }}
+            - name: REDASH_PROXIES_COUNT
+              value: {{ default  .Values.server.proxiesCount | quote }}
+            {{- end }}
+            {{- if .Values.server.statsdHost }}
+            - name: REDASH_STATSD_HOST
+              value: {{ default  .Values.server.statsdHost | quote }}
+            {{- end }}
+            {{- if .Values.server.statsdPort }}
+            - name: REDASH_STATSD_PORT
+              value: {{ default  .Values.server.statsdPort | quote }}
+            {{- end }}
+            {{- if .Values.server.statsdPrefix }}
+            - name: REDASH_STATSD_PREFIX
+              value: {{ default  .Values.server.statsdPrefix | quote }}
+            {{- end }}
+            {{- if .Values.server.statsdUseTags }}
+            - name: REDASH_STATSD_USE_TAGS
+              value: {{ default  .Values.server.statsdUseTags | quote }}
+            {{- end }}
+            {{- if .Values.server.celeryBroker }}
+            - name: REDASH_CELERY_BROKER
+              value: {{ default  .Values.server.celeryBroker | quote }}
+            {{- end }}
+            {{- if .Values.server.celeryBackend }}
+            - name: REDASH_CELERY_BACKEND
+              value: {{ default  .Values.server.celeryBackend | quote }}
+            {{- end }}
+            {{- if .Values.server.celeryTaskResultExpires }}
+            - name: REDASH_CELERY_TASK_RESULT_EXPIRES
+              value: {{ default  .Values.server.celeryTaskResultExpires | quote }}
+            {{- end }}
+            {{- if .Values.server.queryResultsCleanupEnabled }}
+            - name: REDASH_QUERY_RESULTS_CLEANUP_ENABLED
+              value: {{ default  .Values.server.queryResultsCleanupEnabled | quote }}
+            {{- end }}
+            {{- if .Values.server.queryResultsCleanupCount }}
+            - name: REDASH_QUERY_RESULTS_CLEANUP_COUNT
+              value: {{ default  .Values.server.queryResultsCleanupCount | quote }}
+            {{- end }}
+            {{- if .Values.server.queryResultsCleanupMaxAge }}
+            - name: REDASH_QUERY_RESULTS_CLEANUP_MAX_AGE
+              value: {{ default  .Values.server.queryResultsCleanupMaxAge | quote }}
+            {{- end }}
+            {{- if .Values.server.schemasRefreshQueue }}
+            - name: REDASH_SCHEMAS_REFRESH_QUEUE
+              value: {{ default  .Values.server.schemasRefreshQueue | quote }}
+            {{- end }}
+            {{- if .Values.server.schemasRefreshSchedule }}
+            - name: REDASH_SCHEMAS_REFRESH_SCHEDULE
+              value: {{ default  .Values.server.schemasRefreshSchedule | quote }}
+            {{- end }}
+            {{- if .Values.server.authType }}
+            - name: REDASH_AUTH_TYPE
+              value: {{ default  .Values.server.authType | quote }}
+            {{- end }}
+            {{- if .Values.server.enforceHttps }}
+            - name: REDASH_ENFORCE_HTTPS
+              value: {{ default  .Values.server.enforceHttps | quote }}
+            {{- end }}
+            {{- if .Values.server.invitationTokenMaxAge }}
+            - name: REDASH_INVITATION_TOKEN_MAX_AGE
+              value: {{ default  .Values.server.invitationTokenMaxAge | quote }}
+            {{- end }}
+            {{- if .Values.server.multiOrg }}
+            - name: REDASH_MULTI_ORG
+              value: {{ default  .Values.server.multiOrg | quote }}
+            {{- end }}
+            {{- if .Values.server.googleClientId }}
+            - name: REDASH_GOOGLE_CLIENT_ID
+              value: {{ default  .Values.server.googleClientId | quote }}
+            {{- end }}
+            {{- if .Values.server.googleClientSecret }}
+            - name: REDASH_GOOGLE_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "redash.secretName" . }}
+                  key: googleClientSecret
+            {{- end }}
+            {{- if .Values.server.remoteUserLoginEnabled }}
+            - name: REDASH_REMOTE_USER_LOGIN_ENABLED
+              value: {{ default  .Values.server.remoteUserLoginEnabled | quote }}
+            {{- end }}
+            {{- if .Values.server.remoteUserHeader }}
+            - name: REDASH_REMOTE_USER_HEADER
+              value: {{ default  .Values.server.remoteUserHeader | quote }}
+            {{- end }}
+            {{- if .Values.server.ldapLoginEnabled }}
+            - name: REDASH_LDAP_LOGIN_ENABLED
+              value: {{ default  .Values.server.ldapLoginEnabled | quote }}
+            {{- end }}
+            {{- if .Values.server.ldapUrl }}
+            - name: REDASH_LDAP_URL
+              value: {{ default  .Values.server.ldapUrl | quote }}
+            {{- end }}
+            {{- if .Values.server.ldapBindDn }}
+            - name: REDASH_LDAP_BIND_DN
+              value: {{ default  .Values.server.ldapBindDn | quote }}
+            {{- end }}
+            {{- if .Values.server.ldapBindDnPassword }}
+            - name: REDASH_LDAP_BIND_DN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "redash.secretName" . }}
+                  key: ldapBindDnPassword
+            {{- end }}
+            {{- if .Values.server.ldapDisplayNameKey }}
+            - name: REDASH_LDAP_DISPLAY_NAME_KEY
+              value: {{ default  .Values.server.ldapDisplayNameKey | quote }}
+            {{- end }}
+            {{- if .Values.server.ldapEmailKey }}
+            - name: REDASH_LDAP_EMAIL_KEY
+              value: {{ default  .Values.server.ldapEmailKey | quote }}
+            {{- end }}
+            {{- if .Values.server.ldapCustomUsernamePrompt }}
+            - name: REDASH_LDAP_CUSTOM_USERNAME_PROMPT
+              value: {{ default  .Values.server.ldapCustomUsernamePrompt | quote }}
+            {{- end }}
+            {{- if .Values.server.ldapSearchTemplate }}
+            - name: REDASH_LDAP_SEARCH_TEMPLATE
+              value: {{ default  .Values.server.ldapSearchTemplate | quote }}
+            {{- end }}
+            {{- if .Values.server.ldapSearchDn }}
+            - name: REDASH_LDAP_SEARCH_DN
+              value: {{ default  .Values.server.ldapSearchDn | quote }}
+            {{- end }}
+            {{- if .Values.server.staticAssetsPath }}
+            - name: REDASH_STATIC_ASSETS_PATH
+              value: {{ default  .Values.server.staticAssetsPath | quote }}
+            {{- end }}
+            {{- if .Values.server.jobExpiryTime }}
+            - name: REDASH_JOB_EXPIRY_TIME
+              value: {{ default  .Values.server.jobExpiryTime | quote }}
+            {{- end }}
+            {{- if .Values.server.cookieSecret }}
+            - name: REDASH_COOKIE_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "redash.secretName" . }}
+                  key: cookieSecret
+            {{- end }}
+            {{- if .Values.server.logLevel }}
+            - name: REDASH_LOG_LEVEL
+              value: {{ default  .Values.server.logLevel | quote }}
+            {{- end }}
+            {{- if .Values.server.mailServer }}
+            - name: REDASH_MAIL_SERVER
+              value: {{ default  .Values.server.mailServer | quote }}
+            {{- end }}
+            {{- if .Values.server.mailPort }}
+            - name: REDASH_MAIL_PORT
+              value: {{ default  .Values.server.mailPort | quote }}
+            {{- end }}
+            {{- if .Values.server.mailUseTls }}
+            - name: REDASH_MAIL_USE_TLS
+              value: {{ default  .Values.server.mailUseTls | quote }}
+            {{- end }}
+            {{- if .Values.server.mailUseSsl }}
+            - name: REDASH_MAIL_USE_SSL
+              value: {{ default  .Values.server.mailUseSsl | quote }}
+            {{- end }}
+            {{- if .Values.server.mailUsername }}
+            - name: REDASH_MAIL_USERNAME
+              value: {{ default  .Values.server.mailUsername | quote }}
+            {{- end }}
+            {{- if .Values.server.mailPassword }}
+            - name: REDASH_MAIL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "redash.secretName" . }}
+                  key: mailPassword
+            {{- end }}
+            {{- if .Values.server.mailDefaultSender }}
+            - name: REDASH_MAIL_DEFAULT_SENDER
+              value: {{ default  .Values.server.mailDefaultSender | quote }}
+            {{- end }}
+            {{- if .Values.server.mailMaxEmails }}
+            - name: REDASH_MAIL_MAX_EMAILS
+              value: {{ default  .Values.server.mailMaxEmails | quote }}
+            {{- end }}
+            {{- if .Values.server.mailAsciiAttachments }}
+            - name: REDASH_MAIL_ASCII_ATTACHMENTS
+              value: {{ default  .Values.server.mailAsciiAttachments | quote }}
+            {{- end }}
+            {{- if .Values.server.host }}
+            - name: REDASH_HOST
+              value: {{ default  .Values.server.host | quote }}
+            {{- end }}
+            {{- if .Values.server.alertsDefaultMailSubjectTemplate }}
+            - name: REDASH_ALERTS_DEFAULT_MAIL_SUBJECT_TEMPLATE
+              value: {{ default  .Values.server.alertsDefaultMailSubjectTemplate | quote }}
+            {{- end }}
+            {{- if .Values.server.throttleLoginPattern }}
+            - name: REDASH_THROTTLE_LOGIN_PATTERN
+              value: {{ default  .Values.server.throttleLoginPattern | quote }}
+            {{- end }}
+            {{- if .Values.server.limiterStorage }}
+            - name: REDASH_LIMITER_STORAGE
+              value: {{ default  .Values.server.limiterStorage | quote }}
+            {{- end }}
+            {{- if .Values.server.corsAccessControlAllowOrigin }}
+            - name: REDASH_CORS_ACCESS_CONTROL_ALLOW_ORIGIN
+              value: {{ default  .Values.server.corsAccessControlAllowOrigin | quote }}
+            {{- end }}
+            {{- if .Values.server.corsAccessControlAllowCredentials }}
+            - name: REDASH_CORS_ACCESS_CONTROL_ALLOW_CREDENTIALS
+              value: {{ default  .Values.server.corsAccessControlAllowCredentials | quote }}
+            {{- end }}
+            {{- if .Values.server.corsAccessControlRequestMethod }}
+            - name: REDASH_CORS_ACCESS_CONTROL_REQUEST_METHOD
+              value: {{ default  .Values.server.corsAccessControlRequestMethod | quote }}
+            {{- end }}
+            {{- if .Values.server.corsAccessControlAllowHeaders }}
+            - name: REDASH_CORS_ACCESS_CONTROL_ALLOW_HEADERS
+              value: {{ default  .Values.server.corsAccessControlAllowHeaders | quote }}
+            {{- end }}
+            {{- if .Values.server.enabledQueryRunners }}
+            - name: REDASH_ENABLED_QUERY_RUNNERS
+              value: {{ default  .Values.server.enabledQueryRunners | quote }}
+            {{- end }}
+            {{- if .Values.server.additionalQueryRunners }}
+            - name: REDASH_ADDITIONAL_QUERY_RUNNERS
+              value: {{ default  .Values.server.additionalQueryRunners | quote }}
+            {{- end }}
+            {{- if .Values.server.disabledQueryRunners }}
+            - name: REDASH_DISABLED_QUERY_RUNNERS
+              value: {{ default  .Values.server.disabledQueryRunners | quote }}
+            {{- end }}
+            {{- if .Values.server.adhocQueryTimeLimit }}
+            - name: REDASH_ADHOC_QUERY_TIME_LIMIT
+              value: {{ default  .Values.server.adhocQueryTimeLimit | quote }}
+            {{- end }}
+            {{- if .Values.server.enabledDestinations }}
+            - name: REDASH_ENABLED_DESTINATIONS
+              value: {{ default  .Values.server.enabledDestinations | quote }}
+            {{- end }}
+            {{- if .Values.server.additionalDestinations }}
+            - name: REDASH_ADDITIONAL_DESTINATIONS
+              value: {{ default  .Values.server.additionalDestinations | quote }}
+            {{- end }}
+            {{- if .Values.server.eventReportingWebhooks }}
+            - name: REDASH_EVENT_REPORTING_WEBHOOKS
+              value: {{ default  .Values.server.eventReportingWebhooks | quote }}
+            {{- end }}
+            {{- if .Values.server.sentryDsn }}
+            - name: REDASH_SENTRY_DSN
+              value: {{ default  .Values.server.sentryDsn | quote }}
+            {{- end }}
+            {{- if .Values.server.allowScriptsInUserInput }}
+            - name: REDASH_ALLOW_SCRIPTS_IN_USER_INPUT
+              value: {{ default  .Values.server.allowScriptsInUserInput | quote }}
+            {{- end }}
+            {{- if .Values.server.dashboardRefreshIntervals }}
+            - name: REDASH_DASHBOARD_REFRESH_INTERVALS
+              value: {{ default  .Values.server.dashboardRefreshIntervals | quote }}
+            {{- end }}
+            {{- if .Values.server.queryRefreshIntervals }}
+            - name: REDASH_QUERY_REFRESH_INTERVALS
+              value: {{ default  .Values.server.queryRefreshIntervals | quote }}
+            {{- end }}
+            {{- if .Values.server.passwordLoginEnabled }}
+            - name: REDASH_PASSWORD_LOGIN_ENABLED
+              value: {{ default  .Values.server.passwordLoginEnabled | quote }}
+            {{- end }}
+            {{- if .Values.server.samlMetadataUrl }}
+            - name: REDASH_SAML_METADATA_URL
+              value: {{ default  .Values.server.samlMetadataUrl | quote }}
+            {{- end }}
+            {{- if .Values.server.samlEntityId }}
+            - name: REDASH_SAML_ENTITY_ID
+              value: {{ default  .Values.server.samlEntityId | quote }}
+            {{- end }}
+            {{- if .Values.server.samlNameidFormat }}
+            - name: REDASH_SAML_NAMEID_FORMAT
+              value: {{ default  .Values.server.samlNameidFormat | quote }}
+            {{- end }}
+            {{- if .Values.server.dateFormat }}
+            - name: REDASH_DATE_FORMAT
+              value: {{ default  .Values.server.dateFormat | quote }}
+            {{- end }}
+            {{- if .Values.server.jwtLoginEnabled }}
+            - name: REDASH_JWT_LOGIN_ENABLED
+              value: {{ default  .Values.server.jwtLoginEnabled | quote }}
+            {{- end }}
+            {{- if .Values.server.jwtAuthIssuer }}
+            - name: REDASH_JWT_AUTH_ISSUER
+              value: {{ default  .Values.server.jwtAuthIssuer | quote }}
+            {{- end }}
+            {{- if .Values.server.jwtAuthPublicCertsUrl }}
+            - name: REDASH_JWT_AUTH_PUBLIC_CERTS_URL
+              value: {{ default  .Values.server.jwtAuthPublicCertsUrl | quote }}
+            {{- end }}
+            {{- if .Values.server.jwtAuthAudience }}
+            - name: REDASH_JWT_AUTH_AUDIENCE
+              value: {{ default  .Values.server.jwtAuthAudience | quote }}
+            {{- end }}
+            {{- if .Values.server.jwtAuthAlgorithms }}
+            - name: REDASH_JWT_AUTH_ALGORITHMS
+              value: {{ default  .Values.server.jwtAuthAlgorithms | quote }}
+            {{- end }}
+            {{- if .Values.server.jwtAuthCookieName }}
+            - name: REDASH_JWT_AUTH_COOKIE_NAME
+              value: {{ default  .Values.server.jwtAuthCookieName | quote }}
+            {{- end }}
+            {{- if .Values.server.jwtAuthHeaderName }}
+            - name: REDASH_JWT_AUTH_HEADER_NAME
+              value: {{ default  .Values.server.jwtAuthHeaderName | quote }}
+            {{- end }}
+            {{- if .Values.server.featureShowQueryResultsCount }}
+            - name: REDASH_FEATURE_SHOW_QUERY_RESULTS_COUNT
+              value: {{ default  .Values.server.featureShowQueryResultsCount | quote }}
+            {{- end }}
+            {{- if .Values.server.versionCheck }}
+            - name: REDASH_VERSION_CHECK
+              value: {{ default  .Values.server.versionCheck | quote }}
+            {{- end }}
+            {{- if .Values.server.featureDisableRefreshQueries }}
+            - name: REDASH_FEATURE_DISABLE_REFRESH_QUERIES
+              value: {{ default  .Values.server.featureDisableRefreshQueries | quote }}
+            {{- end }}
+            {{- if .Values.server.featureShowPermissionsControl }}
+            - name: REDASH_FEATURE_SHOW_PERMISSIONS_CONTROL
+              value: {{ default  .Values.server.featureShowPermissionsControl | quote }}
+            {{- end }}
+            {{- if .Values.server.featureAllowCustomJsVisualizations }}
+            - name: REDASH_FEATURE_ALLOW_CUSTOM_JS_VISUALIZATIONS
+              value: {{ default  .Values.server.featureAllowCustomJsVisualizations | quote }}
+            {{- end }}
+            {{- if .Values.server.featureDumbRecents }}
+            - name: REDASH_FEATURE_DUMB_RECENTS
+              value: {{ default  .Values.server.featureDumbRecents | quote }}
+            {{- end }}
+            {{- if .Values.server.featureAutoPublishNamedQueries }}
+            - name: REDASH_FEATURE_AUTO_PUBLISH_NAMED_QUERIES
+              value: {{ default  .Values.server.featureAutoPublishNamedQueries | quote }}
+            {{- end }}
+            {{- if .Values.server.bigqueryHttpTimeout }}
+            - name: REDASH_BIGQUERY_HTTP_TIMEOUT
+              value: {{ default  .Values.server.bigqueryHttpTimeout | quote }}
+            {{- end }}
+            {{- if .Values.server.schemaRunTableSizeCalculations }}
+            - name: REDASH_SCHEMA_RUN_TABLE_SIZE_CALCULATIONS
+              value: {{ default  .Values.server.schemaRunTableSizeCalculations | quote }}
+            {{- end }}
+            {{- if .Values.server.webWorkers }}
+            - name: REDASH_WEB_WORKERS
+              value: {{ default  .Values.server.webWorkers | quote }}
+            {{- end }}
+            ## End primary Redash configuration
           {{- include "redash.env" . | nindent 12 }}
           {{- range $key, $value := .Values.server.env }}
             - name: "{{ $key }}"

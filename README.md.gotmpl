@@ -30,7 +30,7 @@ $ helm repo add redash https://getredash.github.io/contrib-helm-chart/
 Create a values file with required secrets (store this securely!):
 
 ```bash
-$ cat > my-values.yaml \<<- EOM
+$ cat > my-values.yaml <<- EOM
 server:
   cookieSecret: $(openssl rand -base64 32)
   secretKey: $(openssl rand -base64 32)
@@ -82,6 +82,11 @@ helm upgrade --reuse-values my-release redash/redash
 ```
 
 Below are notes on manual configuration changes or steps needed for major chart version updates.
+
+### From 1.x to 2.x
+
+- There are 3 required secrets (see above) that must now be specified in your release
+- The server.env is now depreciated (except for non-standard variables such as PYTHON_*) to allow for better management of Redash configuration and secret values - any existing configuration should be migrated to the new values
 
 ### From pre-release to 1.x
 

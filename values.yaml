@@ -15,10 +15,9 @@ imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
-# env --- Redash global envrionment variables - applied to both server and worker containers [ see docs](https://redash.io/help-onpremise/setup/settings-environment-variables.html)
+# env -- Redash global envrionment variables - applied to both server and worker containers.
 env:
   PYTHONUNBUFFERED: 0
-  REDASH_LOG_LEVEL: "INFO"
 
 # serviceAccount -- Service account and security context configuration
 serviceAccount:
@@ -32,22 +31,189 @@ serviceAccount:
 ## Configuration for Redash web server
 ##
 server:
+  ## Start primary Redash configuration
+  # server.secretKey -- REQUIRED `REDASH_SECRET_KEY` value. Defaults to ``. Secret key used for data encryption. Stored as a Secret value.
+  secretKey:
+  # server.proxiesCount -- `REDASH_PROXIES_COUNT` value. Defaults to `1`.
+  proxiesCount:
+  # server.statsdHost -- `REDASH_STATSD_HOST` value. Defaults to `127.0.0.1`.
+  statsdHost:
+  # server.statsdPort -- `REDASH_STATSD_PORT` value. Defaults to `8125`.
+  statsdPort:
+  # server.statsdPrefix -- `REDASH_STATSD_PREFIX` value. Defaults to `redash`.
+  statsdPrefix:
+  # server.statsdUseTags -- `REDASH_STATSD_USE_TAGS` value. Defaults to `false`. Whether to use tags in statsd metrics (influxdb’s format).
+  statsdUseTags:
+  # server.celeryBroker -- `REDASH_CELERY_BROKER` value. Defaults to `REDIS_URL`.
+  celeryBroker:
+  # server.celeryBackend -- `REDASH_CELERY_BACKEND` value. Defaults to `CELERY_BROKER`.
+  celeryBackend:
+  # server.celeryTaskResultExpires -- `REDASH_CELERY_TASK_RESULT_EXPIRES` value. Defaults to `3600 \* 4`. How many seconds to keep celery task results in cache (in seconds).
+  celeryTaskResultExpires:
+  # server.queryResultsCleanupEnabled -- `REDASH_QUERY_RESULTS_CLEANUP_ENABLED` value. Defaults to `true`.
+  queryResultsCleanupEnabled:
+  # server.queryResultsCleanupCount -- `REDASH_QUERY_RESULTS_CLEANUP_COUNT` value. Defaults to `100`.
+  queryResultsCleanupCount:
+  # server.queryResultsCleanupMaxAge -- `REDASH_QUERY_RESULTS_CLEANUP_MAX_AGE` value. Defaults to `7`.
+  queryResultsCleanupMaxAge:
+  # server.schemasRefreshQueue -- `REDASH_SCHEMAS_REFRESH_QUEUE` value. Defaults to `celery`. The celery queue for refreshing the data source schemas.
+  schemasRefreshQueue:
+  # server.schemasRefreshSchedule -- `REDASH_SCHEMAS_REFRESH_SCHEDULE` value. Defaults to `30`. How often to refresh the data sources schemas (in minutes).
+  schemasRefreshSchedule:
+  # server.authType -- `REDASH_AUTH_TYPE` value. Defaults to `api_key`.
+  authType:
+  # server.enforceHttps -- `REDASH_ENFORCE_HTTPS` value. Defaults to `false`.
+  enforceHttps:
+  # server.invitationTokenMaxAge -- `REDASH_INVITATION_TOKEN_MAX_AGE` value. Defaults to `60 _ 60 _ 24 \* 7`.
+  invitationTokenMaxAge:
+  # server.multiOrg -- `REDASH_MULTI_ORG` value. Defaults to `false`.
+  multiOrg:
+  # server.googleClientId -- `REDASH_GOOGLE_CLIENT_ID` value. Defaults to ``.
+  googleClientId:
+  # server.googleClientSecret -- `REDASH_GOOGLE_CLIENT_SECRET` value. Defaults to ``. Stored as a Secret value.
+  googleClientSecret:
+  # server.remoteUserLoginEnabled -- `REDASH_REMOTE_USER_LOGIN_ENABLED` value. Defaults to `false`.
+  remoteUserLoginEnabled:
+  # server.remoteUserHeader -- `REDASH_REMOTE_USER_HEADER` value. Defaults to `X-Forwarded-Remote-User`.
+  remoteUserHeader:
+  # server.ldapLoginEnabled -- `REDASH_LDAP_LOGIN_ENABLED` value. Defaults to `false`.
+  ldapLoginEnabled:
+  # server.ldapUrl -- `REDASH_LDAP_URL` value. Defaults to `None`.
+  ldapUrl:
+  # server.ldapBindDn -- `REDASH_LDAP_BIND_DN` value. Defaults to `None`.
+  ldapBindDn:
+  # server.ldapBindDnPassword -- `REDASH_LDAP_BIND_DN_PASSWORD` value. Defaults to ``. Stored as a Secret value.
+  ldapBindDnPassword:
+  # server.ldapDisplayNameKey -- `REDASH_LDAP_DISPLAY_NAME_KEY` value. Defaults to `displayName`.
+  ldapDisplayNameKey:
+  # server.ldapEmailKey -- `REDASH_LDAP_EMAIL_KEY` value. Defaults to `mail`.
+  ldapEmailKey:
+  # server.ldapCustomUsernamePrompt -- `REDASH_LDAP_CUSTOM_USERNAME_PROMPT` value. Defaults to `LDAP/AD/SSO username:`.
+  ldapCustomUsernamePrompt:
+  # server.ldapSearchTemplate -- `REDASH_LDAP_SEARCH_TEMPLATE` value. Defaults to `(cn=%(username)s)`.
+  ldapSearchTemplate:
+  # server.ldapSearchDn -- `REDASH_LDAP_SEARCH_DN` value. Defaults to `REDASH_SEARCH_DN`.
+  ldapSearchDn:
+  # server.staticAssetsPath -- `REDASH_STATIC_ASSETS_PATH` value. Defaults to `”../client/dist/”`.
+  staticAssetsPath:
+  # server.jobExpiryTime -- `REDASH_JOB_EXPIRY_TIME` value. Defaults to `3600 \* 12`.
+  jobExpiryTime:
+  # server.cookieSecret -- REQUIRED `REDASH_COOKIE_SECRET` value. Defaults to ``. Stored as a Secret value.
+  cookieSecret:
+  # server.logLevel -- `REDASH_LOG_LEVEL` value. Defaults to `INFO`.
+  logLevel:
+  # server.mailServer -- `REDASH_MAIL_SERVER` value. Defaults to `localhost`.
+  mailServer:
+  # server.mailPort -- `REDASH_MAIL_PORT` value. Defaults to `25`.
+  mailPort:
+  # server.mailUseTls -- `REDASH_MAIL_USE_TLS` value. Defaults to `false`.
+  mailUseTls:
+  # server.mailUseSsl -- `REDASH_MAIL_USE_SSL` value. Defaults to `false`.
+  mailUseSsl:
+  # server.mailUsername -- `REDASH_MAIL_USERNAME` value. Defaults to `None`.
+  mailUsername:
+  # server.mailPassword -- `REDASH_MAIL_PASSWORD` value. Defaults to `None`. Stored as a Secret value.
+  mailPassword:
+  # server.mailDefaultSender -- `REDASH_MAIL_DEFAULT_SENDER` value. Defaults to `None`.
+  mailDefaultSender:
+  # server.mailMaxEmails -- `REDASH_MAIL_MAX_EMAILS` value. Defaults to `None`.
+  mailMaxEmails:
+  # server.mailAsciiAttachments -- `REDASH_MAIL_ASCII_ATTACHMENTS` value. Defaults to `false`.
+  mailAsciiAttachments:
+  # server.host -- `REDASH_HOST` value. Defaults to ``.
+  host:
+  # server.alertsDefaultMailSubjectTemplate -- `REDASH_ALERTS_DEFAULT_MAIL_SUBJECT_TEMPLATE` value. Defaults to `({state}) {alert_name}`.
+  alertsDefaultMailSubjectTemplate:
+  # server.throttleLoginPattern -- `REDASH_THROTTLE_LOGIN_PATTERN` value. Defaults to `50/hour`.
+  throttleLoginPattern:
+  # server.limiterStorage -- `REDASH_LIMITER_STORAGE` value. Defaults to `REDIS_URL`.
+  limiterStorage:
+  # server.corsAccessControlAllowOrigin -- `REDASH_CORS_ACCESS_CONTROL_ALLOW_ORIGIN` value. Defaults to ``.
+  corsAccessControlAllowOrigin:
+  # server.corsAccessControlAllowCredentials -- `REDASH_CORS_ACCESS_CONTROL_ALLOW_CREDENTIALS` value. Defaults to `false`.
+  corsAccessControlAllowCredentials:
+  # server.corsAccessControlRequestMethod -- `REDASH_CORS_ACCESS_CONTROL_REQUEST_METHOD` value. Defaults to `GET, POST, PUT`.
+  corsAccessControlRequestMethod:
+  # server.corsAccessControlAllowHeaders -- `REDASH_CORS_ACCESS_CONTROL_ALLOW_HEADERS` value. Defaults to `Content-Type`.
+  corsAccessControlAllowHeaders:
+  # server.enabledQueryRunners -- `REDASH_ENABLED_QUERY_RUNNERS` value. Defaults to `”,”.join(default_query_runners)`.
+  enabledQueryRunners:
+  # server.additionalQueryRunners -- `REDASH_ADDITIONAL_QUERY_RUNNERS` value. Defaults to ``.
+  additionalQueryRunners:
+  # server.disabledQueryRunners -- `REDASH_DISABLED_QUERY_RUNNERS` value. Defaults to ``.
+  disabledQueryRunners:
+  # server.adhocQueryTimeLimit -- `REDASH_ADHOC_QUERY_TIME_LIMIT` value. Defaults to `None`.
+  adhocQueryTimeLimit:
+  # server.enabledDestinations -- `REDASH_ENABLED_DESTINATIONS` value. Defaults to `”,”.join(default_destinations)`.
+  enabledDestinations:
+  # server.additionalDestinations -- `REDASH_ADDITIONAL_DESTINATIONS` value. Defaults to ``.
+  additionalDestinations:
+  # server.eventReportingWebhooks -- `REDASH_EVENT_REPORTING_WEBHOOKS` value. Defaults to ``.
+  eventReportingWebhooks:
+  # server.sentryDsn -- `REDASH_SENTRY_DSN` value. Defaults to ``.
+  sentryDsn:
+  # server.allowScriptsInUserInput -- `REDASH_ALLOW_SCRIPTS_IN_USER_INPUT` value. Defaults to `false`. Disable sanitization of text input, allowing full html.
+  allowScriptsInUserInput:
+  # server.dashboardRefreshIntervals -- `REDASH_DASHBOARD_REFRESH_INTERVALS` value. Defaults to `60,300,600,1800,3600,43200,86400`.
+  dashboardRefreshIntervals:
+  # server.queryRefreshIntervals -- `REDASH_QUERY_REFRESH_INTERVALS` value. Defaults to `60, 300, 600, 900, 1800, 3600, 7200, 10800, 14400, 18000, 21600, 25200, 28800, 32400, 36000, 39600, 43200, 86400, 604800, 1209600, 2592000`.
+  queryRefreshIntervals:
+  # server.passwordLoginEnabled -- `REDASH_PASSWORD_LOGIN_ENABLED` value. Defaults to `true`.
+  passwordLoginEnabled:
+  # server.samlMetadataUrl -- `REDASH_SAML_METADATA_URL` value. Defaults to ``.
+  samlMetadataUrl:
+  # server.samlEntityId -- `REDASH_SAML_ENTITY_ID` value. Defaults to ``.
+  samlEntityId:
+  # server.samlNameidFormat -- `REDASH_SAML_NAMEID_FORMAT` value. Defaults to ``.
+  samlNameidFormat:
+  # server.dateFormat -- `REDASH_DATE_FORMAT` value. Defaults to `DD/MM/YY`.
+  dateFormat:
+  # server.jwtLoginEnabled -- `REDASH_JWT_LOGIN_ENABLED` value. Defaults to `false`.
+  jwtLoginEnabled:
+  # server.jwtAuthIssuer -- `REDASH_JWT_AUTH_ISSUER` value. Defaults to ``.
+  jwtAuthIssuer:
+  # server.jwtAuthPublicCertsUrl -- `REDASH_JWT_AUTH_PUBLIC_CERTS_URL` value. Defaults to ``.
+  jwtAuthPublicCertsUrl:
+  # server.jwtAuthAudience -- `REDASH_JWT_AUTH_AUDIENCE` value. Defaults to ``.
+  jwtAuthAudience:
+  # server.jwtAuthAlgorithms -- `REDASH_JWT_AUTH_ALGORITHMS` value. Defaults to `HS256,RS256,ES256`.
+  jwtAuthAlgorithms:
+  # server.jwtAuthCookieName -- `REDASH_JWT_AUTH_COOKIE_NAME` value. Defaults to ``.
+  jwtAuthCookieName:
+  # server.jwtAuthHeaderName -- `REDASH_JWT_AUTH_HEADER_NAME` value. Defaults to ``.
+  jwtAuthHeaderName:
+  # server.featureShowQueryResultsCount -- `REDASH_FEATURE_SHOW_QUERY_RESULTS_COUNT` value. Defaults to `true`. Disable/enable showing count of query results in status.
+  featureShowQueryResultsCount:
+  # server.versionCheck -- `REDASH_VERSION_CHECK` value. Defaults to `true`.
+  versionCheck:
+  # server.featureDisableRefreshQueries -- `REDASH_FEATURE_DISABLE_REFRESH_QUERIES` value. Defaults to `false`. Disable scheduled query execution.
+  featureDisableRefreshQueries:
+  # server.featureShowPermissionsControl -- `REDASH_FEATURE_SHOW_PERMISSIONS_CONTROL` value. Defaults to `false`.
+  featureShowPermissionsControl:
+  # server.featureAllowCustomJsVisualizations -- `REDASH_FEATURE_ALLOW_CUSTOM_JS_VISUALIZATIONS` value. Defaults to `false`.
+  featureAllowCustomJsVisualizations:
+  # server.featureDumbRecents -- `REDASH_FEATURE_DUMB_RECENTS` value. Defaults to `false`.
+  featureDumbRecents:
+  # server.featureAutoPublishNamedQueries -- `REDASH_FEATURE_AUTO_PUBLISH_NAMED_QUERIES` value. Defaults to `true`.
+  featureAutoPublishNamedQueries:
+  # server.bigqueryHttpTimeout -- `REDASH_BIGQUERY_HTTP_TIMEOUT` value. Defaults to `600`.
+  bigqueryHttpTimeout:
+  # server.schemaRunTableSizeCalculations -- `REDASH_SCHEMA_RUN_TABLE_SIZE_CALCULATIONS` value. Defaults to `false`.
+  schemaRunTableSizeCalculations:
+  # server.webWorkers -- `REDASH_WEB_WORKERS` value. Defaults to `4`. How many processes will gunicorn spawn to handle web requests.
+  webWorkers:
+  ## End primary Redash configuration
+
   # server.httpPort -- Server container port (only useful if you are using a customized image)
   httpPort: 5000
 
-  # server.cookieSecret -- REQUIRED: Secure value for session cookie secret
-  # cookieSecret: ""
-
-  # server.secretKey -- REQUIRED: Secure value for encryption your data sources configuration
-  # secretKey: ""
-
   # server.existingSecret -- Use existing secret instead of either the values above
-  ## This secret must contain keys "cookieSecret" and "secretKey"
+  ## This secret must contain keys matching the values marked a secret above.
   # existingSecret:
 
-  # server.env -- Redash server specific global envrionment variables [see docs](https://redash.io/help-onpremise/setup/settings-environment-variables.html)
-  env:
-    REDASH_WEB_WORKERS: 4
+  # server.env -- Redash server specific envrionment variables
+  # Don't use this for variables that are in the configuration above, however.
+  env: {}
 
   # server.replicaCount -- Number of server pods to run
   replicaCount: 1
@@ -100,7 +266,7 @@ ingress:
 
 # adhocWorker -- Configuration for Redash ad-hoc workers
 adhocWorker:
-  # adhocWorker.env -- Redash ad-hoc worker specific global envrionment variables [see docs](https://redash.io/help-onpremise/setup/settings-environment-variables.html)
+  # adhocWorker.env -- Redash ad-hoc worker specific envrionment variables.
   env:
     QUEUES: "queries,celery"
     WORKERS_COUNT: 2
@@ -132,7 +298,7 @@ adhocWorker:
 
 # scheduledWorker -- Configuration for Redash scheduled workers
 scheduledWorker:
-  # scheduledWorker.env -- Redash scheduled worker specific global envrionment variables [see docs](https://redash.io/help-onpremise/setup/settings-environment-variables.html)
+  # scheduledWorker.env -- Redash scheduled worker specific envrionment variables.
   env:
     QUEUES: "scheduled_queries"
     WORKERS_COUNT: 2
@@ -175,7 +341,7 @@ postgresql:
   # postgresql.postgresqlUsername -- PostgreSQL username for redash user (when postgresql chart enabled)
   postgresqlUsername: redash
   # postgresql.postgresqlPassword -- REQUIRED: PostgreSQL password for redash user (when postgresql chart enabled)
-  # postgresqlPassword:
+  postgresqlPassword:
   # postgresql.postgresqlDatabase -- PostgreSQL database name (when postgresql chart enabled)
   postgresqlDatabase: redash
   service:

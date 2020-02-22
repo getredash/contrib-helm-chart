@@ -21,3 +21,9 @@
 .idea/
 *.tmproj
 .vscode/
+# Ignore development oriented files
+.circleci/
+scripts/
+*.gotmpl
+.restyled.yaml
+.pre-commit-config.yaml

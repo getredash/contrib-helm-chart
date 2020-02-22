@@ -75,16 +75,6 @@ Get the secret name.
 Shared environment block used across each component.
 */}}
 {{- define "redash.env" -}}
-- name: REDASH_SECRET_KEY
-  valueFrom:
-    secretKeyRef:
-      name: {{ include "redash.secretName" . }}
-      key: secretKey
-- name: REDASH_COOKIE_SECRET
-  valueFrom:
-    secretKeyRef:
-      name: {{ include "redash.secretName" . }}
-      key: cookieSecret
 {{- if not .Values.postgresql.enabled }}
 - name: REDASH_DATABASE_URL
   value: {{ default "" .Values.externalPostgreSQL | quote }}

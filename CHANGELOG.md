@@ -9,6 +9,7 @@
 - Extended CI testing for testing major version upgrades
 - Moved install and upgrade logic to Helm hooks
 - Added basic connectivity test hook for `helm test`
+- Created values for each environment variable accepted by Redash
 
 ## 1.2.0
 
