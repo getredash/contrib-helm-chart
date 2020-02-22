@@ -17,6 +17,7 @@ Before opening a new issue or submitting a new pull request, it's helpful to sea
 ### Technical Requirements
 
 - Must pass the linter (`helm lint`)
+- If Redash [environment variable configuration](https://github.com/getredash/website/blob/master/src/pages/kb/open-source/admin-guide/env-vars-settings.md) changes it should be updated using [the process below](#updating-environment-variable-config).
 - The [README](README.md) file must be regenerated using [helm-docs](https://github.com/norwoodj/helm-docs) - you can run this manually or use the [pre-commit hook](#pre-commit-hook)
 - Must successfully launch following basic steps in the [README](README.md)
   - All pods go to the running state (or NOTES.txt provides further instructions if a required value is missing e.g. [minecraft](https://github.com/helm/charts/blob/master/stable/minecraft/templates/NOTES.txt#L3))
@@ -33,6 +34,18 @@ Before opening a new issue or submitting a new pull request, it's helpful to sea
 - Follows [best practices](https://github.com/helm/helm/tree/master/docs/chart_best_practices)
   (especially for [labels](https://github.com/helm/helm/blob/master/docs/chart_best_practices/labels.md)
   and [values](https://github.com/helm/helm/blob/master/docs/chart_best_practices/values.md))
+
+### Updating Environment Variable Config
+
+A script it used to help update the configuration (in between start/end markers) using the markdown documentation.
+
+To run this script:
+
+```bash
+python scripts/update-env-config.py
+```
+
+Carefully review, test and commit the results. If changes are required (e.g. to mark a specific variable as a secret) update the script to produce the correct changes - don't manually edit the configuration between the markers.
 
 ### Pre-commit Hook Setup
 
