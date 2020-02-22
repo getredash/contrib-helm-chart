@@ -18,7 +18,7 @@ Before opening a new issue or submitting a new pull request, it's helpful to sea
 
 - Must pass the linter (`helm lint`)
 - If Redash [environment variable configuration](https://github.com/getredash/website/blob/master/src/pages/kb/open-source/admin-guide/env-vars-settings.md) changes it should be updated using [the process below](#updating-environment-variable-config).
-- The [README](README.md) file must be regenerated using [helm-docs](https://github.com/norwoodj/helm-docs) - you can run this manually or use the [pre-commit hook](#pre-commit-hook)
+- The [README](README.md) must be regenerated using [helm-docs](https://github.com/norwoodj/helm-docs) and Markdown files should be formatted using [prettier](https://prettier.io/) - you can run this manually or use the [pre-commit hook](#pre-commit-hook)
 - Must successfully launch following basic steps in the [README](README.md)
   - All pods go to the running state (or NOTES.txt provides further instructions if a required value is missing e.g. [minecraft](https://github.com/helm/charts/blob/master/stable/minecraft/templates/NOTES.txt#L3))
   - All services have at least one endpoint
@@ -58,7 +58,8 @@ pre-commit install
 pre-commit install-hooks
 ```
 
-Future changes to your charts requirements.yaml, values.yaml, or Chart.yaml files will cause an update to documentation when you commit.
+- Future changes to your charts requirements.yaml, values.yaml, or Chart.yaml files will cause an update to documentation when you commit.
+- Prettier will also format Markdown files using the default configuration.
 
 ### Merge Approval and Release Process
 
