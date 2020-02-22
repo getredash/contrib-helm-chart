@@ -50,5 +50,3 @@ labels: ["Skip CI"]
 # Restylers to run, and how
 restylers:
   - name: prettier
-    include:
-      - "*.md"

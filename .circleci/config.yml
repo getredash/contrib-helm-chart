@@ -253,7 +253,7 @@ workflows:
           requires:
             - h2k15
       - publish:
-           # The publish step depends on all the test steps passing
+          # The publish step depends on all the test steps passing
           requires:
             - h2k15
             - h2k16
