@@ -47,6 +47,8 @@ $ helm upgrade --install -f my-values.yaml my-release redash/redash
 
 The command deploys Redash on the Kubernetes cluster in the default configuration. The [configuration](#configuration) section and and default [values.yaml](values.yaml) lists the parameters that can be configured during installation.
 
+It's possible to use an existing secret for PostgreSQL (instead of a password) or to disable the built in chart and use an external PostgreSQL instead. See the documentation below for details.
+
 > **Tip**: List all releases using `helm list`
 
 ## Uninstalling the Chart
