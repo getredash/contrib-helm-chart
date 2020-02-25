@@ -7,9 +7,9 @@ repos:
         entry: sh -c 'helm-docs --dry-run | prettier --parser markdown > README.md'
         language: system
         files: README.md
-    require_serial: true
+        require_serial: true
   - repo: https://github.com/prettier/prettier
     rev: 1.19.1
     hooks:
       - id: prettier
-    require_serial: true
+        require_serial: true
