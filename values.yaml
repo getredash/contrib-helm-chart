@@ -19,7 +19,7 @@ fullnameOverride: ""
 env:
   PYTHONUNBUFFERED: 0
 
-# serviceAccount -- Service account and security context configuration
+## Service account and security context configuration
 serviceAccount:
   # serviceAccount.create -- Specifies whether a service account should be created
   create: true
@@ -29,7 +29,6 @@ serviceAccount:
   name:
 
 ## Configuration for Redash web server
-##
 server:
   ## Start primary Redash configuration
   # server.secretKey -- REQUIRED `REDASH_SECRET_KEY` value. Defaults to ``. Secret key used for data encryption. Stored as a Secret value.
@@ -264,7 +263,7 @@ ingress:
   #    hosts:
   #      - chart-example.local
 
-# adhocWorker -- Configuration for Redash ad-hoc workers
+## Configuration for Redash ad-hoc workers
 adhocWorker:
   # adhocWorker.env -- Redash ad-hoc worker specific envrionment variables.
   env:
@@ -296,7 +295,7 @@ adhocWorker:
   # adhocWorker.affinity -- Affinity for ad-hoc worker pod assignment [ref](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity)
   affinity: {}
 
-# scheduledWorker -- Configuration for Redash scheduled workers
+## Configuration for Redash scheduled workers
 scheduledWorker:
   # scheduledWorker.env -- Redash scheduled worker specific envrionment variables.
   env:
@@ -331,7 +330,7 @@ scheduledWorker:
 # externalPostgreSQL -- External PostgreSQL configuration. To use an external PostgreSQL instead of the automatically deployed postgresql chart: set postgresql.enabled to false then uncomment and configure the externalPostgreSQL connection URL.
 # externalPostgreSQL: postgresql://user:pass@host:5432/database
 
-# postgresql -- Configuration values for the postgresql dependency. This PostgreSQL instance is used by default for all Redash state storage [ref](https://github.com/kubernetes/charts/blob/master/stable/postgresql/README.md)
+## Configuration values for the postgresql dependency. This PostgreSQL instance is used by default for all Redash state storage [ref](https://github.com/kubernetes/charts/blob/master/stable/postgresql/README.md)
 postgresql:
   # postgresql.enabled -- Whether to deploy a PostgreSQL server to satisfy the applications database requirements. To use an external PostgreSQL set this to false and configure the externalPostgreSQL parameter.
   enabled: true
@@ -362,7 +361,7 @@ postgresql:
 # externalRedis -- External Redis configuration. To use an external Redis instead of the automatically deployed redis chart: set redis.enabled to false then uncomment and configure the externalRedis connection URL.
 # externalRedis: redis://user:pass@host:6379/database
 
-# redis -- Configuration values for the redis dependency. This Redis instance is used by default for caching and temporary storage [ref](https://github.com/kubernetes/charts/blob/master/stable/redis/README.md)
+## Configuration values for the redis dependency. This Redis instance is used by default for caching and temporary storage [ref](https://github.com/kubernetes/charts/blob/master/stable/redis/README.md)
 redis:
   # redis.enabled -- Whether to deploy a Redis server to satisfy the applications database requirements. To use an external Redis set this to false and configure the externalRedis parameter.
   enabled: true
