@@ -3,7 +3,37 @@ entries:
   redash:
   - apiVersion: v1
     appVersion: 8.0.2.b37747
-    created: "2020-02-24T18:27:52.361753966Z"
+    created: "2020-02-26T03:41:27.756445943Z"
+    dependencies:
+    - condition: redis.enabled
+      name: redis
+      repository: https://kubernetes-charts.storage.googleapis.com
+      version: ^10.5.3
+    - condition: postgresql.enabled
+      name: postgresql
+      repository: https://kubernetes-charts.storage.googleapis.com
+      version: ^8.3.4
+    description: Redash is an open source tool built for teams to query, visualize
+      and collaborate.
+    digest: e000db4807c9a7616d49df33ee6483c485a4d0667bece6a9e1456c472f9073d3
+    home: https://redash.io/
+    icon: https://redash.io/assets/images/elements/redash-logo.svg
+    keywords:
+    - redash
+    - analytics
+    - vizualisation
+    maintainers:
+    - email: owen.barton@civicactions.com
+      name: grugnog
+    name: redash
+    sources:
+    - https://github.com/getredash/redash
+    urls:
+    - redash-2.0.0-beta.2.tgz
+    version: 2.0.0-beta.2
+  - apiVersion: v1
+    appVersion: 8.0.2.b37747
+    created: "2020-02-26T03:41:27.742504374Z"
     dependencies:
     - condition: redis.enabled
       name: redis
@@ -33,7 +63,7 @@ entries:
     version: 2.0.0-beta.1
   - apiVersion: v1
     appVersion: 8.0.2.b37747
-    created: "2020-02-24T18:27:52.346706359Z"
+    created: "2020-02-26T03:41:27.718386714Z"
     dependencies:
     - condition: redis.enabled
       name: redis
@@ -63,7 +93,7 @@ entries:
     version: 1.2.0
   - apiVersion: v1
     appVersion: 8.0.1.b33387
-    created: "2020-02-24T18:27:52.322700785Z"
+    created: "2020-02-26T03:41:27.705835486Z"
     dependencies:
     - condition: redis.enabled
       name: redis
@@ -91,4 +121,4 @@ entries:
     urls:
     - redash-1.1.0.tgz
     version: 1.1.0
-generated: "2020-02-24T18:27:52.312485495Z"
+generated: "2020-02-26T03:41:27.693001085Z"
