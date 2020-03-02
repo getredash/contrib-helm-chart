@@ -152,12 +152,12 @@ jobs:
             kubectl top pod -A || true
             kubectl get all -A || true
             echo "TEST LOGS"
-            kubectl describe -l "app.kubernetes.io/instance=redashup,app.kubernetes.io/component=test-connection"
-            kubectl logs --tail=20 -l "app.kubernetes.io/instance=redashup,app.kubernetes.io/component=test-connection" || true
+            kubectl describe pod "$(kubectl get pods -l 'app.kubernetes.io/component=test-connection' -o jsonpath='{.items[0].metadata.name}')"
+            kubectl logs --tail=20 -l "app.kubernetes.io/component=test-connection" || true
             echo "INSTALL LOGS"
-            kubectl logs --tail=40 -l "app.kubernetes.io/instance=redash,job-name=redash-install" || true
+            kubectl logs --tail=40 -l "job-name=redash-install" || true
             echo "SERVER LOGS"
-            kubectl logs --tail=20 -l "app.kubernetes.io/instance=redash,app.kubernetes.io/component=server" || true
+            kubectl logs --tail=20 -l "app.kubernetes.io/component=server" || true
             echo "MINIKUBE LOGS"
             minikube logs -n10 || true
 
