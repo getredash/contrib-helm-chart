@@ -58,7 +58,7 @@ for var in vars:
     required = ""
     if var['required']:
         required = "REQUIRED "
-    comment = "  # server.%s -- %s`%s` value. Defaults to `%s`." % (
+    comment = "  # redash.%s -- %s`%s` value. Defaults to `%s`." % (
         var['name'], required, var['env'], var['default'])
     if len(var['desc']) > 0:
         comment += " %s." % (var['desc'].capitalize())
@@ -82,10 +82,10 @@ config = [start_token]
 for var in vars:
     required = 'default "" '
     if var['required']:
-        required = 'required "A secure random value for server.%s is required" ' % (
+        required = 'required "A secure random value for redash.%s is required" ' % (
             var['name'])
     if var['secret']:
-        config.append("  %s: {{ %s.Values.server.%s | b64enc | quote }}" % (
+        config.append("  %s: {{ %s.Values.redash.%s | b64enc | quote }}" % (
             var['name'], required, var['name']))
 config.append('  ## End primary Redash configuration')
 
@@ -97,26 +97,27 @@ secrets.truncate()
 secrets.write(content)
 secrets.close()
 
-print("server-deployment.yaml snippet")
+print("_helpers.tpl snippet")
 print()
 
 config = [start_token]
 for var in vars:
-    config.append("            {{- if .Values.server.%s }}" % (var['name']))
-    config.append("            - name: %s" % (var['env']))
+    config.append(
+        "{{- if or .Values.redash.%s .Values.redash.existingSecret }}" % (var['name']))
+    config.append("- name: %s" % (var['env']))
     if var['secret']:
-        config.append('              valueFrom:')
-        config.append('                secretKeyRef:')
+        config.append('  valueFrom:')
+        config.append('    secretKeyRef:')
         config.append(
-            '                  name: {{ include "redash.secretName" . }}')
-        config.append('                  key: %s' % (var['name']))
+            '      name: {{ include "redash.secretName" . }}')
+        config.append('      key: %s' % (var['name']))
     else:
         config.append(
-            "              value: {{ default "" .Values.server.%s | quote }}" % (var['name']))
-    config.append("            {{- end }}")
-config.append('            ## End primary Redash configuration')
+            "  value: {{ default "" .Values.redash.%s | quote }}" % (var['name']))
+    config.append("{{- end }}")
+config.append('## End primary Redash configuration')
 
-secrets = open("templates/server-deployment.yaml", 'r+')
+secrets = open("templates/_helpers.tpl", 'r+')
 content = re.sub(start_token + '.*' + end_token,
                  "\n".join(config), secrets.read(), flags=re.DOTALL)
 secrets.seek(0)
