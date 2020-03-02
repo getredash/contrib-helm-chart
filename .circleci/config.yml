@@ -107,7 +107,7 @@ jobs:
           command: |
             # As well a setting secrets we also reduce resource usage a bit by dropping the worker count.
             cat > test-values.yaml \<<- EOM
-            server:
+            redash:
               cookieSecret: $(openssl rand -base64 32)
               secretKey: $(openssl rand -base64 32)
               env:
