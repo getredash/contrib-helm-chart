@@ -31,7 +31,7 @@ Create a values file with required secrets (store this securely!):
 
 ```bash
 $ cat > my-values.yaml <<- EOM
-server:
+redash:
   cookieSecret: $(openssl rand -base64 32)
   secretKey: $(openssl rand -base64 32)
 postgresql:
