@@ -152,6 +152,7 @@ jobs:
             kubectl top pod -A || true
             kubectl get all -A || true
             echo "TEST LOGS"
+            kubectl describe -l "app.kubernetes.io/instance=redashup,app.kubernetes.io/component=test-connection"
             kubectl logs --tail=20 -l "app.kubernetes.io/instance=redashup,app.kubernetes.io/component=test-connection" || true
             echo "INSTALL LOGS"
             kubectl logs --tail=40 -l "app.kubernetes.io/instance=redash,job-name=redash-install" || true
