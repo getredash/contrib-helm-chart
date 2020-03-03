@@ -64,8 +64,8 @@ Create a default fully qualified redis name.
 Get the secret name.
 */}}
 {{- define "redash.secretName" -}}
-{{- if .Values.server.existingSecret }}
-    {{- printf "%s" .Values.server.existingSecret -}}
+{{- if .Values.redash.existingSecret }}
+    {{- printf "%s" .Values.redash.existingSecret -}}
 {{- else -}}
     {{- printf "%s" (include "redash.fullname" .) -}}
 {{- end -}}

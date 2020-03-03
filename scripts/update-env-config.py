@@ -82,11 +82,11 @@ config = [start_token]
 for var in vars:
     required = 'default "" '
     if var['required']:
-        required = 'required "A secure random value for redash.%s is required" ' % (
-            var['name'])
+        config.append('  {{ $null := required "A value for one of the following variables is required: redash.%s (secure random value), redash.existingSecret (secret name)" (or .Values.redash.%s .Values.redash.existingSecret) }}' % (
+            var['name'], var['name']))
     if var['secret']:
-        config.append("  %s: {{ %s.Values.redash.%s | b64enc | quote }}" % (
-            var['name'], required, var['name']))
+        config.append('  %s: {{ default "" .Values.redash.%s | b64enc | quote }}' % (
+            var['name'], var['name']))
 config.append('  ## End primary Redash configuration')
 
 secrets = open("templates/secrets.yaml", 'r+')
