@@ -3,7 +3,37 @@ entries:
   redash:
   - apiVersion: v1
     appVersion: 8.0.2.b37747
-    created: "2020-03-03T00:40:43.062323766Z"
+    created: "2020-03-03T02:28:01.154732519Z"
+    dependencies:
+    - condition: redis.enabled
+      name: redis
+      repository: https://kubernetes-charts.storage.googleapis.com
+      version: ^10.5.3
+    - condition: postgresql.enabled
+      name: postgresql
+      repository: https://kubernetes-charts.storage.googleapis.com
+      version: ^8.3.4
+    description: Redash is an open source tool built for teams to query, visualize
+      and collaborate.
+    digest: 68c3ed34016b74fb2723573aabfca2ea5cfb27e012443f2c012caf702fb44bd9
+    home: https://redash.io/
+    icon: https://redash.io/assets/images/elements/redash-logo.svg
+    keywords:
+    - redash
+    - analytics
+    - vizualisation
+    maintainers:
+    - email: owen.barton@civicactions.com
+      name: grugnog
+    name: redash
+    sources:
+    - https://github.com/getredash/redash
+    urls:
+    - redash-2.0.0-beta.4.tgz
+    version: 2.0.0-beta.4
+  - apiVersion: v1
+    appVersion: 8.0.2.b37747
+    created: "2020-03-03T02:28:01.128979439Z"
     dependencies:
     - condition: redis.enabled
       name: redis
@@ -33,7 +63,7 @@ entries:
     version: 2.0.0-beta.3
   - apiVersion: v1
     appVersion: 8.0.2.b37747
-    created: "2020-03-03T00:40:43.037561868Z"
+    created: "2020-03-03T02:28:01.1086041Z"
     dependencies:
     - condition: redis.enabled
       name: redis
@@ -63,7 +93,7 @@ entries:
     version: 2.0.0-beta.2
   - apiVersion: v1
     appVersion: 8.0.2.b37747
-    created: "2020-03-03T00:40:43.02483647Z"
+    created: "2020-03-03T02:28:01.0860889Z"
     dependencies:
     - condition: redis.enabled
       name: redis
@@ -93,7 +123,7 @@ entries:
     version: 2.0.0-beta.1
   - apiVersion: v1
     appVersion: 8.0.2.b37747
-    created: "2020-03-03T00:40:43.009314237Z"
+    created: "2020-03-03T02:28:01.073573618Z"
     dependencies:
     - condition: redis.enabled
       name: redis
@@ -123,7 +153,7 @@ entries:
     version: 1.2.0
   - apiVersion: v1
     appVersion: 8.0.1.b33387
-    created: "2020-03-03T00:40:42.985306022Z"
+    created: "2020-03-03T02:28:01.055381504Z"
     dependencies:
     - condition: redis.enabled
       name: redis
@@ -151,4 +181,4 @@ entries:
     urls:
     - redash-1.1.0.tgz
     version: 1.1.0
-generated: "2020-03-03T00:40:42.975879281Z"
+generated: "2020-03-03T02:28:01.046555975Z"
