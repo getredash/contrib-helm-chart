@@ -102,16 +102,19 @@ print()
 
 config = [start_token]
 for var in vars:
-    config.append(
-        "{{- if or .Values.redash.%s .Values.redash.existingSecret }}" % (var['name']))
-    config.append("- name: %s" % (var['env']))
     if var['secret']:
+        config.append(
+            "{{- if or .Values.redash.%s .Values.redash.existingSecret }}" % (var['name']))
+        config.append("- name: %s" % (var['env']))
         config.append('  valueFrom:')
         config.append('    secretKeyRef:')
         config.append(
             '      name: {{ include "redash.secretName" . }}')
         config.append('      key: %s' % (var['name']))
     else:
+        config.append(
+            "{{- if .Values.redash.%s }}" % (var['name']))
+        config.append("- name: %s" % (var['env']))
         config.append(
             "  value: {{ default "" .Values.redash.%s | quote }}" % (var['name']))
     config.append("{{- end }}")
