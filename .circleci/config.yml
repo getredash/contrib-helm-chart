@@ -156,6 +156,8 @@ jobs:
             kubectl logs --tail=20 -l "app.kubernetes.io/component=test-connection" || true
             echo "INSTALL LOGS"
             kubectl logs --tail=40 -l "job-name=redash-install" || true
+            echo "UPGRADE LOGS"
+            kubectl logs --tail=40 -l "job-name=redash-upgrade" || true
             echo "SERVER LOGS"
             kubectl logs --tail=20 -l "app.kubernetes.io/component=server" || true
             echo "MINIKUBE LOGS"
