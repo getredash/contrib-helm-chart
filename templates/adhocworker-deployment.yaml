@@ -16,6 +16,10 @@ spec:
       labels:
         {{- include "redash.selectorLabels" . | nindent 8 }}
         app.kubernetes.io/component: adhocworker
+      {{- if .Values.adhocWorker.podAnnotations }}
+      annotations:
+      {{ toYaml .Values.adhocWorker.podAnnotations | nindent 8 }}
+      {{- end }}
     spec:
     {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
