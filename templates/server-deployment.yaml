@@ -16,6 +16,10 @@ spec:
       labels:
         {{- include "redash.selectorLabels" . | nindent 8 }}
         app.kubernetes.io/component: server
+      {{- if .Values.server.podAnnotations }}
+      annotations:
+      {{ toYaml .Values.server.podAnnotations | nindent 8 }}
+      {{- end }}
     spec:
     {{- with .Values.imagePullSecrets }}
       imagePullSecrets:

@@ -240,6 +240,9 @@ server:
   # server.affinity -- Affinity for server pod assignment [ref](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity)
   affinity: {}
 
+  # server.podAnnotations -- Annotations for server pod assignment [ref](https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/)
+  podAnnotations: {}
+
 service:
   # service.type -- Kubernetes Service type
   type: ClusterIP
@@ -296,6 +299,9 @@ adhocWorker:
   # adhocWorker.affinity -- Affinity for ad-hoc worker pod assignment [ref](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity)
   affinity: {}
 
+  # adhocWorker.podAnnotations -- Annotations for adhoc worker pod assignment [ref](https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/)
+  podAnnotations: {}
+
 ## Configuration for Redash scheduled workers
 scheduledWorker:
   # scheduledWorker.env -- Redash scheduled worker specific envrionment variables.
@@ -327,6 +333,9 @@ scheduledWorker:
 
   # scheduledWorker.affinity -- Affinity for scheduled worker pod assignment [ref](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity)
   affinity: {}
+
+  # scheduledWorker.podAnnotations -- Annotations for scheduled worker pod assignment [ref](https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/)
+  podAnnotations: {}
 
 # externalPostgreSQL -- External PostgreSQL configuration. To use an external PostgreSQL instead of the automatically deployed postgresql chart: set postgresql.enabled to false then uncomment and configure the externalPostgreSQL connection URL.
 # externalPostgreSQL: postgresql://user:pass@host:5432/database
