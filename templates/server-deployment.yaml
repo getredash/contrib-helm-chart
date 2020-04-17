@@ -403,8 +403,8 @@ spec:
           ports:
             - containerPort: {{ .Values.server.httpPort }}
           livenessProbe:
-            exec:
-              command: ["/bin/sh", "-c", ". /config/dynamicenv.sh && /app/manage.py status"]
+            tcpSocket:
+              port: {{ .Values.server.httpPort }}
             # Redash can take a while to come up initially, so we delay checks.
             initialDelaySeconds: 90
             timeoutSeconds: 1
