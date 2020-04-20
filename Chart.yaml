@@ -12,6 +12,6 @@ sources:
   - https://github.com/getredash/redash
 icon: https://redash.io/assets/images/elements/redash-logo.svg
 maintainers:
-  - name: grugnog
+  - name: Owen Barton
     email: owen.barton@civicactions.com
 engine: gotpl
