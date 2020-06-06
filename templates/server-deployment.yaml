@@ -403,7 +403,8 @@ spec:
           ports:
             - containerPort: {{ .Values.server.httpPort }}
           livenessProbe:
-            tcpSocket:
+            httpGet:
+              path: /ping
               port: {{ .Values.server.httpPort }}
             # Redash can take a while to come up initially, so we delay checks.
             initialDelaySeconds: 90
@@ -413,7 +414,7 @@ spec:
             failureThreshold: 10
           readinessProbe:
             httpGet:
-              path: /static/images/redash_icon_small.png
+              path: /ping
               port: {{ .Values.server.httpPort }}
             initialDelaySeconds: 10
             timeoutSeconds: 1
