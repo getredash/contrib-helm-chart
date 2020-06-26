@@ -5,7 +5,7 @@ image:
   # image.repository -- Redash image name used for server and worker pods
   repository: redash/redash
   # image.tag -- Redash image [tag](https://hub.docker.com/r/redash/redash/tags)
-  tag: 8.0.2.b37747
+  tag: 9.0.0-beta.b42121
   # image.pullPolicy - Image pull policy
   pullPolicy: IfNotPresent
 
@@ -267,11 +267,71 @@ ingress:
   #    hosts:
   #      - chart-example.local
 
+## Configuration for Redash RQ scheduler
+scheduler:
+  replicaCount: 1
+
+  # scheduler.resources -- Resource requests and limits [ref](http://kubernetes.io/docs/user-guide/compute-resources/)
+  resources:
+    # limits:
+    #   cpu: 500m
+    #   memory: 3Gi
+    # requests:
+    #   cpu: 100m
+    #  memory: 500Mi
+
+  podSecurityContext: {}
+  securityContext: {}
+
+  # scheduler.nodeSelector -- Node labels for pod assignment [ref](https://kubernetes.io/docs/user-guide/node-selection/)
+  nodeSelector: {}
+
+  # scheduler.tolerations -- Tolerations for pod assignment [ref](https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/)
+  tolerations: []
+
+  # scheduler.affinity -- Affinity for pod assignment [ref](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity)
+  affinity: {}
+
+  # scheduler.podAnnotations -- Annotations for pod assignment [ref](https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/)
+  podAnnotations: {}
+
+## Configuration for Redash worker
+genericWorker:
+  env:
+    QUEUES: "periodic emails default"
+    WORKERS_COUNT: 1
+
+  replicaCount: 1
+
+  # genericWorker.resources -- Resource requests and limits [ref](http://kubernetes.io/docs/user-guide/compute-resources/)
+  resources:
+    # limits:
+    #   cpu: 500m
+    #   memory: 3Gi
+    # requests:
+    #   cpu: 100m
+    #  memory: 500Mi
+
+  podSecurityContext: {}
+  securityContext: {}
+
+  # genericWorker.nodeSelector -- Node labels for pod assignment [ref](https://kubernetes.io/docs/user-guide/node-selection/)
+  nodeSelector: {}
+
+  # genericWorker.tolerations -- Tolerations for pod assignment [ref](https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/)
+  tolerations: []
+
+  # genericWorker.affinity -- Affinity for pod assignment [ref](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity)
+  affinity: {}
+
+  # genericWorker.podAnnotations -- Annotations for pod assignment [ref](https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/)
+  podAnnotations: {}
+
 ## Configuration for Redash ad-hoc workers
 adhocWorker:
   # adhocWorker.env -- Redash ad-hoc worker specific envrionment variables.
   env:
-    QUEUES: "queries,celery"
+    QUEUES: "queries"
     WORKERS_COUNT: 2
 
   # adhocWorker.replicaCount -- Number of ad-hoc worker pods to run
@@ -306,7 +366,7 @@ adhocWorker:
 scheduledWorker:
   # scheduledWorker.env -- Redash scheduled worker specific envrionment variables.
   env:
-    QUEUES: "scheduled_queries"
+    QUEUES: "scheduled_queries schemas"
     WORKERS_COUNT: 2
 
   # scheduledWorker.replicaCount -- Number of scheduled worker pods to run

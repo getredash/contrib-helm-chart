@@ -20,6 +20,9 @@ data:
     # Max number of attempts
     MAX_ATTEMPTS=10
 
+    # Patch the status command
+    sed -i '57s/.*/    #removed/' /app/redash/monitor.py
+
     # Load connection variables
     . /config/dynamicenv.sh
     # Initialize attempt counter
