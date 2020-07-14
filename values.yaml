@@ -406,7 +406,7 @@ postgresql:
   enabled: true
   image:
     # postgresql.image.tag -- Bitnami supported version close to the one specified in Redash [setup docker-compose.yml](https://github.com/getredash/setup/blob/master/data/docker-compose.yml)
-    tag: "9.6.17-debian-10-r3"
+    tag: "9.6.18-debian-10-r56"
   # postgresql.postgresqlUsername -- PostgreSQL username for redash user (when postgresql chart enabled)
   postgresqlUsername: redash
   # postgresql.postgresqlPassword -- REQUIRED: PostgreSQL password for redash user (when postgresql chart enabled)

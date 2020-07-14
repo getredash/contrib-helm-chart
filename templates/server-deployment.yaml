@@ -56,7 +56,7 @@ spec:
             failureThreshold: 10
           readinessProbe:
             httpGet:
-              path: /static/images/redash_icon_small.png
+              path: /ping
               port: {{ .Values.server.httpPort }}
             initialDelaySeconds: 10
             timeoutSeconds: 1
