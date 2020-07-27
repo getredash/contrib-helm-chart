@@ -4,6 +4,10 @@ metadata:
   name: {{ include "redash.fullname" . }}
   labels:
     {{- include "redash.labels" . | nindent 4 }}
+  annotations:
+  {{- with .Values.service.annotations }}
+  {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
   type: {{ .Values.service.type }}
   ports:
@@ -11,6 +15,9 @@ spec:
       targetPort: {{ .Values.server.httpPort }}
       protocol: TCP
       name: http
+  {{- if .Values.service.loadBalancerIP }}
+  loadBalancerIP: {{ .Values.service.loadBalancerIP }}
+  {{- end }}
   selector:
     {{- include "redash.selectorLabels" . | nindent 4 }}
     app.kubernetes.io/component: server
