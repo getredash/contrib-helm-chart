@@ -244,6 +244,10 @@ server:
   podAnnotations: {}
 
 service:
+  # service.annotations -- Annotations to add to the service
+  annotations: {}
+  # service.loadBalancerIP -- Specific IP address to use for cloud providers such as Azure Kubernetes Service [ref](https://kubernetes.io/docs/concepts/services-networking/service/#loadbalancer)
+  loadBalancerIP:
   # service.type -- Kubernetes Service type
   type: ClusterIP
   # service.port -- Service external port
