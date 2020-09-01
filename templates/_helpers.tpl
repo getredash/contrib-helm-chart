@@ -387,6 +387,10 @@ Shared environment block used across each component.
 - name: REDASH_SENTRY_DSN
   value: {{ default  .Values.redash.sentryDsn | quote }}
 {{- end }}
+{{- if .Values.redash.sentryEnvironment }}
+- name: REDASH_SENTRY_ENVIRONMENT
+  value: {{ default  .Values.redash.sentryEnvironment | quote }}
+{{- end }}
 {{- if .Values.redash.allowScriptsInUserInput }}
 - name: REDASH_ALLOW_SCRIPTS_IN_USER_INPUT
   value: {{ default  .Values.redash.allowScriptsInUserInput | quote }}
