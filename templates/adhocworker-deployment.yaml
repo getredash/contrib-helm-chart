@@ -45,6 +45,8 @@ spec:
             - name: "{{ $key }}"
               value: "{{ $value }}"
           {{- end }}
+          envFrom:
+          {{- include "redash.envFrom" . | nindent 12 }}
           resources:
 {{ toYaml .Values.adhocWorker.resources | indent 12 }}
       volumes:

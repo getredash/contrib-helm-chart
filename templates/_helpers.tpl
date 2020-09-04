@@ -477,6 +477,16 @@ Shared environment block used across each component.
 {{- end -}}
 
 {{/*
+Environment variables initialized from secret used across each component.
+*/}}
+{{- define "redash.envFrom" -}}
+{{- if .Values.envSecretName -}}
+- secretRef:
+    name: {{ .Values.envSecretName }}
+{{- end -}}
+{{- end -}}
+
+{{/*
 Common labels
 */}}
 {{- define "redash.labels" -}}
