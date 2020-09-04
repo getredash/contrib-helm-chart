@@ -248,6 +248,11 @@ service:
   type: ClusterIP
   # service.port -- Service external port
   port: 80
+  # allowed source ranges - open to the world by default
+  loadBalancerSourceRanges:
+  - 0.0.0.0/0
+  # service annotations (useful for things like ssl termination on aws)
+  annotations: {}
 
 ingress:
   # ingress.enabled -- Enable ingress controller resource
