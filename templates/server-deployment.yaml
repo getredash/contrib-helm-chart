@@ -404,6 +404,8 @@ spec:
             - name: "{{ $key }}"
               value: "{{ $value }}"
           {{- end }}
+          envFrom:
+          {{- include "redash.envFrom" . | nindent 12 }}
           ports:
             - containerPort: {{ .Values.server.httpPort }}
           livenessProbe:
