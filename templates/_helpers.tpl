@@ -401,6 +401,10 @@ Shared environment block used across each component.
 - name: REDASH_SAML_NAMEID_FORMAT
   value: {{ default  .Values.redash.samlNameidFormat | quote }}
 {{- end }}
+{{- if .Values.redash.samlSchemeOverride }}
+- name: REDASH_SAML_SCHEME_OVERRIDE
+  value: {{ default  .Values.redash.samlSchemeOverride | quote }}
+{{- end }}
 {{- if .Values.redash.dateFormat }}
 - name: REDASH_DATE_FORMAT
   value: {{ default  .Values.redash.dateFormat | quote }}

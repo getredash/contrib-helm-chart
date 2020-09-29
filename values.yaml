@@ -165,6 +165,8 @@ redash:
   samlEntityId:
   # redash.samlNameidFormat -- `REDASH_SAML_NAMEID_FORMAT` value. Defaults to ``.
   samlNameidFormat:
+ # redash.samlSchemeOverride -- `REDASH_SAML_SCHEME_OVERRIDE` value. Defaults to ``.
+  samlSchemeOverride:
   # redash.dateFormat -- `REDASH_DATE_FORMAT` value. Defaults to `DD/MM/YY`.
   dateFormat:
   # redash.jwtLoginEnabled -- `REDASH_JWT_LOGIN_ENABLED` value. Defaults to `false`.
