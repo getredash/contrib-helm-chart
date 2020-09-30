@@ -61,10 +61,10 @@ The command removes all the Kubernetes components associated with the chart and 
 
 ## Chart Requirements
 
-| Repository                                       | Name       | Version |
-| ------------------------------------------------ | ---------- | ------- |
-| https://kubernetes-charts.storage.googleapis.com | postgresql | ^8.3.4  |
-| https://kubernetes-charts.storage.googleapis.com | redis      | ^10.5.3 |
+| Repository                         | Name       | Version  |
+| ---------------------------------- | ---------- | -------- |
+| https://charts.bitnami.com/bitnami | postgresql | ^8.10.14 |
+| https://charts.bitnami.com/bitnami | redis      | ^10.8.2  |
 
 ## Configuration
 
