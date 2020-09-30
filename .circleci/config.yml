@@ -5,7 +5,7 @@ jobs:
     parameters:
       helm:
         description: "Helm version to test with"
-        default: "v2.16.1"
+        default: "v3.3.4"
         type: string
       k8s:
         description: "Kubernetes version to test with"
@@ -168,7 +168,7 @@ jobs:
       image: circleci/classic:201808-01
 
     environment:
-      HELM_VERSION: v3.1.0
+      HELM_VERSION: v3.3.4
       GITHUB_PAGES_BRANCH: gh-pages
 
     working_directory: ~/redash
@@ -224,35 +224,35 @@ workflows:
       # This makes tests take a bit longer but conserves resources
       - test:
           name: h2k15
-          helm: v2.16.3
+          helm: v2.16.12
           k8s: v1.15.10
       - test:
           name: h2k16
-          helm: v2.16.3
+          helm: v2.16.12
           k8s: v1.16.7
           requires:
             - h2k15
       - test:
           name: h2k17
-          helm: v2.16.3
+          helm: v2.16.12
           k8s: v1.17.3
           requires:
             - h2k15
       - test:
           name: h3k15
-          helm: v3.1.0
+          helm: v3.3.4
           k8s: v1.15.10
           requires:
             - h2k15
       - test:
           name: h3k16
-          helm: v3.1.0
+          helm: v3.3.4
           k8s: v1.16.7
           requires:
             - h2k15
       - test:
           name: h3k17
-          helm: v3.1.0
+          helm: v3.3.4
           k8s: v1.17.3
           requires:
             - h2k15
