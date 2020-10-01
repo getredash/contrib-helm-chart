@@ -211,6 +211,7 @@ jobs:
             git config user.email "${CIRCLE_USERNAME}@users.noreply.github.com"
             git config user.name CircleCI
             # Only add new files - this ensures that already deployed chart versions are never updated in place
+            if ! git status -s | grep '??'; then echo "No new files"; exit 0; fi
             git status -s | grep '??' | awk '{ print $2 }' | xargs git add
             git status
             git commit -m "Published by CircleCI ${CIRCLE_BUILD_URL} [skip ci]"
