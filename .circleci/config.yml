@@ -258,12 +258,12 @@ workflows:
       - publish:
           # The publish step depends on all the test steps passing
           requires:
-            - h2k15
             - h2k16
-            - h2k17
-            - h3k15
             - h3k16
             - h3k17
+            - h3k18
+            - h2k19
+            - h3k19
           filters:
             branches:
               only: master
