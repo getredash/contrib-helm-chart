@@ -96,9 +96,9 @@ jobs:
       - run:
           name: Install chart dependencies
           command: |
-            # Need to add stable repo for Helm v3+
+            # Need to add bitnami repo for Helm v3+
             if [[ $HELM_VERSION != v2* ]]; then
-              helm repo add stable https://kubernetes-charts.storage.googleapis.com
+              helm repo add bitnami "https://charts.bitnami.com/bitnami"
             fi
             helm dependency build .
 
