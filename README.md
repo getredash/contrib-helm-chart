@@ -15,7 +15,7 @@ Source code can be found [here](https://redash.io/)
 ## Prerequisites
 
 - At least 3 GB of RAM available on your cluster
-- Kubernetes 1.15+ - chart is tested with latest 3 stable versions
+- Kubernetes 1.16+ - chart is tested with latest 3 stable versions
 - Helm 2 or 3
 - PV provisioner support in the underlying infrastructure
 
