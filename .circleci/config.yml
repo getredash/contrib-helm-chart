@@ -96,10 +96,7 @@ jobs:
       - run:
           name: Install chart dependencies
           command: |
-            # Need to add bitnami repo for Helm v3+
-            if [[ $HELM_VERSION != v2* ]]; then
-              helm repo add bitnami "https://charts.bitnami.com/bitnami"
-            fi
+            helm repo add bitnami "https://charts.bitnami.com/bitnami"
             helm dependency build .
 
       - run:
