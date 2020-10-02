@@ -16,10 +16,23 @@ spec:
       name: "{{ .Release.Name }}"
       labels:
         {{- include "redash.selectorLabels" . | nindent 8 }}
+      {{- if .Values.hookInstallJob.podAnnotations }}
+      annotations:
+      {{ toYaml .Values.hookInstallJob.podAnnotations | nindent 8 }}
+      {{- end }}
     spec:
+    {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      serviceAccountName: {{ include "redash.serviceAccountName" . }}
       restartPolicy: Never
+      securityContext:
+        {{- toYaml .Values.hookInstallJob.podSecurityContext | nindent 8 }}
       containers:
       - name: {{ include "redash.name" . }}-server
+        securityContext:
+          {{- toYaml .Values.hookInstallJob.securityContext | nindent 12 }}
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         command: ["/bin/bash", "/config/install-upgrade.sh", "install"]
@@ -40,15 +53,15 @@ spec:
         - name: config
           configMap:
             name: {{ include "redash.fullname" . }}
-    {{- with .Values.server.nodeSelector }}
+    {{- with .Values.hookInstallJob.nodeSelector }}
       nodeSelector:
 {{ toYaml . | indent 8 }}
     {{- end }}
-    {{- with .Values.server.affinity }}
+    {{- with .Values.hookInstallJob.affinity }}
       affinity:
 {{ toYaml . | indent 8 }}
     {{- end }}
-    {{- with .Values.server.tolerations }}
+    {{- with .Values.hookInstallJob.tolerations }}
       tolerations:
 {{ toYaml . | indent 8 }}
     {{- end }}
