@@ -189,7 +189,7 @@ jobs:
             VERSION=$(docker run --rm -i -v "${PWD}":/workdir mikefarah/yq yq read Chart.yaml 'version')
             if git show-ref --tags --quiet --verify -- "refs/tags/v$VERSION"; then
               echo "Release already exists, skipping publish"
-              exit 0
+              circleci-agent step halt
             fi
             git tag "v$VERSION"
             git push origin "v$VERSION"
@@ -223,8 +223,8 @@ jobs:
             cd /tmp/helm/publish
             git config user.email "${CIRCLE_USERNAME}@users.noreply.github.com"
             git config user.name CircleCI
-            # Only add new files - this ensures that already deployed chart versions are never updated in place
-            if ! git status -s | grep '??'; then echo "No new files"; exit 0; fi
+            # Skip if no new files - safety check to ensure that already deployed chart versions are never updated in place
+            if ! git status -s | grep '??'; then echo "No new files"; exit 1; fi
             git status -s | grep '??' | awk '{ print $2 }' | xargs git add
             git status
             git commit -m "Published by CircleCI ${CIRCLE_BUILD_URL} [skip ci]"
