@@ -49,7 +49,7 @@ Carefully review, test and commit the results. If changes are required (e.g. to 
 
 ### Pre-commit Hook Setup
 
-- Install [helm-docs](https://github.com/norwoodj/helm-docs)
+- Install [helm-docs](https://github.com/norwoodj/helm-docs) v1.4+
 - Install [the pre-commit binary](https://pre-commit.com/#install)
 - Then run:
 

@@ -10,7 +10,7 @@ This is a contributed project developed by volunteers and not officially support
 
 Current chart version is `2.1.0`
 
-Source code can be found [here](https://redash.io/)
+- <https://github.com/getredash/redash>
 
 ## Prerequisites
 
@@ -59,7 +59,7 @@ $ helm delete my-release
 
 The command removes all the Kubernetes components associated with the chart and deletes the release.
 
-## Chart Requirements
+## Requirements
 
 | Repository                         | Name       | Version  |
 | ---------------------------------- | ---------- | -------- |
@@ -70,7 +70,7 @@ The command removes all the Kubernetes components associated with the chart and 
 
 The following table lists the configurable parameters of the Redash chart and their default values.
 
-## Chart Values
+## Values
 
 | Key                                       | Type   | Default                                            | Description                                                                                                                                                                                                                                                                                                                                                                              |
 | ----------------------------------------- | ------ | -------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -206,7 +206,7 @@ The following table lists the configurable parameters of the Redash chart and th
 | scheduledWorker.securityContext           | object | `{}`                                               |                                                                                                                                                                                                                                                                                                                                                                                          |
 | scheduledWorker.tolerations               | list   | `[]`                                               | Tolerations for scheduled worker pod assignment [ref](https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/)                                                                                                                                                                                                                                                           |
 | server.affinity                           | object | `{}`                                               | Affinity for server pod assignment [ref](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity)                                                                                                                                                                                                                                                  |
-| server.env                                | object | `{}`                                               | Redash server specific envrionment variables                                                                                                                                                                                                                                                                                                                                             |
+| server.env                                | object | `{}`                                               | Redash server specific envrionment variables Don't use this for variables that are in the configuration above, however.                                                                                                                                                                                                                                                                  |
 | server.httpPort                           | int    | `5000`                                             | Server container port (only useful if you are using a customized image)                                                                                                                                                                                                                                                                                                                  |
 | server.nodeSelector                       | object | `{}`                                               | Node labels for server pod assignment [ref](https://kubernetes.io/docs/user-guide/node-selection/)                                                                                                                                                                                                                                                                                       |
 | server.podAnnotations                     | object | `{}`                                               | Annotations for server pod assignment [ref](https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/)                                                                                                                                                                                                                                                              |
