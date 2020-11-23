@@ -33,6 +33,8 @@ redash:
   ## Start primary Redash configuration
   # redash.secretKey -- REQUIRED `REDASH_SECRET_KEY` value. Defaults to ``. Secret key used for data encryption. Stored as a Secret value.
   secretKey:
+  # redash.samlSchemeOverride -- `REDASH_SAML_SCHEME_OVERRIDE` value. Defaults to ``. This setting will allow you to override the saml auth url scheme that gets constructed by flask. this is a useful feature if, for example, you're behind a proxy protocol enabled tcp load balancer (aws elb that terminates ssl) and your nginx proxy or similar adds a x-forwarded-proto of http even though your redash url for saml auth is https..
+  samlSchemeOverride:
   # redash.proxiesCount -- `REDASH_PROXIES_COUNT` value. Defaults to `1`.
   proxiesCount:
   # redash.statsdHost -- `REDASH_STATSD_HOST` value. Defaults to `127.0.0.1`.
@@ -141,7 +143,9 @@ redash:
   additionalQueryRunners:
   # redash.disabledQueryRunners -- `REDASH_DISABLED_QUERY_RUNNERS` value. Defaults to ``.
   disabledQueryRunners:
-  # redash.adhocQueryTimeLimit -- `REDASH_ADHOC_QUERY_TIME_LIMIT` value. Defaults to `None`.
+  # redash.scheduledQueryTimeLimit -- `REDASH_SCHEDULED_QUERY_TIME_LIMIT` value. Defaults to `None`. Time limit for scheduled queries (in seconds).
+  scheduledQueryTimeLimit:
+  # redash.adhocQueryTimeLimit -- `REDASH_ADHOC_QUERY_TIME_LIMIT` value. Defaults to `None`. Time limit for adhoc queries (in seconds).
   adhocQueryTimeLimit:
   # redash.enabledDestinations -- `REDASH_ENABLED_DESTINATIONS` value. Defaults to `”,”.join(default_destinations)`.
   enabledDestinations:
@@ -165,8 +169,6 @@ redash:
   samlEntityId:
   # redash.samlNameidFormat -- `REDASH_SAML_NAMEID_FORMAT` value. Defaults to ``.
   samlNameidFormat:
- # redash.samlSchemeOverride -- `REDASH_SAML_SCHEME_OVERRIDE` value. Defaults to ``.
-  samlSchemeOverride:
   # redash.dateFormat -- `REDASH_DATE_FORMAT` value. Defaults to `DD/MM/YY`.
   dateFormat:
   # redash.jwtLoginEnabled -- `REDASH_JWT_LOGIN_ENABLED` value. Defaults to `false`.
