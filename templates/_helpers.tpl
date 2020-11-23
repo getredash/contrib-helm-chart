@@ -125,6 +125,10 @@ Shared environment block used across each component.
       name: {{ include "redash.secretName" . }}
       key: secretKey
 {{- end }}
+{{- if .Values.redash.samlSchemeOverride }}
+- name: REDASH_SAML_SCHEME_OVERRIDE
+  value: {{ default  .Values.redash.samlSchemeOverride | quote }}
+{{- end }}
 {{- if .Values.redash.proxiesCount }}
 - name: REDASH_PROXIES_COUNT
   value: {{ default  .Values.redash.proxiesCount | quote }}
@@ -353,6 +357,10 @@ Shared environment block used across each component.
 - name: REDASH_DISABLED_QUERY_RUNNERS
   value: {{ default  .Values.redash.disabledQueryRunners | quote }}
 {{- end }}
+{{- if .Values.redash.scheduledQueryTimeLimit }}
+- name: REDASH_SCHEDULED_QUERY_TIME_LIMIT
+  value: {{ default  .Values.redash.scheduledQueryTimeLimit | quote }}
+{{- end }}
 {{- if .Values.redash.adhocQueryTimeLimit }}
 - name: REDASH_ADHOC_QUERY_TIME_LIMIT
   value: {{ default  .Values.redash.adhocQueryTimeLimit | quote }}
@@ -400,10 +408,6 @@ Shared environment block used across each component.
 {{- if .Values.redash.samlNameidFormat }}
 - name: REDASH_SAML_NAMEID_FORMAT
   value: {{ default  .Values.redash.samlNameidFormat | quote }}
-{{- end }}
-{{- if .Values.redash.samlSchemeOverride }}
-- name: REDASH_SAML_SCHEME_OVERRIDE
-  value: {{ default  .Values.redash.samlSchemeOverride | quote }}
 {{- end }}
 {{- if .Values.redash.dateFormat }}
 - name: REDASH_DATE_FORMAT

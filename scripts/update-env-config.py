@@ -16,6 +16,15 @@ vars.append({
     'secret': True,
     'required': True,
 })
+# Can remove once documented: https://github.com/getredash/website/issues/528
+vars.append({
+    'name': 'samlSchemeOverride',
+    'env': 'REDASH_SAML_SCHEME_OVERRIDE',
+    'desc': 'This setting will allow you to override the SAML Auth URL scheme that gets constructed by Flask. This is a useful feature if, for example, you\'re behind a Proxy Protocol enabled TCP load balancer (AWS ELB that terminates SSL) and your Nginx proxy or similar adds a X-Forwarded-Proto of HTTP even though your Redash URL for SAML auth is HTTPS.',
+    'default': '',
+    'secret': False,
+    'required': False,
+})
 # Parse the docs and build a list of environment variables
 with urllib.request.urlopen('https://raw.githubusercontent.com/getredash/website/master/src/pages/kb/open-source/admin-guide/env-vars-settings.md') as response:
     data = response.read().decode('utf-8')
