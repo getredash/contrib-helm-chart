@@ -227,6 +227,7 @@ jobs:
             git config user.name CircleCI
             # Skip if no new files - safety check to ensure that already deployed chart versions are never updated in place
             if ! git status -s | grep '??'; then echo "No new files"; exit 1; fi
+            git status -s | grep '??' | awk '{ print $2 }' | xargs git add
             git commit -a -m "Published by CircleCI ${CIRCLE_BUILD_URL} [skip ci]"
             git push origin "${GITHUB_PAGES_BRANCH}"
 
