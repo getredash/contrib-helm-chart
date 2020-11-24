@@ -3,7 +3,7 @@ entries:
   redash:
   - apiVersion: v1
     appVersion: 8.0.2.b37747
-    created: "2020-11-24T01:51:40.668165838Z"
+    created: "2020-11-24T04:01:54.811314534Z"
     dependencies:
     - condition: redis.enabled
       name: redis
@@ -15,7 +15,7 @@ entries:
       version: ^8.10.14
     description: Redash is an open source tool built for teams to query, visualize
       and collaborate.
-    digest: 47c2d752bfab12309e87e1fc09baff8ba040dbf21330a4bad286d51e22e51ac2
+    digest: 6ab86dbaa924d45809a151c4f2e88cab980275f306a23cdd643a1df90c076ed2
     home: https://redash.io/
     icon: https://redash.io/assets/images/elements/redash-logo.svg
     keywords:
@@ -29,11 +29,11 @@ entries:
     sources:
     - https://github.com/getredash/redash
     urls:
-    - redash-2.1.1.tgz
-    version: 2.1.1
+    - redash-2.2.0.tgz
+    version: 2.2.0
   - apiVersion: v1
     appVersion: 8.0.2.b37747
-    created: "2020-11-24T01:51:40.644046946Z"
+    created: "2020-11-24T04:01:54.783533695Z"
     dependencies:
     - condition: redis.enabled
       name: redis
@@ -63,7 +63,7 @@ entries:
     version: 2.1.0
   - apiVersion: v1
     appVersion: 8.0.2.b37747
-    created: "2020-11-24T01:51:40.629092432Z"
+    created: "2020-11-24T04:01:54.766137586Z"
     dependencies:
     - condition: redis.enabled
       name: redis
@@ -93,7 +93,7 @@ entries:
     version: 2.0.0
   - apiVersion: v1
     appVersion: 8.0.2.b37747
-    created: "2020-11-24T01:51:40.60660775Z"
+    created: "2020-11-24T04:01:54.740663823Z"
     dependencies:
     - condition: redis.enabled
       name: redis
@@ -123,7 +123,7 @@ entries:
     version: 2.0.0-beta.8
   - apiVersion: v1
     appVersion: 8.0.2.b37747
-    created: "2020-11-24T01:51:40.583881897Z"
+    created: "2020-11-24T04:01:54.725980877Z"
     dependencies:
     - condition: redis.enabled
       name: redis
@@ -153,7 +153,7 @@ entries:
     version: 2.0.0-beta.7
   - apiVersion: v1
     appVersion: 8.0.2.b37747
-    created: "2020-11-24T01:51:40.571503704Z"
+    created: "2020-11-24T04:01:54.700030614Z"
     dependencies:
     - condition: redis.enabled
       name: redis
@@ -183,7 +183,7 @@ entries:
     version: 2.0.0-beta.6
   - apiVersion: v1
     appVersion: 8.0.2.b37747
-    created: "2020-11-24T01:51:40.556601776Z"
+    created: "2020-11-24T04:01:54.675817223Z"
     dependencies:
     - condition: redis.enabled
       name: redis
@@ -213,7 +213,7 @@ entries:
     version: 2.0.0-beta.5
   - apiVersion: v1
     appVersion: 8.0.2.b37747
-    created: "2020-11-24T01:51:40.535015767Z"
+    created: "2020-11-24T04:01:54.662221943Z"
     dependencies:
     - condition: redis.enabled
       name: redis
@@ -243,7 +243,7 @@ entries:
     version: 2.0.0-beta.4
   - apiVersion: v1
     appVersion: 8.0.2.b37747
-    created: "2020-11-24T01:51:40.521537741Z"
+    created: "2020-11-24T04:01:54.637972469Z"
     dependencies:
     - condition: redis.enabled
       name: redis
@@ -273,7 +273,7 @@ entries:
     version: 2.0.0-beta.3
   - apiVersion: v1
     appVersion: 8.0.2.b37747
-    created: "2020-11-24T01:51:40.498133707Z"
+    created: "2020-11-24T04:01:54.623533674Z"
     dependencies:
     - condition: redis.enabled
       name: redis
@@ -303,7 +303,7 @@ entries:
     version: 2.0.0-beta.2
   - apiVersion: v1
     appVersion: 8.0.2.b37747
-    created: "2020-11-24T01:51:40.476343173Z"
+    created: "2020-11-24T04:01:54.599565275Z"
     dependencies:
     - condition: redis.enabled
       name: redis
@@ -333,7 +333,7 @@ entries:
     version: 2.0.0-beta.1
   - apiVersion: v1
     appVersion: 8.0.2.b37747
-    created: "2020-11-24T01:51:40.463212737Z"
+    created: "2020-11-24T04:01:54.585192695Z"
     dependencies:
     - condition: redis.enabled
       name: redis
@@ -363,7 +363,7 @@ entries:
     version: 1.2.0
   - apiVersion: v1
     appVersion: 8.0.1.b33387
-    created: "2020-11-24T01:51:40.44240686Z"
+    created: "2020-11-24T04:01:54.562882412Z"
     dependencies:
     - condition: redis.enabled
       name: redis
@@ -391,4 +391,4 @@ entries:
     urls:
     - redash-1.1.0.tgz
     version: 1.1.0
-generated: "2020-11-24T01:51:40.433785681Z"
+generated: "2020-11-24T04:01:54.553232757Z"
