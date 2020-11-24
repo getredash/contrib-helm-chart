@@ -40,7 +40,9 @@ jobs:
       - run:
           name: Install helm
           command: |
-            curl -Lo get-helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get && chmod +x get-helm.sh
+            GET=get
+            if [[ $HELM_VERSION =~ ^v3\. ]]; then GET=get-helm-3; fi
+            curl -Lo get-helm.sh "https://raw.githubusercontent.com/helm/helm/master/scripts/${GET}" && chmod +x get-helm.sh
             ./get-helm.sh --version "${HELM_VERSION}"
             rm get-helm.sh
 
@@ -199,7 +201,9 @@ jobs:
       - run:
           name: Install helm
           command: |
-            curl -Lo get-helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get && chmod +x get-helm.sh
+            GET=get
+            if [[ $HELM_VERSION =~ ^v3\. ]]; then GET=get-helm-3; fi
+            curl -Lo get-helm.sh "https://raw.githubusercontent.com/helm/helm/master/scripts/${GET}" && chmod +x get-helm.sh
             ./get-helm.sh --version "${HELM_VERSION}"
             rm get-helm.sh
 
