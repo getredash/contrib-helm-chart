@@ -77,7 +77,13 @@ Shared environment block used across each component.
 {{- define "redash.env" -}}
 {{- if not .Values.postgresql.enabled }}
 - name: REDASH_DATABASE_URL
+  {{- if .Values.externalPostgreSQLSecret }}
+  valueFrom:
+    secretKeyRef:
+      {{- .Values.externalPostgreSQLSecret | toYaml | nindent 6 }}
+  {{- else }}
   value: {{ default "" .Values.externalPostgreSQL | quote }}
+  {{- end }}
 {{- else }}
 - name: REDASH_DATABASE_USER
   value: "{{ .Values.postgresql.postgresqlUsername }}"
@@ -95,7 +101,13 @@ Shared environment block used across each component.
 {{- end }}
 {{- if not .Values.redis.enabled }}
 - name: REDASH_REDIS_URL
+  {{- if .Values.externalRedisSecret }}
+  valueFrom:
+    secretKeyRef:
+      {{- .Values.externalRedisSecret | toYaml | nindent 6 }}
+  {{- else }}
   value: {{ default "" .Values.externalRedis | quote }}
+  {{- end }}
 {{- else }}
 - name: REDASH_REDIS_PASSWORD
   valueFrom:
