@@ -38,15 +38,15 @@ spec:
         - name: config
           configMap:
             name: {{ include "redash.fullname" . }}
-  {{- with .Values.server.nodeSelector }}
-    nodeSelector:
-{{ toYaml . | indent 6 }}
-  {{- end }}
-  {{- with .Values.server.affinity }}
-    affinity:
-{{ toYaml . | indent 6 }}
-  {{- end }}
-  {{- with .Values.server.tolerations }}
-    tolerations:
-{{ toYaml . | indent 6 }}
-  {{- end }}
+      {{- with .Values.server.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with .Values.server.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with .Values.server.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+      {{- end }}
