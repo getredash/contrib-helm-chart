@@ -31,180 +31,248 @@ serviceAccount:
 ## Redash application configuration
 redash:
   ## Start primary Redash configuration
-  # redash.secretKey -- REQUIRED `REDASH_SECRET_KEY` value. Defaults to ``. Secret key used for data encryption. Stored as a Secret value.
-  secretKey:
-  # redash.samlSchemeOverride -- `REDASH_SAML_SCHEME_OVERRIDE` value. Defaults to ``. This setting will allow you to override the saml auth url scheme that gets constructed by flask. this is a useful feature if, for example, you're behind a proxy protocol enabled tcp load balancer (aws elb that terminates ssl) and your nginx proxy or similar adds a x-forwarded-proto of http even though your redash url for saml auth is https..
-  samlSchemeOverride:
-  # redash.proxiesCount -- `REDASH_PROXIES_COUNT` value. Defaults to `1`.
-  proxiesCount:
-  # redash.statsdHost -- `REDASH_STATSD_HOST` value. Defaults to `127.0.0.1`.
-  statsdHost:
-  # redash.statsdPort -- `REDASH_STATSD_PORT` value. Defaults to `8125`.
-  statsdPort:
-  # redash.statsdPrefix -- `REDASH_STATSD_PREFIX` value. Defaults to `redash`.
-  statsdPrefix:
-  # redash.statsdUseTags -- `REDASH_STATSD_USE_TAGS` value. Defaults to `false`. Whether to use tags in statsd metrics (influxdb’s format).
-  statsdUseTags:
-  # redash.celeryBroker -- `REDASH_CELERY_BROKER` value. Defaults to `REDIS_URL`.
-  celeryBroker:
-  # redash.celeryBackend -- `REDASH_CELERY_BACKEND` value. Defaults to `CELERY_BROKER`.
-  celeryBackend:
-  # redash.celeryTaskResultExpires -- `REDASH_CELERY_TASK_RESULT_EXPIRES` value. Defaults to `3600 \* 4`. How many seconds to keep celery task results in cache (in seconds).
-  celeryTaskResultExpires:
-  # redash.queryResultsCleanupEnabled -- `REDASH_QUERY_RESULTS_CLEANUP_ENABLED` value. Defaults to `true`.
-  queryResultsCleanupEnabled:
-  # redash.queryResultsCleanupCount -- `REDASH_QUERY_RESULTS_CLEANUP_COUNT` value. Defaults to `100`.
-  queryResultsCleanupCount:
-  # redash.queryResultsCleanupMaxAge -- `REDASH_QUERY_RESULTS_CLEANUP_MAX_AGE` value. Defaults to `7`.
-  queryResultsCleanupMaxAge:
-  # redash.schemasRefreshQueue -- `REDASH_SCHEMAS_REFRESH_QUEUE` value. Defaults to `celery`. The celery queue for refreshing the data source schemas.
-  schemasRefreshQueue:
-  # redash.schemasRefreshSchedule -- `REDASH_SCHEMAS_REFRESH_SCHEDULE` value. Defaults to `30`. How often to refresh the data sources schemas (in minutes).
-  schemasRefreshSchedule:
-  # redash.authType -- `REDASH_AUTH_TYPE` value. Defaults to `api_key`.
-  authType:
-  # redash.enforceHttps -- `REDASH_ENFORCE_HTTPS` value. Defaults to `false`.
-  enforceHttps:
-  # redash.invitationTokenMaxAge -- `REDASH_INVITATION_TOKEN_MAX_AGE` value. Defaults to `60 _ 60 _ 24 \* 7`.
-  invitationTokenMaxAge:
-  # redash.multiOrg -- `REDASH_MULTI_ORG` value. Defaults to `false`.
-  multiOrg:
-  # redash.googleClientId -- `REDASH_GOOGLE_CLIENT_ID` value. Defaults to ``.
-  googleClientId:
-  # redash.googleClientSecret -- `REDASH_GOOGLE_CLIENT_SECRET` value. Defaults to ``. Stored as a Secret value.
-  googleClientSecret:
-  # redash.remoteUserLoginEnabled -- `REDASH_REMOTE_USER_LOGIN_ENABLED` value. Defaults to `false`.
-  remoteUserLoginEnabled:
-  # redash.remoteUserHeader -- `REDASH_REMOTE_USER_HEADER` value. Defaults to `X-Forwarded-Remote-User`.
-  remoteUserHeader:
-  # redash.ldapLoginEnabled -- `REDASH_LDAP_LOGIN_ENABLED` value. Defaults to `false`.
-  ldapLoginEnabled:
-  # redash.ldapUrl -- `REDASH_LDAP_URL` value. Defaults to `None`.
-  ldapUrl:
-  # redash.ldapBindDn -- `REDASH_LDAP_BIND_DN` value. Defaults to `None`.
-  ldapBindDn:
-  # redash.ldapBindDnPassword -- `REDASH_LDAP_BIND_DN_PASSWORD` value. Defaults to ``. Stored as a Secret value.
-  ldapBindDnPassword:
-  # redash.ldapDisplayNameKey -- `REDASH_LDAP_DISPLAY_NAME_KEY` value. Defaults to `displayName`.
-  ldapDisplayNameKey:
-  # redash.ldapEmailKey -- `REDASH_LDAP_EMAIL_KEY` value. Defaults to `mail`.
-  ldapEmailKey:
-  # redash.ldapCustomUsernamePrompt -- `REDASH_LDAP_CUSTOM_USERNAME_PROMPT` value. Defaults to `LDAP/AD/SSO username:`.
-  ldapCustomUsernamePrompt:
-  # redash.ldapSearchTemplate -- `REDASH_LDAP_SEARCH_TEMPLATE` value. Defaults to `(cn=%(username)s)`.
-  ldapSearchTemplate:
-  # redash.ldapSearchDn -- `REDASH_LDAP_SEARCH_DN` value. Defaults to `REDASH_SEARCH_DN`.
-  ldapSearchDn:
-  # redash.staticAssetsPath -- `REDASH_STATIC_ASSETS_PATH` value. Defaults to `”../client/dist/”`.
-  staticAssetsPath:
-  # redash.jobExpiryTime -- `REDASH_JOB_EXPIRY_TIME` value. Defaults to `3600 \* 12`.
-  jobExpiryTime:
-  # redash.cookieSecret -- REQUIRED `REDASH_COOKIE_SECRET` value. Defaults to ``. Stored as a Secret value.
-  cookieSecret:
-  # redash.logLevel -- `REDASH_LOG_LEVEL` value. Defaults to `INFO`.
-  logLevel:
-  # redash.mailServer -- `REDASH_MAIL_SERVER` value. Defaults to `localhost`.
-  mailServer:
-  # redash.mailPort -- `REDASH_MAIL_PORT` value. Defaults to `25`.
-  mailPort:
-  # redash.mailUseTls -- `REDASH_MAIL_USE_TLS` value. Defaults to `false`.
-  mailUseTls:
-  # redash.mailUseSsl -- `REDASH_MAIL_USE_SSL` value. Defaults to `false`.
-  mailUseSsl:
-  # redash.mailUsername -- `REDASH_MAIL_USERNAME` value. Defaults to `None`.
-  mailUsername:
-  # redash.mailPassword -- `REDASH_MAIL_PASSWORD` value. Defaults to `None`. Stored as a Secret value.
-  mailPassword:
-  # redash.mailDefaultSender -- `REDASH_MAIL_DEFAULT_SENDER` value. Defaults to `None`.
-  mailDefaultSender:
-  # redash.mailMaxEmails -- `REDASH_MAIL_MAX_EMAILS` value. Defaults to `None`.
-  mailMaxEmails:
-  # redash.mailAsciiAttachments -- `REDASH_MAIL_ASCII_ATTACHMENTS` value. Defaults to `false`.
-  mailAsciiAttachments:
-  # redash.host -- `REDASH_HOST` value. Defaults to ``.
-  host:
-  # redash.alertsDefaultMailSubjectTemplate -- `REDASH_ALERTS_DEFAULT_MAIL_SUBJECT_TEMPLATE` value. Defaults to `({state}) {alert_name}`.
-  alertsDefaultMailSubjectTemplate:
-  # redash.throttleLoginPattern -- `REDASH_THROTTLE_LOGIN_PATTERN` value. Defaults to `50/hour`.
-  throttleLoginPattern:
-  # redash.limiterStorage -- `REDASH_LIMITER_STORAGE` value. Defaults to `REDIS_URL`.
-  limiterStorage:
-  # redash.corsAccessControlAllowOrigin -- `REDASH_CORS_ACCESS_CONTROL_ALLOW_ORIGIN` value. Defaults to ``.
-  corsAccessControlAllowOrigin:
-  # redash.corsAccessControlAllowCredentials -- `REDASH_CORS_ACCESS_CONTROL_ALLOW_CREDENTIALS` value. Defaults to `false`.
-  corsAccessControlAllowCredentials:
-  # redash.corsAccessControlRequestMethod -- `REDASH_CORS_ACCESS_CONTROL_REQUEST_METHOD` value. Defaults to `GET, POST, PUT`.
-  corsAccessControlRequestMethod:
-  # redash.corsAccessControlAllowHeaders -- `REDASH_CORS_ACCESS_CONTROL_ALLOW_HEADERS` value. Defaults to `Content-Type`.
-  corsAccessControlAllowHeaders:
-  # redash.enabledQueryRunners -- `REDASH_ENABLED_QUERY_RUNNERS` value. Defaults to `”,”.join(default_query_runners)`.
-  enabledQueryRunners:
-  # redash.additionalQueryRunners -- `REDASH_ADDITIONAL_QUERY_RUNNERS` value. Defaults to ``.
-  additionalQueryRunners:
-  # redash.disabledQueryRunners -- `REDASH_DISABLED_QUERY_RUNNERS` value. Defaults to ``.
-  disabledQueryRunners:
-  # redash.scheduledQueryTimeLimit -- `REDASH_SCHEDULED_QUERY_TIME_LIMIT` value. Defaults to `None`. Time limit for scheduled queries (in seconds).
-  scheduledQueryTimeLimit:
-  # redash.adhocQueryTimeLimit -- `REDASH_ADHOC_QUERY_TIME_LIMIT` value. Defaults to `None`. Time limit for adhoc queries (in seconds).
-  adhocQueryTimeLimit:
-  # redash.enabledDestinations -- `REDASH_ENABLED_DESTINATIONS` value. Defaults to `”,”.join(default_destinations)`.
-  enabledDestinations:
-  # redash.additionalDestinations -- `REDASH_ADDITIONAL_DESTINATIONS` value. Defaults to ``.
-  additionalDestinations:
-  # redash.eventReportingWebhooks -- `REDASH_EVENT_REPORTING_WEBHOOKS` value. Defaults to ``.
-  eventReportingWebhooks:
-  # redash.sentryDsn -- `REDASH_SENTRY_DSN` value. Defaults to ``.
-  sentryDsn:
-  # redash.allowScriptsInUserInput -- `REDASH_ALLOW_SCRIPTS_IN_USER_INPUT` value. Defaults to `false`. Disable sanitization of text input, allowing full html.
-  allowScriptsInUserInput:
-  # redash.dashboardRefreshIntervals -- `REDASH_DASHBOARD_REFRESH_INTERVALS` value. Defaults to `60,300,600,1800,3600,43200,86400`.
-  dashboardRefreshIntervals:
-  # redash.queryRefreshIntervals -- `REDASH_QUERY_REFRESH_INTERVALS` value. Defaults to `60, 300, 600, 900, 1800, 3600, 7200, 10800, 14400, 18000, 21600, 25200, 28800, 32400, 36000, 39600, 43200, 86400, 604800, 1209600, 2592000`.
-  queryRefreshIntervals:
-  # redash.passwordLoginEnabled -- `REDASH_PASSWORD_LOGIN_ENABLED` value. Defaults to `true`.
-  passwordLoginEnabled:
-  # redash.samlMetadataUrl -- `REDASH_SAML_METADATA_URL` value. Defaults to ``.
-  samlMetadataUrl:
-  # redash.samlEntityId -- `REDASH_SAML_ENTITY_ID` value. Defaults to ``.
-  samlEntityId:
-  # redash.samlNameidFormat -- `REDASH_SAML_NAMEID_FORMAT` value. Defaults to ``.
-  samlNameidFormat:
-  # redash.dateFormat -- `REDASH_DATE_FORMAT` value. Defaults to `DD/MM/YY`.
-  dateFormat:
-  # redash.jwtLoginEnabled -- `REDASH_JWT_LOGIN_ENABLED` value. Defaults to `false`.
-  jwtLoginEnabled:
-  # redash.jwtAuthIssuer -- `REDASH_JWT_AUTH_ISSUER` value. Defaults to ``.
-  jwtAuthIssuer:
-  # redash.jwtAuthPublicCertsUrl -- `REDASH_JWT_AUTH_PUBLIC_CERTS_URL` value. Defaults to ``.
-  jwtAuthPublicCertsUrl:
-  # redash.jwtAuthAudience -- `REDASH_JWT_AUTH_AUDIENCE` value. Defaults to ``.
-  jwtAuthAudience:
-  # redash.jwtAuthAlgorithms -- `REDASH_JWT_AUTH_ALGORITHMS` value. Defaults to `HS256,RS256,ES256`.
-  jwtAuthAlgorithms:
-  # redash.jwtAuthCookieName -- `REDASH_JWT_AUTH_COOKIE_NAME` value. Defaults to ``.
-  jwtAuthCookieName:
-  # redash.jwtAuthHeaderName -- `REDASH_JWT_AUTH_HEADER_NAME` value. Defaults to ``.
-  jwtAuthHeaderName:
-  # redash.featureShowQueryResultsCount -- `REDASH_FEATURE_SHOW_QUERY_RESULTS_COUNT` value. Defaults to `true`. Disable/enable showing count of query results in status.
-  featureShowQueryResultsCount:
-  # redash.versionCheck -- `REDASH_VERSION_CHECK` value. Defaults to `true`.
-  versionCheck:
-  # redash.featureDisableRefreshQueries -- `REDASH_FEATURE_DISABLE_REFRESH_QUERIES` value. Defaults to `false`. Disable scheduled query execution.
-  featureDisableRefreshQueries:
-  # redash.featureShowPermissionsControl -- `REDASH_FEATURE_SHOW_PERMISSIONS_CONTROL` value. Defaults to `false`.
-  featureShowPermissionsControl:
-  # redash.featureAllowCustomJsVisualizations -- `REDASH_FEATURE_ALLOW_CUSTOM_JS_VISUALIZATIONS` value. Defaults to `false`.
-  featureAllowCustomJsVisualizations:
-  # redash.featureDumbRecents -- `REDASH_FEATURE_DUMB_RECENTS` value. Defaults to `false`.
-  featureDumbRecents:
-  # redash.featureAutoPublishNamedQueries -- `REDASH_FEATURE_AUTO_PUBLISH_NAMED_QUERIES` value. Defaults to `true`.
-  featureAutoPublishNamedQueries:
-  # redash.bigqueryHttpTimeout -- `REDASH_BIGQUERY_HTTP_TIMEOUT` value. Defaults to `600`.
-  bigqueryHttpTimeout:
-  # redash.schemaRunTableSizeCalculations -- `REDASH_SCHEMA_RUN_TABLE_SIZE_CALCULATIONS` value. Defaults to `false`.
-  schemaRunTableSizeCalculations:
-  # redash.webWorkers -- `REDASH_WEB_WORKERS` value. Defaults to `4`. How many processes will gunicorn spawn to handle web requests.
-  webWorkers:
+  ## Note that we document the Redash defaults, but don't explicitly set them.
+  ## This allows multiple versions of Redash (which may have different defaults) to be more easily used
+  # -- REQUIRED `REDASH_SECRET_KEY` value. Secret key used for data encryption. Stored as a Secret value.
+  secretKey: ""
+  # -- `REDASH_SAML_SCHEME_OVERRIDE` value. This setting will allow you to override the saml auth url scheme that gets constructed by flask. this is a useful feature if, for example, you're behind a proxy protocol enabled tcp load balancer (aws elb that terminates ssl) and your nginx proxy or similar adds a x-forwarded-proto of http even though your redash url for saml auth is https..
+  samlSchemeOverride: ""
+  # -- `REDASH_PROXIES_COUNT` value.
+  # @default -- 1
+  proxiesCount: ""
+  # -- `REDASH_STATSD_HOST` value.
+  # @default -- 127.0.0.1
+  statsdHost: ""
+  # -- `REDASH_STATSD_PORT` value.
+  # @default -- 8125
+  statsdPort: ""
+  # -- `REDASH_STATSD_PREFIX` value.
+  # @default -- redash
+  statsdPrefix: ""
+  # -- `REDASH_STATSD_USE_TAGS` value. Whether to use tags in statsd metrics (influxdb’s format).
+  # @default -- false
+  statsdUseTags: ""
+  # -- `REDASH_CELERY_BROKER` value.
+  # @default -- REDIS_URL
+  celeryBroker: ""
+  # -- `REDASH_CELERY_BACKEND` value.
+  # @default -- CELERY_BROKER
+  celeryBackend: ""
+  # -- `REDASH_CELERY_TASK_RESULT_EXPIRES` value. How many seconds to keep celery task results in cache (in seconds).
+  # @default -- 3600 \* 4
+  celeryTaskResultExpires: ""
+  # -- `REDASH_QUERY_RESULTS_CLEANUP_ENABLED` value.
+  # @default -- true
+  queryResultsCleanupEnabled: ""
+  # -- `REDASH_QUERY_RESULTS_CLEANUP_COUNT` value.
+  # @default -- 100
+  queryResultsCleanupCount: ""
+  # -- `REDASH_QUERY_RESULTS_CLEANUP_MAX_AGE` value.
+  # @default -- 7
+  queryResultsCleanupMaxAge: ""
+  # -- `REDASH_SCHEMAS_REFRESH_QUEUE` value. The celery queue for refreshing the data source schemas.
+  # @default -- celery
+  schemasRefreshQueue: ""
+  # -- `REDASH_SCHEMAS_REFRESH_SCHEDULE` value. How often to refresh the data sources schemas (in minutes).
+  # @default -- 30
+  schemasRefreshSchedule: ""
+  # -- `REDASH_AUTH_TYPE` value.
+  # @default -- api_key
+  authType: ""
+  # -- `REDASH_ENFORCE_HTTPS` value.
+  # @default -- false
+  enforceHttps: ""
+  # -- `REDASH_INVITATION_TOKEN_MAX_AGE` value.
+  # @default -- 60 _ 60 _ 24 \* 7
+  invitationTokenMaxAge: ""
+  # -- `REDASH_MULTI_ORG` value.
+  # @default -- false
+  multiOrg: ""
+  # -- `REDASH_GOOGLE_CLIENT_ID` value.
+  googleClientId: ""
+  # -- `REDASH_GOOGLE_CLIENT_SECRET` value. Stored as a Secret value.
+  googleClientSecret: ""
+  # -- `REDASH_REMOTE_USER_LOGIN_ENABLED` value.
+  # @default -- false
+  remoteUserLoginEnabled: ""
+  # -- `REDASH_REMOTE_USER_HEADER` value.
+  # @default -- X-Forwarded-Remote-User
+  remoteUserHeader: ""
+  # -- `REDASH_LDAP_LOGIN_ENABLED` value.
+  # @default -- false
+  ldapLoginEnabled: ""
+  # -- `REDASH_LDAP_URL` value.
+  # @default -- None
+  ldapUrl: ""
+  # -- `REDASH_LDAP_BIND_DN` value.
+  # @default -- None
+  ldapBindDn: ""
+  # -- `REDASH_LDAP_BIND_DN_PASSWORD` value. Stored as a Secret value.
+  ldapBindDnPassword: ""
+  # -- `REDASH_LDAP_DISPLAY_NAME_KEY` value.
+  # @default -- displayName
+  ldapDisplayNameKey: ""
+  # -- `REDASH_LDAP_EMAIL_KEY` value.
+  # @default -- mail
+  ldapEmailKey: ""
+  # -- `REDASH_LDAP_CUSTOM_USERNAME_PROMPT` value.
+  # @default -- LDAP/AD/SSO username:
+  ldapCustomUsernamePrompt: ""
+  # -- `REDASH_LDAP_SEARCH_TEMPLATE` value.
+  # @default -- (cn=%(username)s)
+  ldapSearchTemplate: ""
+  # -- `REDASH_LDAP_SEARCH_DN` value.
+  # @default -- REDASH_SEARCH_DN
+  ldapSearchDn: ""
+  # -- `REDASH_STATIC_ASSETS_PATH` value.
+  # @default -- ”../client/dist/”
+  staticAssetsPath: ""
+  # -- `REDASH_JOB_EXPIRY_TIME` value.
+  # @default -- 3600 \* 12
+  jobExpiryTime: ""
+  # -- REQUIRED `REDASH_COOKIE_SECRET` value. Stored as a Secret value.
+  cookieSecret: ""
+  # -- `REDASH_LOG_LEVEL` value.
+  # @default -- INFO
+  logLevel: ""
+  # -- `REDASH_MAIL_SERVER` value.
+  # @default -- localhost
+  mailServer: ""
+  # -- `REDASH_MAIL_PORT` value.
+  # @default -- 25
+  mailPort: ""
+  # -- `REDASH_MAIL_USE_TLS` value.
+  # @default -- false
+  mailUseTls: ""
+  # -- `REDASH_MAIL_USE_SSL` value.
+  # @default -- false
+  mailUseSsl: ""
+  # -- `REDASH_MAIL_USERNAME` value.
+  # @default -- None
+  mailUsername: ""
+  # -- `REDASH_MAIL_PASSWORD` value. Stored as a Secret value.
+  # @default -- None
+  mailPassword: ""
+  # -- `REDASH_MAIL_DEFAULT_SENDER` value.
+  # @default -- None
+  mailDefaultSender: ""
+  # -- `REDASH_MAIL_MAX_EMAILS` value.
+  # @default -- None
+  mailMaxEmails: ""
+  # -- `REDASH_MAIL_ASCII_ATTACHMENTS` value.
+  # @default -- false
+  mailAsciiAttachments: ""
+  # -- `REDASH_HOST` value.
+  host: ""
+  # -- `REDASH_ALERTS_DEFAULT_MAIL_SUBJECT_TEMPLATE` value.
+  # @default -- ({state}) {alert_name}
+  alertsDefaultMailSubjectTemplate: ""
+  # -- `REDASH_THROTTLE_LOGIN_PATTERN` value.
+  # @default -- 50/hour
+  throttleLoginPattern: ""
+  # -- `REDASH_LIMITER_STORAGE` value.
+  # @default -- REDIS_URL
+  limiterStorage: ""
+  # -- `REDASH_CORS_ACCESS_CONTROL_ALLOW_ORIGIN` value.
+  corsAccessControlAllowOrigin: ""
+  # -- `REDASH_CORS_ACCESS_CONTROL_ALLOW_CREDENTIALS` value.
+  # @default -- false
+  corsAccessControlAllowCredentials: ""
+  # -- `REDASH_CORS_ACCESS_CONTROL_REQUEST_METHOD` value.
+  # @default -- GET, POST, PUT
+  corsAccessControlRequestMethod: ""
+  # -- `REDASH_CORS_ACCESS_CONTROL_ALLOW_HEADERS` value.
+  # @default -- Content-Type
+  corsAccessControlAllowHeaders: ""
+  # -- `REDASH_ENABLED_QUERY_RUNNERS` value.
+  # @default -- ”,”.join(default_query_runners)
+  enabledQueryRunners: ""
+  # -- `REDASH_ADDITIONAL_QUERY_RUNNERS` value.
+  additionalQueryRunners: ""
+  # -- `REDASH_DISABLED_QUERY_RUNNERS` value.
+  disabledQueryRunners: ""
+  # -- `REDASH_SCHEDULED_QUERY_TIME_LIMIT` value. Time limit for scheduled queries (in seconds).
+  # @default -- None
+  scheduledQueryTimeLimit: ""
+  # -- `REDASH_ADHOC_QUERY_TIME_LIMIT` value. Time limit for adhoc queries (in seconds).
+  # @default -- None
+  adhocQueryTimeLimit: ""
+  # -- `REDASH_ENABLED_DESTINATIONS` value.
+  # @default -- ”,”.join(default_destinations)
+  enabledDestinations: ""
+  # -- `REDASH_ADDITIONAL_DESTINATIONS` value.
+  additionalDestinations: ""
+  # -- `REDASH_EVENT_REPORTING_WEBHOOKS` value.
+  eventReportingWebhooks: ""
+  # -- `REDASH_SENTRY_DSN` value.
+  sentryDsn: ""
+  # -- `REDASH_ALLOW_SCRIPTS_IN_USER_INPUT` value. Disable sanitization of text input, allowing full html.
+  # @default -- false
+  allowScriptsInUserInput: ""
+  # -- `REDASH_DASHBOARD_REFRESH_INTERVALS` value.
+  # @default -- 60,300,600,1800,3600,43200,86400
+  dashboardRefreshIntervals: ""
+  # -- `REDASH_QUERY_REFRESH_INTERVALS` value.
+  # @default -- 60, 300, 600, 900, 1800, 3600, 7200, 10800, 14400, 18000, 21600, 25200, 28800, 32400, 36000, 39600, 43200, 86400, 604800, 1209600, 2592000
+  queryRefreshIntervals: ""
+  # -- `REDASH_PASSWORD_LOGIN_ENABLED` value.
+  # @default -- true
+  passwordLoginEnabled: ""
+  # -- `REDASH_SAML_METADATA_URL` value.
+  samlMetadataUrl: ""
+  # -- `REDASH_SAML_ENTITY_ID` value.
+  samlEntityId: ""
+  # -- `REDASH_SAML_NAMEID_FORMAT` value.
+  samlNameidFormat: ""
+  # -- `REDASH_DATE_FORMAT` value.
+  # @default -- DD/MM/YY
+  dateFormat: ""
+  # -- `REDASH_JWT_LOGIN_ENABLED` value.
+  # @default -- false
+  jwtLoginEnabled: ""
+  # -- `REDASH_JWT_AUTH_ISSUER` value.
+  jwtAuthIssuer: ""
+  # -- `REDASH_JWT_AUTH_PUBLIC_CERTS_URL` value.
+  jwtAuthPublicCertsUrl: ""
+  # -- `REDASH_JWT_AUTH_AUDIENCE` value.
+  jwtAuthAudience: ""
+  # -- `REDASH_JWT_AUTH_ALGORITHMS` value.
+  # @default -- HS256,RS256,ES256
+  jwtAuthAlgorithms: ""
+  # -- `REDASH_JWT_AUTH_COOKIE_NAME` value.
+  jwtAuthCookieName: ""
+  # -- `REDASH_JWT_AUTH_HEADER_NAME` value.
+  jwtAuthHeaderName: ""
+  # -- `REDASH_FEATURE_SHOW_QUERY_RESULTS_COUNT` value. Disable/enable showing count of query results in status.
+  # @default -- true
+  featureShowQueryResultsCount: ""
+  # -- `REDASH_VERSION_CHECK` value.
+  # @default -- true
+  versionCheck: ""
+  # -- `REDASH_FEATURE_DISABLE_REFRESH_QUERIES` value. Disable scheduled query execution.
+  # @default -- false
+  featureDisableRefreshQueries: ""
+  # -- `REDASH_FEATURE_SHOW_PERMISSIONS_CONTROL` value.
+  # @default -- false
+  featureShowPermissionsControl: ""
+  # -- `REDASH_FEATURE_ALLOW_CUSTOM_JS_VISUALIZATIONS` value.
+  # @default -- false
+  featureAllowCustomJsVisualizations: ""
+  # -- `REDASH_FEATURE_DUMB_RECENTS` value.
+  # @default -- false
+  featureDumbRecents: ""
+  # -- `REDASH_FEATURE_AUTO_PUBLISH_NAMED_QUERIES` value.
+  # @default -- true
+  featureAutoPublishNamedQueries: ""
+  # -- `REDASH_BIGQUERY_HTTP_TIMEOUT` value.
+  # @default -- 600
+  bigqueryHttpTimeout: ""
+  # -- `REDASH_SCHEMA_RUN_TABLE_SIZE_CALCULATIONS` value.
+  # @default -- false
+  schemaRunTableSizeCalculations: ""
+  # -- `REDASH_WEB_WORKERS` value. How many processes will gunicorn spawn to handle web requests.
+  # @default -- 4
+  webWorkers: ""
   ## End primary Redash configuration
   # redash.existingSecret -- Name of existing secret to use instead of either the values above
   ## This secret must contain keys matching the items marked "Stored as a Secret value" above.
@@ -345,15 +413,16 @@ scheduledWorker:
   # scheduledWorker.podAnnotations -- Annotations for scheduled worker pod assignment [ref](https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/)
   podAnnotations: {}
 
-# externalPostgreSQL -- External PostgreSQL configuration. To use an external PostgreSQL instead of the automatically deployed postgresql chart: set postgresql.enabled to false then uncomment and configure the externalPostgreSQL connection URL.
-# externalPostgreSQL: postgresql://user:pass@host:5432/database
+# externalPostgreSQL -- External PostgreSQL configuration. To use an external PostgreSQL instead of the automatically deployed postgresql chart: set postgresql.enabled to false then uncomment and configure the externalPostgreSQL connection URL (e.g. postgresql://user:pass@host:5432/database)
+externalPostgreSQL:
 # externalPostgreSQLSecret -- Read external PostgreSQL configuration from a secret. This should point at a secret file with a single key which specifyies the connection string.
-# externalPostgreSQLSecret:
-#   name: redash-postgres
-#   key: connectionString
+externalPostgreSQLSecret:
+  {}
+  # name: redash-postgres
+  # key: connectionString
 
-# envSecretName -- Contents of this secret will be loaded as environment variables into the container. Useful e.g. to set to set PostgreSQL password in externalPostgreSQL parameter: postgresql://user:$(POSTGRESQL_PASSWORD)@host:5432/database [ref](https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/#using-environment-variables-inside-of-your-config)
-envSecretName:
+# envSecretName -- DEPRECIATED, use externalPostgreSQLSecret/externalRedisSecret instead. Contents of this secret will be loaded as environment variables into the container. Useful e.g. to set to set PostgreSQL password in externalPostgreSQL parameter: postgresql://user:$(POSTGRESQL_PASSWORD)@host:5432/database [ref](https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/#using-environment-variables-inside-of-your-config)
+# envSecretName:
 
 ## Configuration values for the postgresql dependency. This PostgreSQL instance is used by default for all Redash state storage [ref](https://github.com/kubernetes/charts/blob/master/stable/postgresql/README.md)
 postgresql:
@@ -383,12 +452,13 @@ postgresql:
     # postgresql.persistence.existingClaim -- Provide an existing PostgreSQL PersistentVolumeClaim
     # existingClaim: ""
 
-# externalRedis -- External Redis configuration. To use an external Redis instead of the automatically deployed redis chart: set redis.enabled to false then uncomment and configure the externalRedis connection URL.
-# externalRedis: redis://user:pass@host:6379/database
+# externalRedis -- External Redis configuration. To use an external Redis instead of the automatically deployed redis chart: set redis.enabled to false then uncomment and configure the externalRedis connection URL (e.g. redis://user:pass@host:6379/database).
+externalRedis:
 # externalRedisSecret -- Read external Redis configuration from a secret. This should point at a secret file with a single key which specifyies the connection string.
-# externalRedisSecret:
-#   name: redash-redis
-#   key: connectionString
+externalRedisSecret:
+  {}
+  # name: redash-redis
+  # key: connectionString
 
 ## Configuration values for the redis dependency. This Redis instance is used by default for caching and temporary storage [ref](https://github.com/kubernetes/charts/blob/master/stable/redis/README.md)
 redis:
