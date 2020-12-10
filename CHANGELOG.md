@@ -1,5 +1,28 @@
 # Changelog
 
+## 2.3.0
+
+- Added externalPostgreSQLSecret / externalRedisSecret
+- Depreciated envSecretName (plan to remove in 3.0.0 chart)
+- Updated docs to make defaults clearer
+
+## 2.2.0
+
+- Update docs to Helm Docs 1.4+ format
+- Removed duplicated env params that already come from "redash.env"
+- Updated Redash environment variables and associated docs
+- Updated CI to use Helm v3.4.1
+
+## 2.1.0
+
+- Added redash.samlSchemeOverride
+- Added envSecretName
+- Expanded service configuration: .service.annotations and .service.loadBalancerIP
+- Moved postgresql and redis charts to Bitnami repo and update to latest patch release versions
+- Updated CI to use Helm v2.16.12 and v3.3.4
+- Updated CI to drop k8s v1.15, add v1.17, v1.18 and v1.19
+- Improved CI release publishing flow
+
 ## 2.0.0
 
 - Made secrets required, rather than auto-generating to avoid them [changing on upgrade](https://github.com/helm/charts/issues/5167)
