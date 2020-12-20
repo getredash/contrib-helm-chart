@@ -415,6 +415,8 @@ scheduledWorker:
 
 ## Configuration for hook-install-job
 hookInstallJob:
+  # hookInstallJob.ttlSecondsAfterFinished -- ttl for install job [ref](https://kubernetes.io/docs/concepts/workloads/controllers/ttlafterfinished/)
+  ttlSecondsAfterFinished: 600
   # hookInstallJob.resources -- Scheduled worker resource requests and limits [ref](http://kubernetes.io/docs/user-guide/compute-resources/)
   resources:
   # limits:
@@ -442,6 +444,8 @@ hookInstallJob:
 
 ## Configuration for hook-upgrade-job
 hookUpgradeJob:
+  # hookUpgradeJob.ttlSecondsAfterFinished -- ttl for install job [ref](https://kubernetes.io/docs/concepts/workloads/controllers/ttlafterfinished/)
+  ttlSecondsAfterFinished: 600
   # hookUpgradeJob.resources -- Scheduled worker resource requests and limits [ref](http://kubernetes.io/docs/user-guide/compute-resources/)
   resources:
   # limits:
