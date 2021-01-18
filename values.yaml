@@ -291,7 +291,7 @@ server:
   replicaCount: 1
 
   # server.resources -- Server resource requests and limits [ref](http://kubernetes.io/docs/user-guide/compute-resources/)
-  resources:
+  resources: {}
     # limits:
     #   cpu: 500m
     #   memory: 3Gi
