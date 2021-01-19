@@ -5,7 +5,7 @@ jobs:
     parameters:
       helm:
         description: "Helm version to test with"
-        default: "v3.4.1"
+        default: "v3.5.0"
         type: string
       k8s:
         description: "Kubernetes version to test with"
@@ -244,35 +244,35 @@ workflows:
       # We test Helm 2 on oldest and newest k8s only, Helm 3 on all versions.
       - test:
           name: h2k16
-          helm: v2.16.12
+          helm: v2.17.0
           k8s: v1.16.15
       - test:
           name: h3k16
-          helm: v3.4.1
+          helm: v3.5.0
           k8s: v1.16.15
           requires:
             - h2k16
       - test:
           name: h3k17
-          helm: v3.4.1
+          helm: v3.5.0
           k8s: v1.17.12
           requires:
             - h2k16
       - test:
           name: h3k18
-          helm: v3.4.1
+          helm: v3.5.0
           k8s: v1.18.9
           requires:
             - h2k16
       - test:
           name: h2k19
-          helm: v2.16.12
+          helm: v2.17.0
           k8s: v1.19.2
           requires:
             - h2k16
       - test:
           name: h3k19
-          helm: v3.4.1
+          helm: v3.5.0
           k8s: v1.19.2
           requires:
             - h2k16
