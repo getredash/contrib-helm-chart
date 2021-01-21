@@ -66,3 +66,7 @@ pre-commit install-hooks
 A Charts maintainer will review the Chart change submission, and the validation job in the CI to verify the technical requirements of the Chart.
 
 Once the change request looks good it will be merged. This will trigger the publish job to automatically run in the CI to package and release the Chart to the repository.
+
+## Code of Conduct
+
+This project adheres to the Contributor Covenant [code of conduct](https://redash.io/community/code_of_conduct). By participating, you are expected to uphold this code. Please report unacceptable behavior to team@redash.io.
