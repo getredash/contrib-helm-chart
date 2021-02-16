@@ -272,6 +272,12 @@ redash:
   schemaRunTableSizeCalculations: ""
   # -- `REDASH_WEB_WORKERS` value. How many processes will gunicorn spawn to handle web requests.
   # @default -- 4
+  SQLAlchemyEnablePoolPrePing: ""
+  # -- SQLALCHEMY_ENABLE_POOL_PRE_PING value, controls whether the database connection that's in the pool will be checked by pinging before being used or not.
+  # Turning this on prevents 500 Internal Server Errors that some people are facing.
+  #  This settings is related to https://github.com/getredash/redash/issues/4675 and the fix is already merged https://github.com/getredash/redash/pull/4741
+  # look here for more information: https://docs.sqlalchemy.org/en/13/core/pooling.html#sqlalchemy.pool.Pool.params.pre_ping
+  # @default -- true
   webWorkers: ""
   ## End primary Redash configuration
   # redash.existingSecret -- Name of existing secret to use instead of either the values above
