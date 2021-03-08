@@ -1,0 +1,46 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: "{{ .Release.Name }}-config"
+  labels:
+{{- include "redash.labels" . | nindent 4 }}
+    app.kubernetes.io/component: config
+  annotations:
+    # This is what defines this resource as a hook.
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy": hook-succeeded
+spec:
+  template:
+    metadata:
+      name: "{{ .Release.Name }}"
+      labels:
+{{- include "redash.selectorLabels" . | nindent 8 }}
+      annotations: {{ toYaml .Values.hookConfigJob.podAnnotations | nindent 8 }}
+    spec:
+      volumes:
+        - configMap:
+            name: {{ .Release.Name }}-datasources
+          name: {{ .Release.Name }}-datasources
+        - configMap:
+            name: {{ .Release.Name }}-groups
+          name: {{ .Release.Name }}-groups
+      restartPolicy: Never
+      containers:
+      - name: {{ include "redash.name" . }}-config
+        image: "{{ .Values.hookConfigJob.image.repository }}:{{ .Values.hookConfigJob.image.tag }}"
+        imagePullPolicy: {{ .Values.hookConfigJob.image.pullPolicy }}
+        command: ["pyhton", "script.py"]
+        args:
+          - --datasources=/config/datasources.yaml
+          - --groups=/config/groups.yaml
+          - --host={{ .Release.Name }}
+        volumeMounts:
+        - name: {{ .Release.Name }}-datasources
+          mountPath: /config
+        - name: {{ .Release.Name }}-groups
+          mountPath: /config
+        envFrom:
+{{- include "redash.envFrom" . | nindent 10 }}
+        resources:
+{{ toYaml .Values.hookConfigJob.resources | indent 10 }}

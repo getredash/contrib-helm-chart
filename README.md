@@ -6,9 +6,7 @@ Redash is an open source tool built for teams to query, visualize and collaborat
 
 This chart bootstraps a [Redash](https://github.com/getredash/redash) deployment on a [Kubernetes](http://kubernetes.io) cluster using the [Helm](https://helm.sh) package manager.
 
-This is a contributed project developed by volunteers and not officially supported by Redash.
-
-Current chart version is `2.0.1`
+This is a fork from a contributed project developed by volunteers and not officially supported by Redash: https://github.com/getredash/contrib-helm-chart
 
 ## Source Code
 

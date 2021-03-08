@@ -1,0 +1,14 @@
+apiVersion: v1
+data:
+  datasources.yaml: |
+    datasources:
+    {{- range .Values.config.datasources }}
+      - name: {{ .name }}
+        host: {{ .host }}
+        user: {{ .user }}
+        pwd: {{ .pwd }}
+    {{- end }}
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-datasources
+

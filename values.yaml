@@ -28,6 +28,17 @@ serviceAccount:
   # serviceAccount.name -- The name of the service account to use. If not set and create is true, a name is generated using the fullname template
   name:
 
+config:
+  datasources:
+    - name: preprod/dbre/test
+      host: dbre/test
+      user: redash_rd
+      pwd: DBRE_TEST_PWD #name of the pwd variable in secret
+  groups:
+    - name: dbre
+      datasources:
+        - mariadb-test
+
 ## Redash application configuration
 redash:
   ## Start primary Redash configuration
@@ -342,6 +353,21 @@ scheduledWorker:
 
   # scheduledWorker.podAnnotations -- Annotations for scheduled worker pod assignment [ref](https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/)
   podAnnotations: {}
+
+## Configuration for hook-config-job
+hookConfigJob:
+  image:
+    repository: eu.gcr.io/bbc-registry/
+    tag: 0.1
+    pullPolicy: IfNotPresent
+  # hookConfigJob.podAnnotations -- Annotations for scheduled worker pod assignment [ref](https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/)
+  podAnnotations: {}
+  resources:
+  # limits:
+  #   memory: 300Mi
+  # requests:
+  #   cpu: 100m
+  #  memory: 100Mi
 
 ## Configuration for hook-install-job
 hookInstallJob:
