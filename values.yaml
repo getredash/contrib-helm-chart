@@ -30,14 +30,41 @@ serviceAccount:
 
 config:
   datasources:
-    - name: preprod/dbre/test
-      host: dbre/test
-      user: redash_rd
-      pwd: DBRE_TEST_PWD #name of the pwd variable in secret
+    ##mariadb example
+    #- name: preprod/dbre/mariadb-test
+      #type: mysql
+      #options:
+        #host: mariadb-test.dbre
+        #port: 3306
+        #user: redash_rd
+        ##passwordSecretKey
+        #passwd: MARIADB_TEST_DBRE_PWD # name of key Ref in redash secret
+        #db: mysql
+    ##postegresql example
+    #- name: preprod/dbre/pg-test
+      #type: pg
+      #options:
+        #host: pg-test.dbre
+        #port: 5432
+        #user: redash_rd
+        ##passwordSecretKey
+        #password: PG_TEST_DBRE_PWD # name of key Ref in redash secret
+        #dbname: test
+    #cassandra example
+    #- name: preprod/dbre/cassandra-test
+      #type: Cassandra
+      #options:
+        #host: pg-test.dbre
+        #port: 9042
+        #username: redash_rd
+        #passwordSecretKey
+        #password: CASSANDRA_TEST_DBRE_PWD # name of key Ref in redash secret
+        #keyspace: test
   groups:
-    - name: dbre
-      datasources:
-        - mariadb-test
+    #- name: DBRE
+      #datasources:
+        #- preprod/dbre/mariadb-test
+        #- preprod/dbre/pg-test
 
 ## Redash application configuration
 redash:
@@ -357,8 +384,8 @@ scheduledWorker:
 ## Configuration for hook-config-job
 hookConfigJob:
   image:
-    repository: eu.gcr.io/bbc-registry/
-    tag: 0.1
+    repository:
+    tag:
     pullPolicy: IfNotPresent
   # hookConfigJob.podAnnotations -- Annotations for scheduled worker pod assignment [ref](https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/)
   podAnnotations: {}

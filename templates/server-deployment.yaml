@@ -5,6 +5,8 @@ metadata:
   labels:
     {{- include "redash.labels" . | nindent 4 }}
     app.kubernetes.io/component: server
+    app: {{ .Release.Name }}
+    component: database
 spec:
   replicas: {{ .Values.server.replicaCount }}
   selector:
@@ -18,6 +20,8 @@ spec:
         app.kubernetes.io/component: server
       {{- if .Values.server.podAnnotations }}
       annotations:
+        checksum/configmap-datasources: {{ include (print .Template.BasePath "/configmap-datasources.yaml") $ | sha256sum }}
+        checksum/configmap-groups: {{ include (print .Template.BasePath "/configmap-groups.yaml") $ | sha256sum }}
       {{ toYaml .Values.server.podAnnotations | nindent 8 }}
       {{- end }}
     spec:

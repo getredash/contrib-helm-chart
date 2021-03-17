@@ -6,9 +6,8 @@ metadata:
 {{- include "redash.labels" . | nindent 4 }}
     app.kubernetes.io/component: config
   annotations:
-    # This is what defines this resource as a hook.
     "helm.sh/hook": post-install,post-upgrade
-    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-weight": "30"
     "helm.sh/hook-delete-policy": hook-succeeded
 spec:
   template:
@@ -30,17 +29,23 @@ spec:
       - name: {{ include "redash.name" . }}-config
         image: "{{ .Values.hookConfigJob.image.repository }}:{{ .Values.hookConfigJob.image.tag }}"
         imagePullPolicy: {{ .Values.hookConfigJob.image.pullPolicy }}
-        command: ["pyhton", "script.py"]
+        command: ["python3", "redash-config-gitops.py"]
         args:
-          - --datasources=/config/datasources.yaml
-          - --groups=/config/groups.yaml
-          - --host={{ .Release.Name }}
+          - --host=http://{{ .Release.Name }}
+          - --apikey=$(APIKEY)
         volumeMounts:
         - name: {{ .Release.Name }}-datasources
-          mountPath: /config
+          mountPath: /config/datasources
         - name: {{ .Release.Name }}-groups
-          mountPath: /config
+          mountPath: /config/groups
+        env:
+          - name: APIKEY
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Release.Name }}
+                key: apikey
         envFrom:
-{{- include "redash.envFrom" . | nindent 10 }}
+        - secretRef:
+            name: {{ .Release.Name }}-datasources
         resources:
 {{ toYaml .Values.hookConfigJob.resources | indent 10 }}

@@ -5,6 +5,8 @@ metadata:
   labels:
     {{- include "redash.labels" . | nindent 4 }}
     app.kubernetes.io/component: scheduledworker
+    app: {{ .Release.Name }}
+    component: database
 spec:
   replicas: {{ .Values.scheduledWorker.replicaCount }}
   selector:
