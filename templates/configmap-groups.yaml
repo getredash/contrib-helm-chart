@@ -1,3 +1,4 @@
+{{- if .Values.config -}}
 apiVersion: v1
 data:
   groups.yaml: |
@@ -5,3 +6,4 @@ data:
 kind: ConfigMap
 metadata:
   name: {{ .Release.Name }}-groups
+{{- end -}}

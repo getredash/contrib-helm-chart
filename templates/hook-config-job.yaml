@@ -1,3 +1,4 @@
+{{- if .Values.config -}}
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -5,6 +6,7 @@ metadata:
   labels:
 {{- include "redash.labels" . | nindent 4 }}
     app.kubernetes.io/component: config
+    app: {{ .Release.Name }}
   annotations:
     "helm.sh/hook": post-install,post-upgrade
     "helm.sh/hook-weight": "30"
@@ -49,3 +51,4 @@ spec:
             name: {{ .Release.Name }}-datasources
         resources:
 {{ toYaml .Values.hookConfigJob.resources | indent 10 }}
+{{- end -}}

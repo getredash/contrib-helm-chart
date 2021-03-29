@@ -28,39 +28,36 @@ serviceAccount:
   # serviceAccount.name -- The name of the service account to use. If not set and create is true, a name is generated using the fullname template
   name:
 
-config:
-  datasources:
-    ##mariadb example
+#config:
+  #datasources:
+    ########### mariadb example ###########
     #- name: preprod/dbre/mariadb-test
       #type: mysql
       #options:
         #host: mariadb-test.dbre
         #port: 3306
         #user: redash_rd
-        ##passwordSecretKey
         #passwd: MARIADB_TEST_DBRE_PWD # name of key Ref in redash secret
         #db: mysql
-    ##postegresql example
+    ########### postegresql example ###########
     #- name: preprod/dbre/pg-test
       #type: pg
       #options:
         #host: pg-test.dbre
         #port: 5432
         #user: redash_rd
-        ##passwordSecretKey
         #password: PG_TEST_DBRE_PWD # name of key Ref in redash secret
         #dbname: test
-    #cassandra example
+    ########### cassandra example ###########
     #- name: preprod/dbre/cassandra-test
       #type: Cassandra
       #options:
         #host: pg-test.dbre
         #port: 9042
         #username: redash_rd
-        #passwordSecretKey
         #password: CASSANDRA_TEST_DBRE_PWD # name of key Ref in redash secret
         #keyspace: test
-  groups:
+  #groups:
     #- name: DBRE
       #datasources:
         #- preprod/dbre/mariadb-test

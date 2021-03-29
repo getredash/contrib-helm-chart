@@ -13,16 +13,20 @@ spec:
     matchLabels:
       {{- include "redash.selectorLabels" . | nindent 6 }}
       app.kubernetes.io/component: server
+      app: {{ .Release.Name }}
   template:
     metadata:
       labels:
         {{- include "redash.selectorLabels" . | nindent 8 }}
         app.kubernetes.io/component: server
-      {{- if .Values.server.podAnnotations }}
+        app: {{ .Release.Name }}
       annotations:
+      {{- if .Values.server.podAnnotations -}}
+      {{ toYaml .Values.server.podAnnotations | nindent 8 }}
+      {{- end }}
+      {{- if .Values.config }}
         checksum/configmap-datasources: {{ include (print .Template.BasePath "/configmap-datasources.yaml") $ | sha256sum }}
         checksum/configmap-groups: {{ include (print .Template.BasePath "/configmap-groups.yaml") $ | sha256sum }}
-      {{ toYaml .Values.server.podAnnotations | nindent 8 }}
       {{- end }}
     spec:
     {{- with .Values.imagePullSecrets }}

@@ -13,11 +13,13 @@ spec:
     matchLabels:
       {{- include "redash.selectorLabels" . | nindent 6 }}
       app.kubernetes.io/component: adhocworker
+      app: {{ .Release.Name }}
   template:
     metadata:
       labels:
         {{- include "redash.selectorLabels" . | nindent 8 }}
         app.kubernetes.io/component: adhocworker
+        app: {{ .Release.Name }}
       {{- if .Values.adhocWorker.podAnnotations }}
       annotations:
       {{ toYaml .Values.adhocWorker.podAnnotations | nindent 8 }}

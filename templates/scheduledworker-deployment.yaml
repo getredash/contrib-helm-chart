@@ -13,11 +13,13 @@ spec:
     matchLabels:
       {{- include "redash.selectorLabels" . | nindent 6 }}
       app.kubernetes.io/component: scheduledworker
+      app: {{ .Release.Name }}
   template:
     metadata:
       labels:
         {{- include "redash.selectorLabels" . | nindent 8 }}
         app.kubernetes.io/component: scheduledworker
+        app: {{ .Release.Name }}
       {{- if .Values.scheduledWorker.podAnnotations }}
       annotations:
       {{ toYaml .Values.scheduledWorker.podAnnotations | nindent 8 }}
