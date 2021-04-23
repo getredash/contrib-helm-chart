@@ -145,18 +145,6 @@ Shared environment block used across each component.
 - name: REDASH_STATSD_USE_TAGS
   value: {{ default  .Values.redash.statsdUseTags | quote }}
 {{- end }}
-{{- if .Values.redash.celeryBroker }}
-- name: REDASH_CELERY_BROKER
-  value: {{ default  .Values.redash.celeryBroker | quote }}
-{{- end }}
-{{- if .Values.redash.celeryBackend }}
-- name: REDASH_CELERY_BACKEND
-  value: {{ default  .Values.redash.celeryBackend | quote }}
-{{- end }}
-{{- if .Values.redash.celeryTaskResultExpires }}
-- name: REDASH_CELERY_TASK_RESULT_EXPIRES
-  value: {{ default  .Values.redash.celeryTaskResultExpires | quote }}
-{{- end }}
 {{- if .Values.redash.queryResultsCleanupEnabled }}
 - name: REDASH_QUERY_RESULTS_CLEANUP_ENABLED
   value: {{ default  .Values.redash.queryResultsCleanupEnabled | quote }}
@@ -373,6 +361,10 @@ Shared environment block used across each component.
 - name: REDASH_SENTRY_DSN
   value: {{ default  .Values.redash.sentryDsn | quote }}
 {{- end }}
+{{- if .Values.redash.sentryEnvironment }}
+- name: REDASH_SENTRY_ENVIRONMENT
+  value: {{ default  .Values.redash.sentryEnvironment | quote }}
+{{- end }}
 {{- if .Values.redash.allowScriptsInUserInput }}
 - name: REDASH_ALLOW_SCRIPTS_IN_USER_INPUT
   value: {{ default  .Values.redash.allowScriptsInUserInput | quote }}
@@ -508,6 +500,8 @@ Selector labels
 {{- define "redash.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "redash.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
+app: {{ .Release.Name }}
+component: database
 {{- end -}}
 
 {{/*

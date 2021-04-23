@@ -1,7 +1,7 @@
 apiVersion: v1
 name: redash
-version: 0.0.1
-appVersion: 8.0.2.b37747
+version: 0.0.2
+appVersion: 9.0.0-beta.b42121
 description: This is a fork from the redash contrib helm chart https://github.com/getredash/contrib-helm-chart
 keywords:
   - redash

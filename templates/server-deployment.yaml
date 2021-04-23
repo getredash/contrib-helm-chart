@@ -5,8 +5,6 @@ metadata:
   labels:
     {{- include "redash.labels" . | nindent 4 }}
     app.kubernetes.io/component: server
-    app: {{ .Release.Name }}
-    component: database
 spec:
   replicas: {{ .Values.server.replicaCount }}
   selector:
@@ -35,11 +33,9 @@ spec:
     {{- end }}
       serviceAccountName: {{ include "redash.serviceAccountName" . }}
       securityContext:
-        {{- toYaml .Values.server.podSecurityContext | nindent 8 }}
+        {{- toYaml .Values.redash.securityContext | nindent 8 }}
       containers:
         - name: {{ include "redash.name" . }}-server
-          securityContext:
-            {{- toYaml .Values.server.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command: ["/bin/sh"]
@@ -75,18 +71,6 @@ spec:
             {{- if .Values.redash.statsdUseTags }}
             - name: REDASH_STATSD_USE_TAGS
               value: {{ default  .Values.redash.statsdUseTags | quote }}
-            {{- end }}
-            {{- if .Values.redash.celeryBroker }}
-            - name: REDASH_CELERY_BROKER
-              value: {{ default  .Values.redash.celeryBroker | quote }}
-            {{- end }}
-            {{- if .Values.redash.celeryBackend }}
-            - name: REDASH_CELERY_BACKEND
-              value: {{ default  .Values.redash.celeryBackend | quote }}
-            {{- end }}
-            {{- if .Values.redash.celeryTaskResultExpires }}
-            - name: REDASH_CELERY_TASK_RESULT_EXPIRES
-              value: {{ default  .Values.redash.celeryTaskResultExpires | quote }}
             {{- end }}
             {{- if .Values.redash.queryResultsCleanupEnabled }}
             - name: REDASH_QUERY_RESULTS_CLEANUP_ENABLED

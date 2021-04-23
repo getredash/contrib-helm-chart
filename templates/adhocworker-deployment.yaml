@@ -5,8 +5,6 @@ metadata:
   labels:
     {{- include "redash.labels" . | nindent 4 }}
     app.kubernetes.io/component: adhocworker
-    app: {{ .Release.Name }}
-    component: database
 spec:
   replicas: {{ .Values.adhocWorker.replicaCount }}
   selector:
@@ -31,11 +29,9 @@ spec:
     {{- end }}
       serviceAccountName: {{ include "redash.serviceAccountName" . }}
       securityContext:
-        {{- toYaml .Values.adhocWorker.podSecurityContext | nindent 8 }}
+        {{- toYaml .Values.redash.securityContext | nindent 8 }}
       containers:
         - name: {{ include "redash.name" . }}-adhocworker
-          securityContext:
-            {{- toYaml .Values.adhocWorker.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command: ["/bin/sh"]

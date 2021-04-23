@@ -5,7 +5,7 @@ image:
   # image.repository -- Redash image name used for server and worker pods
   repository: redash/redash
   # image.tag -- Redash image [tag](https://hub.docker.com/r/redash/redash/tags)
-  tag: 8.0.2.b37747
+  tag: 9.0.0-beta.b42121
   # image.pullPolicy - Image pull policy
   pullPolicy: IfNotPresent
 
@@ -78,19 +78,13 @@ redash:
   statsdPrefix:
   # redash.statsdUseTags -- `REDASH_STATSD_USE_TAGS` value. Defaults to `false`. Whether to use tags in statsd metrics (influxdb’s format).
   statsdUseTags:
-  # redash.celeryBroker -- `REDASH_CELERY_BROKER` value. Defaults to `REDIS_URL`.
-  celeryBroker:
-  # redash.celeryBackend -- `REDASH_CELERY_BACKEND` value. Defaults to `CELERY_BROKER`.
-  celeryBackend:
-  # redash.celeryTaskResultExpires -- `REDASH_CELERY_TASK_RESULT_EXPIRES` value. Defaults to `3600 \* 4`. How many seconds to keep celery task results in cache (in seconds).
-  celeryTaskResultExpires:
   # redash.queryResultsCleanupEnabled -- `REDASH_QUERY_RESULTS_CLEANUP_ENABLED` value. Defaults to `true`.
   queryResultsCleanupEnabled:
   # redash.queryResultsCleanupCount -- `REDASH_QUERY_RESULTS_CLEANUP_COUNT` value. Defaults to `100`.
   queryResultsCleanupCount:
   # redash.queryResultsCleanupMaxAge -- `REDASH_QUERY_RESULTS_CLEANUP_MAX_AGE` value. Defaults to `7`.
   queryResultsCleanupMaxAge:
-  # redash.schemasRefreshQueue -- `REDASH_SCHEMAS_REFRESH_QUEUE` value. Defaults to `celery`. The celery queue for refreshing the data source schemas.
+  # redash.schemasRefreshQueue -- `REDASH_SCHEMAS_REFRESH_QUEUE` value. Defaults to `rq`. The rq queue for refreshing the data source schemas.
   schemasRefreshQueue:
   # redash.schemasRefreshSchedule -- `REDASH_SCHEMAS_REFRESH_SCHEDULE` value. Defaults to `30`. How often to refresh the data sources schemas (in minutes).
   schemasRefreshSchedule:
@@ -186,6 +180,8 @@ redash:
   eventReportingWebhooks:
   # redash.sentryDsn -- `REDASH_SENTRY_DSN` value. Defaults to ``.
   sentryDsn:
+    # redash.sentryEnvironment -- `REDASH_SENTRY_ENVIRONMENT` value. Defaults to ``.
+  sentryEnvironment:
   # redash.allowScriptsInUserInput -- `REDASH_ALLOW_SCRIPTS_IN_USER_INPUT` value. Defaults to `false`. Disable sanitization of text input, allowing full html.
   allowScriptsInUserInput:
   # redash.dashboardRefreshIntervals -- `REDASH_DASHBOARD_REFRESH_INTERVALS` value. Defaults to `60,300,600,1800,3600,43200,86400`.
@@ -243,6 +239,13 @@ redash:
   ## This secret must contain keys matching the items marked "Stored as a Secret value" above.
   # existingSecret:
 
+securityContext:
+  # 1000 is the uid of the default redash user in the image
+  runAsUser: 1000
+  fsGroup: 1000
+  runAsGroup: 1000
+
+
 ## Configuration for Redash web server
 server:
   # server.httpPort -- Server container port (only useful if you are using a customized image)
@@ -263,10 +266,6 @@ server:
     # requests:
     #   cpu: 100m
     #  memory: 500Mi
-
-  # server.podSecurityContext -- Security contexts for server pod assignment [ref](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
-  podSecurityContext: {}
-  securityContext: {}
 
   # server.nodeSelector -- Node labels for server pod assignment [ref](https://kubernetes.io/docs/user-guide/node-selection/)
   nodeSelector: {}
@@ -308,14 +307,39 @@ ingress:
   #    hosts:
   #      - chart-example.local
 
+## Configuration for Redash RQ scheduler
+scheduledWorker:
+
+  # scheduler.resources -- Resource requests and limits [ref](http://kubernetes.io/docs/user-guide/compute-resources/)
+  resources:
+    # limits:
+    #   cpu: 500m
+    #   memory: 3Gi
+    # requests:
+    #   cpu: 100m
+    #  memory: 500Mi
+
+  # scheduler.nodeSelector -- Node labels for pod assignment [ref](https://kubernetes.io/docs/user-guide/node-selection/)
+  nodeSelector: {}
+
+  # scheduler.tolerations -- Tolerations for pod assignment [ref](https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/)
+  tolerations: []
+
+  # scheduler.affinity -- Affinity for pod assignment [ref](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity)
+  affinity: {}
+
+  # scheduler.podAnnotations -- Annotations for pod assignment [ref](https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/)
+  podAnnotations: {}
+
 ## Configuration for Redash ad-hoc workers
 adhocWorker:
   # adhocWorker.env -- Redash ad-hoc worker specific envrionment variables.
   env:
-    QUEUES: "queries,celery"
+    QUEUES: "queries periodic emails default scheduled_queries schemas"
+    #Number of tasks to run in parrallel per worker node
     WORKERS_COUNT: 2
 
-  # adhocWorker.replicaCount -- Number of ad-hoc worker pods to run
+  # adhocWorker.replicaCount -- Number of ad-hoc worker pods to run -- 2 for prod
   replicaCount: 1
 
   # adhocWorker.resources -- Ad-hoc worker resource requests and limits [ref](http://kubernetes.io/docs/user-guide/compute-resources/)
@@ -327,10 +351,6 @@ adhocWorker:
     #   cpu: 100m
     #  memory: 500Mi
 
-  # adhocWorker.podSecurityContext -- Security contexts for ad-hoc worker pod assignment [ref](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
-  podSecurityContext: {}
-  securityContext: {}
-
   # adhocWorker.nodeSelector -- Node labels for ad-hoc worker pod assignment [ref](https://kubernetes.io/docs/user-guide/node-selection/)
   nodeSelector: {}
 
@@ -341,41 +361,6 @@ adhocWorker:
   affinity: {}
 
   # adhocWorker.podAnnotations -- Annotations for adhoc worker pod assignment [ref](https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/)
-  podAnnotations: {}
-
-## Configuration for Redash scheduled workers
-scheduledWorker:
-  # scheduledWorker.env -- Redash scheduled worker specific envrionment variables.
-  env:
-    QUEUES: "scheduled_queries"
-    WORKERS_COUNT: 2
-
-  # scheduledWorker.replicaCount -- Number of scheduled worker pods to run
-  replicaCount: 1
-
-  # scheduledWorker.resources -- Scheduled worker resource requests and limits [ref](http://kubernetes.io/docs/user-guide/compute-resources/)
-  resources:
-    # limits:
-    #   cpu: 500m
-    #   memory: 3Gi
-    # requests:
-    #   cpu: 100m
-    #  memory: 500Mi
-
-  # scheduledWorker.podSecurityContext -- Security contexts for scheduled worker pod assignment [ref](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
-  podSecurityContext: {}
-  securityContext: {}
-
-  # scheduledWorker.nodeSelector -- Node labels for scheduled worker pod assignment [ref](https://kubernetes.io/docs/user-guide/node-selection/)
-  nodeSelector: {}
-
-  # scheduledWorker.tolerations -- Tolerations for scheduled worker pod assignment [ref](https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/)
-  tolerations: []
-
-  # scheduledWorker.affinity -- Affinity for scheduled worker pod assignment [ref](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity)
-  affinity: {}
-
-  # scheduledWorker.podAnnotations -- Annotations for scheduled worker pod assignment [ref](https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/)
   podAnnotations: {}
 
 ## Configuration for hook-config-job
@@ -404,10 +389,6 @@ hookInstallJob:
   #   cpu: 100m
   #  memory: 500Mi
 
-  # hookInstallJob.podSecurityContext -- Security contexts for scheduled worker pod assignment [ref](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
-  podSecurityContext: {}
-  securityContext: {}
-
   # hookInstallJob.nodeSelector -- Node labels for scheduled worker pod assignment [ref](https://kubernetes.io/docs/user-guide/node-selection/)
   nodeSelector: {}
 
@@ -431,10 +412,6 @@ hookUpgradeJob:
   #   cpu: 100m
   #  memory: 500Mi
 
-  # hookUpgradeJob.podSecurityContext -- Security contexts for scheduled worker pod assignment [ref](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
-  podSecurityContext: {}
-  securityContext: {}
-
   # hookUpgradeJob.nodeSelector -- Node labels for scheduled worker pod assignment [ref](https://kubernetes.io/docs/user-guide/node-selection/)
   nodeSelector: {}
 
@@ -456,7 +433,7 @@ envSecretName:
 ## Configuration values for the postgresql dependency. This PostgreSQL instance is used by default for all Redash state storage [ref](https://github.com/kubernetes/charts/blob/master/stable/postgresql/README.md)
 postgresql:
   # postgresql.enabled -- Whether to deploy a PostgreSQL server to satisfy the applications database requirements. To use an external PostgreSQL set this to false and configure the externalPostgreSQL parameter.
-  enabled: true
+  enabled: false
   image:
     # postgresql.image.tag -- Bitnami supported version close to the one specified in Redash [setup docker-compose.yml](https://github.com/getredash/setup/blob/master/data/docker-compose.yml)
     tag: "9.6.17-debian-10-r3"
@@ -487,7 +464,7 @@ postgresql:
 ## Configuration values for the redis dependency. This Redis instance is used by default for caching and temporary storage [ref](https://github.com/kubernetes/charts/blob/master/stable/redis/README.md)
 redis:
   # redis.enabled -- Whether to deploy a Redis server to satisfy the applications database requirements. To use an external Redis set this to false and configure the externalRedis parameter.
-  enabled: true
+  enabled: false
   # redis.password -- If the password is not specified, a random password will be generated (when redis chart enabled)
   # password:
   # redis.databaseNumber -- Redis database number to use (when redis chart enabled)
