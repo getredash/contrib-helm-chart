@@ -88,6 +88,10 @@ redash:
   schemasRefreshQueue:
   # redash.schemasRefreshSchedule -- `REDASH_SCHEMAS_REFRESH_SCHEDULE` value. Defaults to `30`. How often to refresh the data sources schemas (in minutes).
   schemasRefreshSchedule:
+  # redash.integerFormat -- `REDASH_INTEGER_FORMAT` value. Defaults to `0,0`.
+  integerFormat: "00"
+  # redash.floatFormat -- `REDASH_FLOAT_FORMAT` value. Defaults to `0,0.00`.
+  floatFormat: "00.00"
   # redash.authType -- `REDASH_AUTH_TYPE` value. Defaults to `api_key`.
   authType:
   # redash.enforceHttps -- `REDASH_ENFORCE_HTTPS` value. Defaults to `false`.

@@ -165,6 +165,14 @@ Shared environment block used across each component.
 - name: REDASH_SCHEMAS_REFRESH_SCHEDULE
   value: {{ default  .Values.redash.schemasRefreshSchedule | quote }}
 {{- end }}
+{{- if .Values.redash.integerFormat }}
+- name: REDASH_INTEGER_FORMAT
+  value: {{ default  .Values.redash.integerFormat | quote }}
+{{- end }}
+{{- if .Values.redash.floatFormat }}
+- name: REDASH_FLOAT_FORMAT
+  value: {{ default  .Values.redash.floatFormat | quote }}
+{{- end }}
 {{- if .Values.redash.authType }}
 - name: REDASH_AUTH_TYPE
   value: {{ default  .Values.redash.authType | quote }}

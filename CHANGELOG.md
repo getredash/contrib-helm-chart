@@ -1,10 +1,13 @@
 # Changelog
 
-## 0.0.2
+## 0.2.1
+- add integerFormat and floatFormat values to diplay int/float without comma
+
+## 0.2.0
 - apply changes for redash v9 (celery to rq)
 - simplify security contexts as all pods use the same redash image with the same user
 
-## 0.0.1
+## 0.1.0
 - adding hook config job along with config maps to provide a gitops solution for datasources and groups conf managements
 - adding pod annotations for hook jobs 
 
