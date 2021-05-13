@@ -169,6 +169,7 @@ jobs:
       image: circleci/classic:201808-01
 
     environment:
+      YQ_VERSION: v4.8.0
       HELM_VERSION: v3.3.4
       GITHUB_PAGES_BRANCH: gh-pages
 
@@ -188,7 +189,9 @@ jobs:
       - run:
           name: Test if we have a new version to publish or not - if we do, tag the repo
           command: |
-            VERSION=$(docker run --rm -i -v "${PWD}":/workdir mikefarah/yq read Chart.yaml 'version')
+            wget "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_linux_amd64" -O /usr/bin/yq
+            chmod +x /usr/bin/yq
+            VERSION=$(yq eval '.version' Chart.yaml)
             if git show-ref --tags --quiet --verify -- "refs/tags/v$VERSION"; then
               echo "Release already exists, skipping publish job"
               circleci-agent step halt
