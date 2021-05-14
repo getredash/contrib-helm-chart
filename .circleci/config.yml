@@ -189,8 +189,8 @@ jobs:
       - run:
           name: Test if we have a new version to publish or not - if we do, tag the repo
           command: |
-            wget "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_linux_amd64" -O /usr/bin/yq
-            chmod +x /usr/bin/yq
+            sudo wget "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_linux_amd64" -O /usr/local/bin/yq
+            sudo chmod +x /usr/local/bin/yq
             VERSION=$(yq eval '.version' Chart.yaml)
             if git show-ref --tags --quiet --verify -- "refs/tags/v$VERSION"; then
               echo "Release already exists, skipping publish job"
