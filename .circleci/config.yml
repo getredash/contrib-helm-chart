@@ -222,7 +222,6 @@ jobs:
       - run:
           name: Package chart and update chart index
           command: |
-            helm repo add stable https://kubernetes-charts.storage.googleapis.com
             helm package --destination /tmp/helm/publish --dependency-update .
             helm repo index /tmp/helm/publish
 
