@@ -243,11 +243,11 @@ redash:
   ## This secret must contain keys matching the items marked "Stored as a Secret value" above.
   # existingSecret:
 
-securityContext:
-  # 1000 is the uid of the default redash user in the image
-  runAsUser: 1000
-  fsGroup: 1000
-  runAsGroup: 1000
+  securityContext:
+    # 1000 is the uid of the default redash user in the image
+    runAsUser: 1000
+    fsGroup: 1000
+    runAsGroup: 1000
 
 
 ## Configuration for Redash web server

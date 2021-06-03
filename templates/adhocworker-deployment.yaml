@@ -28,8 +28,7 @@ spec:
         {{- toYaml . | nindent 8 }}
     {{- end }}
       serviceAccountName: {{ include "redash.serviceAccountName" . }}
-      securityContext:
-        {{- toYaml .Values.redash.securityContext | nindent 8 }}
+      securityContext: {{ toYaml .Values.redash.securityContext | nindent 8 }}
       containers:
         - name: {{ include "redash.name" . }}-adhocworker
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
