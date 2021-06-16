@@ -36,6 +36,8 @@ redash:
   secretKey: $(openssl rand -base64 32)
 postgresql:
   postgresqlPassword: $(openssl rand -base64 32)
+redis:
+  password: $(echo "redash" | sha256sum)
 EOM
 ```
 
