@@ -16,6 +16,9 @@ spec:
       labels:
         {{- include "redash.selectorLabels" . | nindent 8 }}
         app.kubernetes.io/component: server
+        {{- if .Values.server.podLabels }}
+        {{- tpl (toYaml .Values.server.podLabels) $ | nindent 8 }}
+        {{- end }}
       {{- if .Values.server.podAnnotations }}
       annotations:
       {{ toYaml .Values.server.podAnnotations | nindent 8 }}
