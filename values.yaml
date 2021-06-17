@@ -315,6 +315,9 @@ server:
   # server.podAnnotations -- Annotations for server pod assignment [ref](https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/)
   podAnnotations: {}
 
+  # server.podLabels -- Labels for server pod assignment [ref](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/)
+  podLabels: {}
+
 service:
   # service.annotations -- Annotations to add to the service
   annotations: {}
@@ -378,6 +381,9 @@ adhocWorker:
   # adhocWorker.podAnnotations -- Annotations for adhoc worker pod assignment [ref](https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/)
   podAnnotations: {}
 
+  # adhocWorker.podLabels -- Labels for adhoc worker pod assignment [ref](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/)
+  podLabels: {}
+
 ## Configuration for Redash scheduled workers
 scheduledWorker:
   # scheduledWorker.env -- Redash scheduled worker specific envrionment variables.
@@ -412,6 +418,9 @@ scheduledWorker:
 
   # scheduledWorker.podAnnotations -- Annotations for scheduled worker pod assignment [ref](https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/)
   podAnnotations: {}
+
+  # scheduledWorker.podLabels -- Labels for scheduled worker pod assignment [ref](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/)
+  podLabels: {}
 
 ## Configuration for hook-install-job
 hookInstallJob:

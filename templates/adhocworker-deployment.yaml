@@ -16,6 +16,9 @@ spec:
       labels:
         {{- include "redash.selectorLabels" . | nindent 8 }}
         app.kubernetes.io/component: adhocworker
+        {{- if .Values.adhocWorker.podLabels }}
+        {{- tpl (toYaml .Values.adhocWorker.podLabels) $ | nindent 8 }}
+        {{- end }}
       {{- if .Values.adhocWorker.podAnnotations }}
       annotations:
       {{ toYaml .Values.adhocWorker.podAnnotations | nindent 8 }}
