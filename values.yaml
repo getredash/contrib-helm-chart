@@ -5,7 +5,7 @@ image:
   # image.repository -- Redash image name used for server and worker pods
   repository: redash/redash
   # image.tag -- Redash image [tag](https://hub.docker.com/r/redash/redash/tags)
-  tag: 9.0.0-beta.b42121
+  tag: 10.0.0-beta.b49597
   # image.pullPolicy - Image pull policy
   pullPolicy: IfNotPresent
 
