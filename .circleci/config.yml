@@ -19,7 +19,7 @@ jobs:
       K8S_VERSION: << parameters.k8s >>
       REDASH_UPGRADE_SOURCE: 7.0.0.b18042
       KUBECONFIG: /home/circleci/.kube/config
-      MINIKUBE_VERSION: v1.13.1
+      MINIKUBE_VERSION: v1.23.2
       MINIKUBE_WANTUPDATENOTIFICATION: false
       MINIKUBE_WANTREPORTERRORPROMPT: false
       MINIKUBE_HOME: /home/circleci
