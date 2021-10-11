@@ -33,7 +33,7 @@ spec:
       containers:
       - name: {{ include "redash.name" . }}-server
         securityContext:
-          {{- toYaml .Values.hookInstallJob.securityContext | nindent 12 }}
+          {{- toYaml .Values.hookUpgradeJob.securityContext | nindent 12 }}
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         command: ["/bin/bash", "/config/install-upgrade.sh", "upgrade"]
