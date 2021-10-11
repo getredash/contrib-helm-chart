@@ -247,35 +247,35 @@ workflows:
       - test:
           name: h2k19
           helm: v2.17.0
-          k8s: v1.19.16
+          k8s: v1.19.15
       - test:
           name: h3k19
           helm: v3.7.0
-          k8s: v1.19.19
+          k8s: v1.19.15
           requires:
             - h2k19
       - test:
           name: h3k20
           helm: v3.7.0
-          k8s: v1.20.12
+          k8s: v1.20.11
           requires:
             - h2k19
       - test:
           name: h3k21
           helm: v3.7.0
-          k8s: v1.21.6
+          k8s: v1.21.5
           requires:
             - h2k19
       - test:
           name: h2k22
           helm: v2.17.0
-          k8s: v1.22.3
+          k8s: v1.22.2
           requires:
             - h2k19
       - test:
           name: h3k22
           helm: v3.7.0
-          k8s: v1.22.3
+          k8s: v1.22.2
           requires:
             - h2k19
       - publish:
