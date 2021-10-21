@@ -47,6 +47,20 @@ Create a default fully qualified scheduledworker name.
 {{- end -}}
 
 {{/*
+Create a default fully qualified genericWorker name.
+*/}}
+{{- define "redash.genericWorker.fullname" -}}
+{{- template "redash.fullname" . -}}-genericworker
+{{- end -}}
+
+{{/*
+Create a default fully qualified scheduler name.
+*/}}
+{{- define "redash.scheduler.fullname" -}}
+{{- template "redash.fullname" . -}}-scheduler
+{{- end -}}
+
+{{/*
 Create a default fully qualified postgresql name.
 */}}
 {{- define "redash.postgresql.fullname" -}}
