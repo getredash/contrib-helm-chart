@@ -360,7 +360,7 @@ ingress:
 adhocWorker:
   # adhocWorker.env -- Redash ad-hoc worker specific envrionment variables.
   env:
-    QUEUES: "queries,celery"
+    QUEUES: "queries"
     WORKERS_COUNT: 2
 
   # adhocWorker.replicaCount -- Number of ad-hoc worker pods to run
@@ -398,8 +398,8 @@ adhocWorker:
 scheduledWorker:
   # scheduledWorker.env -- Redash scheduled worker specific envrionment variables.
   env:
-    QUEUES: "scheduled_queries"
-    WORKERS_COUNT: 2
+    QUEUES: "scheduled_queries,schemas"
+    WORKERS_COUNT: 1
 
   # scheduledWorker.replicaCount -- Number of scheduled worker pods to run
   replicaCount: 1
