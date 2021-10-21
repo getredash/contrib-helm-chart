@@ -339,12 +339,20 @@ ingress:
   # ingress.annotations -- Ingress annotations configuration
   annotations:
     {}
-    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/ingress.class: nginx [deprecated]
     # kubernetes.io/tls-acme: "true"
+
+  # ingress.ingressClassName -- Sets the ingress controller class name to use.
+  ingressClassName: ""
+
   # ingress.hosts -- Ingress resource hostnames and path mappings
   hosts:
     - host: chart-example.local
       paths: []
+
+  #ingress.pathType -- How ingress paths should be treated.
+  pathType: Prefix
+
   # ingress.tls -- Ingress TLS configuration
   tls: []
   #  - secretName: chart-example-tls

@@ -571,3 +571,10 @@ Return if ingress supports ingressClassName.
 {{- define "redash.ingress.supportsIngressClassName" -}}
   {{- or (eq (include "redash.ingress.isStable" .) "true") (and (eq (include "redash.ingress.apiVersion" .) "networking.k8s.io/v1beta1") (semverCompare ">= 1.18-0" .Capabilities.KubeVersion.Version)) -}}
 {{- end -}}
+
+{{/*
+Return if ingress supports pathType.
+*/}}
+{{- define "redash.ingress.supportsPathType" -}}
+  {{- or (eq (include "redash.ingress.isStable" .) "true") (and (eq (include "redash.ingress.apiVersion" .) "networking.k8s.io/v1beta1") (semverCompare ">= 1.18-0" .Capabilities.KubeVersion.Version)) -}}
+{{- end -}}

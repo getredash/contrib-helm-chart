@@ -2,7 +2,9 @@
 {{- $fullName := include "redash.fullname" . -}}
 {{- $svcPort := .Values.service.port -}}
 {{- $ingressApiIsStable := eq (include "redash.ingress.isStable" .) "true" -}}
+{{- $ingressPathType := .Values.ingress.pathType -}}
 {{- $ingressSupportsIngressClassName := eq (include "redash.ingress.supportsIngressClassName" .) "true" -}}
+{{- $ingressSupportsPathType := eq (include "redash.ingress.supportsPathType" .) "true" -}}
 apiVersion: {{ include "redash.ingress.apiVersion" . }}
 kind: Ingress
 metadata:
@@ -15,8 +17,8 @@ metadata:
   {{- end }}
 spec:
 {{- if and $ingressSupportsIngressClassName .Values.ingress.ingressClassName }}
-ingressClassName: {{ .Values.ingress.ingressClassName }}
-{{- end -}}
+  ingressClassName: {{ .Values.ingress.ingressClassName | quote }}
+{{- end }}
 {{- if .Values.ingress.tls }}
   tls:
   {{- range .Values.ingress.tls }}
@@ -34,6 +36,9 @@ ingressClassName: {{ .Values.ingress.ingressClassName }}
         paths:
         {{- range .paths }}
           - path: {{ . }}
+            {{- if $ingressSupportsPathType }}
+            pathType: {{ $ingressPathType }}
+            {{- end }}
             backend:
               {{- if $ingressApiIsStable }}
               service:
