@@ -432,17 +432,53 @@ scheduledWorker:
   # scheduledWorker.podLabels -- Labels for scheduled worker pod assignment [ref](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/)
   podLabels: {}
 
-## Configuration for Redash scheduled workers
+## Configuration for Redash scheduler
+scheduler:
+  # scheduler.env -- Redash scheduler specific envrionment variables.
+  env: {}
+
+  # scheduler.replicaCount -- Number of scheduler pods to run
+  replicaCount: 1
+
+  # scheduler.resources -- scheduler resource requests and limits [ref](http://kubernetes.io/docs/user-guide/compute-resources/)
+  resources:
+  # limits:
+  #   cpu: 500m
+  #   memory: 3Gi
+  # requests:
+  #   cpu: 100m
+  #  memory: 500Mi
+
+  # scheduler.podSecurityContext -- Security contexts for scheduler pod assignment [ref](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
+  podSecurityContext: {}
+  securityContext: {}
+
+  # scheduler.nodeSelector -- Node labels for scheduler pod assignment [ref](https://kubernetes.io/docs/user-guide/node-selection/)
+  nodeSelector: {}
+
+  # scheduler.tolerations -- Tolerations for scheduler pod assignment [ref](https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/)
+  tolerations: []
+
+  # scheduler.affinity -- Affinity for scheduler pod assignment [ref](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity)
+  affinity: {}
+
+  # scheduler.podAnnotations -- Annotations for scheduler pod assignment [ref](https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/)
+  podAnnotations: {}
+
+  # scheduler.podLabels -- Labels for scheduler pod assignment [ref](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/)
+  podLabels: {}
+
+## Configuration for Redash generic workers
 genericWorker:
-  # genericWorker.env -- Redash scheduled worker specific envrionment variables.
+  # genericWorker.env -- Redash generic worker specific envrionment variables.
   env:
     QUEUES: "periodic emails default"
     WORKERS_COUNT: 1
 
-  # genericWorker.replicaCount -- Number of scheduled worker pods to run
+  # genericWorker.replicaCount -- Number of generic worker pods to run
   replicaCount: 1
 
-  # genericWorker.resources -- Scheduled worker resource requests and limits [ref](http://kubernetes.io/docs/user-guide/compute-resources/)
+  # genericWorker.resources -- Generic worker resource requests and limits [ref](http://kubernetes.io/docs/user-guide/compute-resources/)
   resources:
   # limits:
   #   cpu: 500m
