@@ -398,7 +398,7 @@ adhocWorker:
 scheduledWorker:
   # scheduledWorker.env -- Redash scheduled worker specific envrionment variables.
   env:
-    QUEUES: "scheduled_queries,schemas"
+    QUEUES: "scheduled_queries schemas"
     WORKERS_COUNT: 1
 
   # scheduledWorker.replicaCount -- Number of scheduled worker pods to run
