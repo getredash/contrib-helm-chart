@@ -18,10 +18,14 @@ data:
     # Time to wait between attempts
     RETRY_WAIT=10
     # Max number of attempts
-    MAX_ATTEMPTS=10
+    MAX_ATTEMPTS=1
 
     # Load connection variables
     . /config/dynamicenv.sh
+
+    # Check Settings
+    /app/manage.py check_settings
+
     # Initialize attempt counter
     ATTEMPTS=0
     while ((ATTEMPTS < MAX_ATTEMPTS)); do
