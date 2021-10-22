@@ -398,7 +398,7 @@ adhocWorker:
 scheduledWorker:
   # scheduledWorker.env -- Redash scheduled worker specific envrionment variables.
   env:
-    QUEUES: "scheduled_queries schemas"
+    QUEUES: "scheduled_queries,schemas"
     WORKERS_COUNT: 1
 
   # scheduledWorker.replicaCount -- Number of scheduled worker pods to run
@@ -472,7 +472,7 @@ scheduler:
 genericWorker:
   # genericWorker.env -- Redash generic worker specific envrionment variables.
   env:
-    QUEUES: "periodic emails default"
+    QUEUES: "periodic,emails,default"
     WORKERS_COUNT: 1
 
   # genericWorker.replicaCount -- Number of generic worker pods to run
