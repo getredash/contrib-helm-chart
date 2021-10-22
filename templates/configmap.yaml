@@ -36,10 +36,8 @@ data:
       if [[ "${1}" == "install" ]]; then
         echo "Installing Redash:"
         timeout $CREATE_TIMEOUT /app/manage.py database create_tables
-        timeout $CREATE_TIMEOUT /app/manage.py database create_tables
         echo "Tables created"
         echo "Running Redash database migrations after install"
-        timeout $UPGRADE_TIMEOUT /app/manage.py db upgrade
         timeout $UPGRADE_TIMEOUT /app/manage.py db upgrade
         echo "Upgrade complete"
       fi
