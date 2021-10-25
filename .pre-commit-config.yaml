@@ -9,7 +9,7 @@ repos:
         always_run: true
         require_serial: true
   - repo: https://github.com/prettier/prettier
-    rev: 1.19.1
+    rev: 2.4.1
     hooks:
       - id: prettier
         require_serial: true
