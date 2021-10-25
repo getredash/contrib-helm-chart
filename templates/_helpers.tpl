@@ -495,6 +495,10 @@ Shared environment block used across each component.
 - name: REDASH_FEATURE_AUTO_PUBLISH_NAMED_QUERIES
   value: {{ default  .Values.redash.featureAutoPublishNamedQueries | quote }}
 {{- end }}
+{{- if .Values.redash.featureExtendedAlertOptions }}
+- name: REDASH_FEATURE_EXTENDED_ALERT_OPTIONS
+  value: {{ default  .Values.redash.featureExtendedAlertOptions | quote }}
+{{- end }}
 {{- if .Values.redash.bigqueryHttpTimeout }}
 - name: REDASH_BIGQUERY_HTTP_TIMEOUT
   value: {{ default  .Values.redash.bigqueryHttpTimeout | quote }}
