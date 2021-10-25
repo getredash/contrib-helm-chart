@@ -264,6 +264,9 @@ redash:
   # -- `REDASH_FEATURE_AUTO_PUBLISH_NAMED_QUERIES` value.
   # @default -- true
   featureAutoPublishNamedQueries: ""
+  # -- `REDASH_FEATURE_EXTENDED_ALERT_OPTIONS` value. Disable/enable custom template for alert.
+  # @default -- false
+  featureExtendedAlertOptions: ""
   # -- `REDASH_BIGQUERY_HTTP_TIMEOUT` value.
   # @default -- 600
   bigqueryHttpTimeout: ""
