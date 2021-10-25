@@ -180,7 +180,7 @@ jobs:
       - add_ssh_keys:
           fingerprints:
             # Primary repo key
-            - "cd:8c:c9:52:64:ed:e5:1c:35:8c:18:5a:8a:7a:36:d3"
+            - "36:04:b4:4a:31:a6:16:a1:e8:75:da:ee:b7:05:f4:34"
             # Testing repo key
             - "a1:20:e5:b6:bc:47:94:d1:59:8d:22:4b:7c:8c:04:63"
 
