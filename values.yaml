@@ -337,10 +337,7 @@ ingress:
   # ingress.enabled -- Enable ingress controller resource
   enabled: false
   # ingress.annotations -- Ingress annotations configuration
-  annotations:
-    {}
-    # kubernetes.io/ingress.class: nginx [deprecated]
-    # kubernetes.io/tls-acme: "true"
+  annotations: {}
 
   # ingress.ingressClassName -- Sets the ingress controller class name to use.
   ingressClassName: ""
