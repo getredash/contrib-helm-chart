@@ -286,6 +286,11 @@ helm upgrade --reuse-values my-release redash/redash
 
 Below are notes on manual configuration changes or steps needed for major chart version updates.
 
+### From 2.x to 3.x
+
+- The Redash version updated from v8 to v10
+- The values.yaml structure has several changes
+
 ### From 1.x to 2.x
 
 - There are 3 required secrets (see above) that must now be specified in your release
