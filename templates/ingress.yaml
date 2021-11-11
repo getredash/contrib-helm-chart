@@ -1,6 +1,5 @@
 {{- if .Values.ingress.enabled -}}
 {{- $fullName := include "redash.fullname" . -}}
-{{- $ingressPathType := .Values.ingress.pathType -}}
 {{- $svcPort := .Values.service.port -}}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -13,9 +12,6 @@ metadata:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
-{{- if .Values.ingress.ingressClassName }}
-  ingressClassName: {{ .Values.ingress.ingressClassName | quote }}
-{{- end }}
 {{- if .Values.ingress.tls }}
   tls:
   {{- range .Values.ingress.tls }}
@@ -33,7 +29,7 @@ spec:
         paths:
         {{- range .paths }}
           - path: {{ . }}
-            pathType: {{ $ingressPathType }}
+            pathType: Prefix
             backend:
               service:
                 name: {{ $fullName }}
