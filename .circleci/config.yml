@@ -289,4 +289,6 @@ workflows:
             - h3k22
           filters:
             branches:
-              only: master
+              only:
+                - master
+                - v2
