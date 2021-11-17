@@ -1,5 +1,17 @@
 # Changelog
 
+## 2.4.0
+
+- Final v2.x release (except for critical fixes)
+- Final release to support Redash v8.x
+- Redis password is now required
+- Kubernetes minimum version increased to v19.x
+- Helm 2 depreciated, will be removed in a future version
+- Supports stable Ingress API
+- Add support for SQL Alchemy pool pre-ping configuration
+- Add support for configurable worker pod labels
+- Expand configurability of install/upgrade hooks
+
 ## 2.3.0
 
 - Added externalPostgreSQLSecret / externalRedisSecret

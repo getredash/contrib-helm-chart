@@ -8,15 +8,15 @@ This chart bootstraps a [Redash](https://github.com/getredash/redash) deployment
 
 This is a contributed project developed by volunteers and not officially supported by Redash.
 
-Current chart version is `2.3.1`
+Current chart version is `2.4.0`
 
 - <https://github.com/getredash/redash>
 
 ## Prerequisites
 
 - At least 3 GB of RAM available on your cluster
-- Kubernetes 1.16+ - chart is tested with latest 3 stable versions
-- Helm 2 or 3
+- Kubernetes 1.19+ - chart is tested with latest 3 stable versions
+- Helm 3 (Helm 2 depreciated)
 - PV provisioner support in the underlying infrastructure
 
 ## Installing the Chart
@@ -115,6 +115,8 @@ The following table lists the configurable parameters of the Redash chart and th
 | ingress.annotations                       | object | `{}`                                                                                                                                       | Ingress annotations configuration                                                                                                                                                                                                                                                                                                                                                            |
 | ingress.enabled                           | bool   | `false`                                                                                                                                    | Enable ingress controller resource                                                                                                                                                                                                                                                                                                                                                           |
 | ingress.hosts                             | list   | `[{"host":"chart-example.local","paths":[]}]`                                                                                              | Ingress resource hostnames and path mappings                                                                                                                                                                                                                                                                                                                                                 |
+| ingress.ingressClassName                  | string | `""`                                                                                                                                       | Sets the ingress controller class name to use.                                                                                                                                                                                                                                                                                                                                               |
+| ingress.pathType                          | string | `"Prefix"`                                                                                                                                 | How ingress paths should be treated.                                                                                                                                                                                                                                                                                                                                                         |
 | ingress.tls                               | list   | `[]`                                                                                                                                       | Ingress TLS configuration                                                                                                                                                                                                                                                                                                                                                                    |
 | nameOverride                              | string | `""`                                                                                                                                       |                                                                                                                                                                                                                                                                                                                                                                                              |
 | postgresql.enabled                        | bool   | `true`                                                                                                                                     | Whether to deploy a PostgreSQL server to satisfy the applications database requirements. To use an external PostgreSQL set this to false and configure the externalPostgreSQL parameter.                                                                                                                                                                                                     |
