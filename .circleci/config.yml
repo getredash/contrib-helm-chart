@@ -17,7 +17,7 @@ jobs:
     environment:
       HELM_VERSION: << parameters.helm >>
       K8S_VERSION: << parameters.k8s >>
-      REDASH_UPGRADE_SOURCE: 7.0.0.b18042
+      REDASH_UPGRADE_SOURCE: 8.0.2.b37747
       KUBECONFIG: /home/circleci/.kube/config
       MINIKUBE_VERSION: v1.23.2
       MINIKUBE_WANTUPDATENOTIFICATION: false
