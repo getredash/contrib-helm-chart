@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.0.0
+
+- Initial release supporting Redash v10.x
+- See upgrade notes in [README](README.md#upgrading)
+
 ## 2.4.0
 
 - Final v2.x release (except for critical fixes)
