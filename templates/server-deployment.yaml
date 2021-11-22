@@ -42,6 +42,9 @@ spec:
           volumeMounts:
             - name: config
               mountPath: /config
+            {{- with .Values.server.volumeMounts }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
           env:
           {{- include "redash.env" . | nindent 12 }}
           {{- range $key, $value := .Values.server.env }}
@@ -77,6 +80,9 @@ spec:
         - name: config
           configMap:
             name: {{ include "redash.fullname" . }}
+        {{- with .Values.server.volumes }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
     {{- with .Values.server.nodeSelector }}
       nodeSelector:
 {{ toYaml . | indent 8 }}
