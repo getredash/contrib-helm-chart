@@ -326,6 +326,12 @@ server:
   # server.podLabels -- Labels for server pod assignment [ref](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/)
   podLabels: {}
 
+  # server.volumes -- Volumes for server pod assignment [ref](https://kubernetes.io/docs/concepts/storage/volumes/)
+  volumes: []
+
+  # server.volumeMounts -- VolumeMounts for server pod assignment [ref](https://kubernetes.io/docs/concepts/storage/volumes/)
+  volumeMounts: []
+
 service:
   # service.annotations -- Annotations to add to the service
   annotations: {}
@@ -397,6 +403,13 @@ adhocWorker:
   # adhocWorker.podLabels -- Labels for adhoc worker pod assignment [ref](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/)
   podLabels: {}
 
+  # adhocWorker.volumes -- Volumes for ad-hoc pod worker assignment [ref](https://kubernetes.io/docs/concepts/storage/volumes/)
+  volumes: []
+
+  # adhocWorker.volumeMounts -- VolumeMounts for ad-hoc worker pod assignment [ref](https://kubernetes.io/docs/concepts/storage/volumes/)
+  volumeMounts: []
+
+
 ## Configuration for Redash scheduled workers
 scheduledWorker:
   # scheduledWorker.env -- Redash scheduled worker specific envrionment variables.
@@ -435,6 +448,12 @@ scheduledWorker:
   # scheduledWorker.podLabels -- Labels for scheduled worker pod assignment [ref](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/)
   podLabels: {}
 
+  # scheduledWorker.volumes -- Volumes for scheduled pod  worker assignment [ref](https://kubernetes.io/docs/concepts/storage/volumes/)
+  volumes: []
+
+  # scheduledWorker.volumeMounts -- VolumeMounts for scheduled worker pod assignment [ref](https://kubernetes.io/docs/concepts/storage/volumes/)
+  volumeMounts: []
+
 ## Configuration for Redash scheduler
 scheduler:
   # scheduler.env -- Redash scheduler specific envrionment variables.
@@ -470,6 +489,12 @@ scheduler:
 
   # scheduler.podLabels -- Labels for scheduler pod assignment [ref](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/)
   podLabels: {}
+
+  # scheduler.volumes -- Volumes for scheduler pod  assignment [ref](https://kubernetes.io/docs/concepts/storage/volumes/)
+  volumes: []
+
+  # scheduler.volumeMounts -- VolumeMounts for scheduler pod assignment [ref](https://kubernetes.io/docs/concepts/storage/volumes/)
+  volumeMounts: []
 
 ## Configuration for Redash generic workers
 genericWorker:
@@ -508,6 +533,12 @@ genericWorker:
 
   # genericWorker.podLabels -- Labels for generic worker pod assignment [ref](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/)
   podLabels: {}
+
+  # genericWorker.volumes -- Volumes for generic worker pod assignment [ref](https://kubernetes.io/docs/concepts/storage/volumes/)
+  volumes: []
+
+  # genericWorker.volumeMounts -- VolumeMounts for generic worker pod assignment [ref](https://kubernetes.io/docs/concepts/storage/volumes/)
+  volumeMounts: []
 
 ## Configuration for hook-install-job
 hookInstallJob:
