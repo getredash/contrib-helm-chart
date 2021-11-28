@@ -35,7 +35,12 @@ redash:
   cookieSecret: $(openssl rand -base64 32)
   secretKey: $(openssl rand -base64 32)
 postgresql:
+  enabled: true
+  image:
+    tag: "10.7.0-r68"
+  postgresqlUsername: redash
   postgresqlPassword: $(openssl rand -base64 32)
+  postgresqlDatabase: redash
 redis:
   password: $(openssl rand -base64 32)
 EOM
