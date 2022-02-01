@@ -6,7 +6,7 @@ description: Redash is an open source tool built for teams to query, visualize a
 keywords:
   - redash
   - analytics
-  - vizualisation
+  - visualization
 home: https://redash.io/
 sources:
   - https://github.com/getredash/redash
