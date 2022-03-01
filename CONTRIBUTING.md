@@ -49,7 +49,7 @@ Carefully review, test and commit the results. If changes are required (e.g. to 
 
 ### Pre-commit Hook Setup
 
-- Install [helm-docs](https://github.com/norwoodj/helm-docs)
+- Install [helm-docs](https://github.com/norwoodj/helm-docs) v1.4+
 - Install [the pre-commit binary](https://pre-commit.com/#install)
 - Then run:
 
@@ -66,3 +66,7 @@ pre-commit install-hooks
 A Charts maintainer will review the Chart change submission, and the validation job in the CI to verify the technical requirements of the Chart.
 
 Once the change request looks good it will be merged. This will trigger the publish job to automatically run in the CI to package and release the Chart to the repository.
+
+## Code of Conduct
+
+This project adheres to the Contributor Covenant [code of conduct](https://redash.io/community/code_of_conduct). By participating, you are expected to uphold this code. Please report unacceptable behavior to team@redash.io.

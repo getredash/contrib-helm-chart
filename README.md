@@ -15,8 +15,8 @@ This is a fork from a contributed project developed by volunteers and not offici
 ## Prerequisites
 
 - At least 3 GB of RAM available on your cluster
-- Kubernetes 1.16+ - chart is tested with latest 3 stable versions
-- Helm 2 or 3
+- Kubernetes 1.19+ - chart is tested with latest 3 stable versions
+- Helm 3 (Helm 2 depreciated)
 - PV provisioner support in the underlying infrastructure
 
 ## Installing the Chart
@@ -36,6 +36,8 @@ redash:
   secretKey: $(openssl rand -base64 32)
 postgresql:
   postgresqlPassword: $(openssl rand -base64 32)
+redis:
+  password: $(openssl rand -base64 32)
 EOM
 ```
 

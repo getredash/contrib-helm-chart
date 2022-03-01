@@ -5,7 +5,7 @@ image:
   # image.repository -- Redash image name used for server and worker pods
   repository: redash/redash
   # image.tag -- Redash image [tag](https://hub.docker.com/r/redash/redash/tags)
-  tag: 10.0.0-beta.b49597
+  tag: 10.1.0.b50633
   # image.pullPolicy - Image pull policy
   pullPolicy: IfNotPresent
 
@@ -239,6 +239,10 @@ redash:
   # redash.webWorkers -- `REDASH_WEB_WORKERS` value. Defaults to `4`. How many processes will gunicorn spawn to handle web requests.
   webWorkers:
   ## End primary Redash configuration
+
+  # -- `SQLALCHEMY_ENABLE_POOL_PRE_PING` value, controls whether the database connection that's in the pool will be checked by pinging before being used or not. See https://docs.sqlalchemy.org/en/13/core/pooling.html#sqlalchemy.pool.Pool.params.pre_ping
+  # @default -- true
+  sqlAlchemyEnablePoolPrePing: "true"
   # redash.existingSecret -- Name of existing secret to use instead of either the values above
   ## This secret must contain keys matching the items marked "Stored as a Secret value" above.
   # existingSecret:
@@ -264,6 +268,7 @@ server:
 
   # server.resources -- Server resource requests and limits [ref](http://kubernetes.io/docs/user-guide/compute-resources/)
   resources:
+    {}
     # limits:
     #   cpu: 500m
     #   memory: 3Gi
@@ -283,6 +288,9 @@ server:
   # server.podAnnotations -- Annotations for server pod assignment [ref](https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/)
   podAnnotations: {}
 
+  # server.podLabels -- Labels for server pod assignment [ref](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/)
+  podLabels: {}
+
 service:
   # service.annotations -- Annotations to add to the service
   annotations: {}
@@ -297,14 +305,19 @@ ingress:
   # ingress.enabled -- Enable ingress controller resource
   enabled: false
   # ingress.annotations -- Ingress annotations configuration
-  annotations:
-    {}
-    # kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
+  annotations: {}
+
+  # ingress.ingressClassName -- Sets the ingress controller class name to use.
+  ingressClassName: ""
+
   # ingress.hosts -- Ingress resource hostnames and path mappings
   hosts:
     - host: chart-example.local
       paths: []
+
+  #ingress.pathType -- How ingress paths should be treated.
+  pathType: Prefix
+
   # ingress.tls -- Ingress TLS configuration
   tls: []
   #  - secretName: chart-example-tls
@@ -428,11 +441,77 @@ hookUpgradeJob:
   # hookUpgradeJob.podAnnotations -- Annotations for scheduled worker pod assignment [ref](https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/)
   podAnnotations: {}
 
-# externalPostgreSQL -- External PostgreSQL configuration. To use an external PostgreSQL instead of the automatically deployed postgresql chart: set postgresql.enabled to false then uncomment and configure the externalPostgreSQL connection URL.
-# externalPostgreSQL: postgresql://user:pass@host:5432/database
+  # scheduledWorker.podLabels -- Labels for scheduled worker pod assignment [ref](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/)
+  podLabels: {}
 
-# envSecretName -- Contents of this secret will be loaded as environment variables into the container. Useful e.g. to set to set PostgreSQL password in externalPostgreSQL parameter: postgresql://user:$(POSTGRESQL_PASSWORD)@host:5432/database [ref](https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/#using-environment-variables-inside-of-your-config)
-envSecretName:
+## Configuration for hook-install-job
+hookInstallJob:
+  # hookInstallJob.ttlSecondsAfterFinished -- ttl for install job [ref](https://kubernetes.io/docs/concepts/workloads/controllers/ttlafterfinished/)
+  ttlSecondsAfterFinished: 600
+  # hookInstallJob.resources -- Scheduled worker resource requests and limits [ref](http://kubernetes.io/docs/user-guide/compute-resources/)
+  resources:
+  # limits:
+  #   cpu: 500m
+  #   memory: 3Gi
+  # requests:
+  #   cpu: 100m
+  #  memory: 500Mi
+
+  # hookInstallJob.podSecurityContext -- Security contexts for scheduled worker pod assignment [ref](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
+  podSecurityContext: {}
+  securityContext: {}
+
+  # hookInstallJob.nodeSelector -- Node labels for scheduled worker pod assignment [ref](https://kubernetes.io/docs/user-guide/node-selection/)
+  nodeSelector: {}
+
+  # hookInstallJob.tolerations -- Tolerations for server pod assignment [ref](https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/)
+  tolerations: []
+
+  # hookInstallJob.affinity -- Affinity for scheduled worker pod assignment [ref](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity)
+  affinity: {}
+
+  # hookInstallJob.podAnnotations -- Annotations for scheduled worker pod assignment [ref](https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/)
+  podAnnotations: {}
+
+## Configuration for hook-upgrade-job
+hookUpgradeJob:
+  # hookUpgradeJob.ttlSecondsAfterFinished -- ttl for install job [ref](https://kubernetes.io/docs/concepts/workloads/controllers/ttlafterfinished/)
+  ttlSecondsAfterFinished: 600
+  # hookUpgradeJob.resources -- Scheduled worker resource requests and limits [ref](http://kubernetes.io/docs/user-guide/compute-resources/)
+  resources:
+  # limits:
+  #   cpu: 500m
+  #   memory: 3Gi
+  # requests:
+  #   cpu: 100m
+  #  memory: 500Mi
+
+  # hookUpgradeJob.podSecurityContext -- Security contexts for scheduled worker pod assignment [ref](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
+  podSecurityContext: {}
+  securityContext: {}
+
+  # hookUpgradeJob.nodeSelector -- Node labels for scheduled worker pod assignment [ref](https://kubernetes.io/docs/user-guide/node-selection/)
+  nodeSelector: {}
+
+  # hookUpgradeJob.tolerations -- Tolerations for server pod assignment [ref](https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/)
+  tolerations: []
+
+  # hookUpgradeJob.affinity -- Affinity for scheduled worker pod assignment [ref](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity)
+  affinity: {}
+
+  # hookUpgradeJob.podAnnotations -- Annotations for scheduled worker pod assignment [ref](https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/)
+  podAnnotations: {}
+
+# externalPostgreSQL -- External PostgreSQL configuration. To use an external PostgreSQL instead of the automatically deployed postgresql chart: set postgresql.enabled to false then uncomment and configure the externalPostgreSQL connection URL (e.g. postgresql://user:pass@host:5432/database)
+externalPostgreSQL:
+# externalPostgreSQLSecret -- Read external PostgreSQL configuration from a secret. This should point at a secret file with a single key which specifyies the connection string.
+externalPostgreSQLSecret:
+  {}
+  # name: redash-postgres
+  # key: connectionString
+
+# envSecretName -- DEPRECIATED, use externalPostgreSQLSecret/externalRedisSecret instead. Contents of this secret will be loaded as environment variables into the container. Useful e.g. to set to set PostgreSQL password in externalPostgreSQL parameter: postgresql://user:$(POSTGRESQL_PASSWORD)@host:5432/database [ref](https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/#using-environment-variables-inside-of-your-config)
+# envSecretName:
 
 ## Configuration values for the postgresql dependency. This PostgreSQL instance is used by default for all Redash state storage [ref](https://github.com/kubernetes/charts/blob/master/stable/postgresql/README.md)
 postgresql:
@@ -462,8 +541,13 @@ postgresql:
     # postgresql.persistence.existingClaim -- Provide an existing PostgreSQL PersistentVolumeClaim
     # existingClaim: ""
 
-# externalRedis -- External Redis configuration. To use an external Redis instead of the automatically deployed redis chart: set redis.enabled to false then uncomment and configure the externalRedis connection URL.
-# externalRedis: redis://user:pass@host:6379/database
+# externalRedis -- External Redis configuration. To use an external Redis instead of the automatically deployed redis chart: set redis.enabled to false then uncomment and configure the externalRedis connection URL (e.g. redis://user:pass@host:6379/database).
+externalRedis:
+# externalRedisSecret -- Read external Redis configuration from a secret. This should point at a secret file with a single key which specifyies the connection string.
+externalRedisSecret:
+  {}
+  # name: redash-redis
+  # key: connectionString
 
 ## Configuration values for the redis dependency. This Redis instance is used by default for caching and temporary storage [ref](https://github.com/kubernetes/charts/blob/master/stable/redis/README.md)
 redis:

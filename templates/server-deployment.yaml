@@ -35,6 +35,8 @@ spec:
       securityContext: {{ toYaml .Values.redash.securityContext | nindent 8 }}
       containers:
         - name: {{ include "redash.name" . }}-server
+          securityContext:
+            {{- toYaml .Values.server.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command: ["/bin/sh"]

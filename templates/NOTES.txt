@@ -23,4 +23,4 @@
 Below is for validation only - the value is not used here - see also: https://github.com/helm/charts/issues/5167
 This can replaced by the JSON schema in Helm 3
 */ -}}
-{{ $null := required "A value for one of the following variables is required: postgresql.postgresqlPassword (secure password), postgresql.existingSecret (secret name), externalPostgreSQL (connection string)" (or .Values.postgresql.postgresqlPassword .Values.postgresql.existingSecret .Values.externalPostgreSQL) }}
+{{ $null := required "A value for one of the following variables is required: postgresql.postgresqlPassword (secure password), postgresql.existingSecret (secret name), externalPostgreSQL (connection string)" (or .Values.postgresql.postgresqlPassword .Values.postgresql.existingSecret .Values.externalPostgreSQL .Values.externalPostgreSQLSecret) }}

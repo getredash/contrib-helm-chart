@@ -77,7 +77,13 @@ Shared environment block used across each component.
 {{- define "redash.env" -}}
 {{- if not .Values.postgresql.enabled }}
 - name: REDASH_DATABASE_URL
+  {{- if .Values.externalPostgreSQLSecret }}
+  valueFrom:
+    secretKeyRef:
+      {{- .Values.externalPostgreSQLSecret | toYaml | nindent 6 }}
+  {{- else }}
   value: {{ default "" .Values.externalPostgreSQL | quote }}
+  {{- end }}
 {{- else }}
 - name: REDASH_DATABASE_USER
   value: "{{ .Values.postgresql.postgresqlUsername }}"
@@ -95,7 +101,13 @@ Shared environment block used across each component.
 {{- end }}
 {{- if not .Values.redis.enabled }}
 - name: REDASH_REDIS_URL
+  {{- if .Values.externalRedisSecret }}
+  valueFrom:
+    secretKeyRef:
+      {{- .Values.externalRedisSecret | toYaml | nindent 6 }}
+  {{- else }}
   value: {{ default "" .Values.externalRedis | quote }}
+  {{- end }}
 {{- else }}
 - name: REDASH_REDIS_PASSWORD
   valueFrom:
@@ -124,6 +136,10 @@ Shared environment block used across each component.
     secretKeyRef:
       name: {{ include "redash.secretName" . }}
       key: secretKey
+{{- end }}
+{{- if .Values.redash.samlSchemeOverride }}
+- name: REDASH_SAML_SCHEME_OVERRIDE
+  value: {{ default  .Values.redash.samlSchemeOverride | quote }}
 {{- end }}
 {{- if .Values.redash.proxiesCount }}
 - name: REDASH_PROXIES_COUNT
@@ -349,6 +365,10 @@ Shared environment block used across each component.
 - name: REDASH_DISABLED_QUERY_RUNNERS
   value: {{ default  .Values.redash.disabledQueryRunners | quote }}
 {{- end }}
+{{- if .Values.redash.scheduledQueryTimeLimit }}
+- name: REDASH_SCHEDULED_QUERY_TIME_LIMIT
+  value: {{ default  .Values.redash.scheduledQueryTimeLimit | quote }}
+{{- end }}
 {{- if .Values.redash.adhocQueryTimeLimit }}
 - name: REDASH_ADHOC_QUERY_TIME_LIMIT
   value: {{ default  .Values.redash.adhocQueryTimeLimit | quote }}
@@ -400,10 +420,6 @@ Shared environment block used across each component.
 {{- if .Values.redash.samlNameidFormat }}
 - name: REDASH_SAML_NAMEID_FORMAT
   value: {{ default  .Values.redash.samlNameidFormat | quote }}
-{{- end }}
-{{- if .Values.redash.samlSchemeOverride }}
-- name: REDASH_SAML_SCHEME_OVERRIDE
-  value: {{ default  .Values.redash.samlSchemeOverride | quote }}
 {{- end }}
 {{- if .Values.redash.dateFormat }}
 - name: REDASH_DATE_FORMAT
@@ -476,6 +492,10 @@ Shared environment block used across each component.
 {{- if .Values.redash.webWorkers }}
 - name: REDASH_WEB_WORKERS
   value: {{ default  .Values.redash.webWorkers | quote }}
+{{- end }}
+{{- if .Values.redash.sqlAlchemyEnablePoolPrePing }}
+- name: SQLALCHEMY_ENABLE_POOL_PRE_PING
+  value: {{ default .Values.redash.sqlAlchemyEnablePoolPrePing | quote }}
 {{- end }}
 ## End primary Redash configuration
 {{- end -}}

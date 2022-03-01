@@ -5,7 +5,7 @@ jobs:
     parameters:
       helm:
         description: "Helm version to test with"
-        default: "v3.3.4"
+        default: "v3.7.0"
         type: string
       k8s:
         description: "Kubernetes version to test with"
@@ -19,7 +19,7 @@ jobs:
       K8S_VERSION: << parameters.k8s >>
       REDASH_UPGRADE_SOURCE: 7.0.0.b18042
       KUBECONFIG: /home/circleci/.kube/config
-      MINIKUBE_VERSION: v1.13.1
+      MINIKUBE_VERSION: v1.23.2
       MINIKUBE_WANTUPDATENOTIFICATION: false
       MINIKUBE_WANTREPORTERRORPROMPT: false
       MINIKUBE_HOME: /home/circleci
@@ -40,7 +40,9 @@ jobs:
       - run:
           name: Install helm
           command: |
-            curl -Lo get-helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get && chmod +x get-helm.sh
+            GET=get
+            if [[ $HELM_VERSION =~ ^v3\. ]]; then GET=get-helm-3; fi
+            curl -Lo get-helm.sh "https://raw.githubusercontent.com/helm/helm/master/scripts/${GET}" && chmod +x get-helm.sh
             ./get-helm.sh --version "${HELM_VERSION}"
             rm get-helm.sh
 
@@ -60,7 +62,7 @@ jobs:
           name: Start minikube
           background: true
           command: |
-            sudo -E minikube start --vm-driver=none --cpus 2 --memory 6144 --kubernetes-version=${K8S_VERSION}
+            sudo -E minikube start --vm-driver=none --kubernetes-version=${K8S_VERSION}
             sudo -E minikube addons enable metrics-server
 
       - run:
@@ -167,6 +169,7 @@ jobs:
       image: circleci/classic:201808-01
 
     environment:
+      YQ_VERSION: v4.8.0
       HELM_VERSION: v3.3.4
       GITHUB_PAGES_BRANCH: gh-pages
 
@@ -176,14 +179,34 @@ jobs:
       # Add read-write SSH deploy key
       - add_ssh_keys:
           fingerprints:
+            # Primary repo key
             - "36:04:b4:4a:31:a6:16:a1:e8:75:da:ee:b7:05:f4:34"
+            # Testing repo key
+            - "a1:20:e5:b6:bc:47:94:d1:59:8d:22:4b:7c:8c:04:63"
 
       - checkout
 
       - run:
+          name: Test if we have a new version to publish or not - if we do, tag the repo
+          command: |
+            sudo wget "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_linux_amd64" -O /usr/local/bin/yq
+            sudo chmod +x /usr/local/bin/yq
+            VERSION=$(yq eval '.version' Chart.yaml)
+            if git show-ref --tags --quiet --verify -- "refs/tags/v$VERSION"; then
+              echo "Release already exists, skipping publish job"
+              circleci-agent step halt
+            else
+              echo "Tagging release"
+              git tag "v$VERSION"
+              git push origin "v$VERSION"
+            fi
+
+      - run:
           name: Install helm
           command: |
-            curl -Lo get-helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get && chmod +x get-helm.sh
+            GET=get
+            if [[ $HELM_VERSION =~ ^v3\. ]]; then GET=get-helm-3; fi
+            curl -Lo get-helm.sh "https://raw.githubusercontent.com/helm/helm/master/scripts/${GET}" && chmod +x get-helm.sh
             ./get-helm.sh --version "${HELM_VERSION}"
             rm get-helm.sh
 
@@ -199,7 +222,6 @@ jobs:
       - run:
           name: Package chart and update chart index
           command: |
-            helm repo add stable https://kubernetes-charts.storage.googleapis.com
             helm package --destination /tmp/helm/publish --dependency-update .
             helm repo index /tmp/helm/publish
 
@@ -209,11 +231,10 @@ jobs:
             cd /tmp/helm/publish
             git config user.email "${CIRCLE_USERNAME}@users.noreply.github.com"
             git config user.name CircleCI
-            # Only add new files - this ensures that already deployed chart versions are never updated in place
-            if ! git status -s | grep '??'; then echo "No new files"; exit 0; fi
+            # Skip if no new files - safety check to ensure that already deployed chart versions are never updated in place
+            if ! git status -s | grep '??'; then echo "No new files"; exit 1; fi
             git status -s | grep '??' | awk '{ print $2 }' | xargs git add
-            git status
-            git commit -m "Published by CircleCI ${CIRCLE_BUILD_URL} [skip ci]"
+            git commit -a -m "Published by CircleCI ${CIRCLE_BUILD_URL} [skip ci]"
             git push origin "${GITHUB_PAGES_BRANCH}"
 
 workflows:
@@ -224,48 +245,50 @@ workflows:
       # This makes tests take a bit longer but conserves resources
       # We test Helm 2 on oldest and newest k8s only, Helm 3 on all versions.
       - test:
-          name: h2k16
-          helm: v2.16.12
-          k8s: v1.16.15
-      - test:
-          name: h3k16
-          helm: v3.3.4
-          k8s: v1.16.15
-          requires:
-            - h2k16
-      - test:
-          name: h3k17
-          helm: v3.3.4
-          k8s: v1.17.12
-          requires:
-            - h2k16
-      - test:
-          name: h3k18
-          helm: v3.3.4
-          k8s: v1.18.9
-          requires:
-            - h2k16
-      - test:
           name: h2k19
-          helm: v2.16.12
-          k8s: v1.19.2
-          requires:
-            - h2k16
+          helm: v2.17.0
+          k8s: v1.19.15
       - test:
           name: h3k19
-          helm: v3.3.4
-          k8s: v1.19.2
+          helm: v3.7.0
+          k8s: v1.19.15
           requires:
-            - h2k16
+            - h2k19
+      - test:
+          name: h3k20
+          helm: v3.7.0
+          k8s: v1.20.11
+          requires:
+            - h2k19
+      - test:
+          name: h3k21
+          helm: v3.7.0
+          k8s: v1.21.5
+          requires:
+            - h2k19
+      - test:
+          name: h2k22
+          helm: v2.17.0
+          k8s: v1.22.2
+          requires:
+            - h2k19
+      - test:
+          name: h3k22
+          helm: v3.7.0
+          k8s: v1.22.2
+          requires:
+            - h2k19
       - publish:
           # The publish step depends on all the test steps passing
           requires:
-            - h2k16
-            - h3k16
-            - h3k17
-            - h3k18
             - h2k19
             - h3k19
+            - h3k20
+            - h3k21
+            - h2k22
+            - h3k22
           filters:
             branches:
-              only: master
+              only:
+                - master
+                - v2
