@@ -10,7 +10,7 @@ data:
     echo "This will retry connections until PostgreSQL/Redis is up, then perform database installation/migrations as needed."
 
     # Status command timeout
-    STATUS_TIMEOUT=10
+    STATUS_TIMEOUT=45
     # Create tables command timeout
     CREATE_TIMEOUT=60
     # Upgrade command timeout
