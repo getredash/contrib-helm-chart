@@ -189,9 +189,10 @@ jobs:
       - run:
           name: Test if we have a new version to publish or not - if we do, tag the repo
           command: |
-            sudo wget "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_linux_amd64" -O /usr/local/bin/yq
+            sudo wget -q "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_linux_amd64" -O /usr/local/bin/yq
             sudo chmod +x /usr/local/bin/yq
             VERSION=$(yq eval '.version' Chart.yaml)
+            echo "Version: $VERSION"
             if git show-ref --tags --quiet --verify -- "refs/tags/v$VERSION"; then
               echo "Release already exists, skipping publish job"
               circleci-agent step halt
