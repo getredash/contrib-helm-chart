@@ -8,7 +8,7 @@ This chart bootstraps a [Redash](https://github.com/getredash/redash) deployment
 
 This is a contributed project developed by volunteers and not officially supported by Redash.
 
-Current chart version is `3.0.0-beta2`
+Current chart version is `3.0.0`
 
 - <https://github.com/getredash/redash>
 
