@@ -11,13 +11,11 @@ spec:
     matchLabels:
       {{- include "redash.selectorLabels" . | nindent 6 }}
       app.kubernetes.io/component: server
-      app: {{ .Release.Name }}
   template:
     metadata:
       labels:
         {{- include "redash.selectorLabels" . | nindent 8 }}
         app.kubernetes.io/component: server
-        app: {{ .Release.Name }}
       annotations:
       {{- if .Values.server.podAnnotations -}}
       {{ toYaml .Values.server.podAnnotations | nindent 8 }}

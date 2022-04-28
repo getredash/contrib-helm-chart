@@ -6,7 +6,6 @@ metadata:
   labels:
 {{- include "redash.labels" . | nindent 4 }}
     app.kubernetes.io/component: config
-    app: {{ .Release.Name }}
   annotations:
     "helm.sh/hook": post-install,post-upgrade
     "helm.sh/hook-weight": "30"
