@@ -34,8 +34,8 @@ spec:
       - name: {{ include "redash.name" . }}-server
         securityContext:
           {{- toYaml .Values.hookUpgradeJob.securityContext | nindent 12 }}
-        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        image: "{{ include "base.images.image" ( dict  "imageRoot" .Values.image "global" .Values.global  "Values" .Values ) }}"
+        imagePullPolicy: "{{ include "base.images.pullPolicy" ( dict  "imageRoot" .Values.image "global" .Values.global  "Values" .Values ) }}"
         command: ["/bin/bash", "/config/install-upgrade.sh", "upgrade"]
         volumeMounts:
           - name: config

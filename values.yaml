@@ -1,11 +1,14 @@
 ## Default values for Redash.
 ## This is a YAML-formatted file.
 
+
 image:
+  # image.repository -- Base registry that should be used to pull docker images
+  registry: eu.gcr.io
   # image.repository -- Redash image name used for server and worker pods
-  repository: redash/redash
+  repository:  datareporter/datareporter
   # image.tag -- Redash image [tag](https://hub.docker.com/r/redash/redash/tags)
-  tag: 10.0.0.b50363
+  tag: latest
   # image.pullPolicy - Image pull policy
   pullPolicy: IfNotPresent
 

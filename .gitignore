@@ -1,5 +1,6 @@
-charts
+charts/*tgz
 keys
 my-values.yaml
 .idea
 .vscode
+*.iml

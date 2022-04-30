@@ -132,6 +132,8 @@ Shared environment block used across each component.
       name: {{ .Release.Name }}-redis
     {{- end }}
       key: redis-password
+- name: PLYWOOD_SERVER_URL
+  value: {{ include "redash.plywood.fullname" . }}
 - name: REDASH_REDIS_HOSTNAME
   value: {{ include "redash.redis.fullname" . }}
 - name: REDASH_REDIS_PORT
@@ -561,3 +563,45 @@ Create the name of the service account to use
 
 # This ensures a random value is provided for postgresqlPassword:
 required "A secure random value for .postgresql.postgresqlPassword is required" .Values.postgresql.postgresqlPassword
+
+{{- define "redash.plywood.fullname" -}}
+{{- template "plywood.fullname" . -}}
+{{- end -}}
+
+
+{{ include "base.images.image" ( dict "imageRoot" .Values.path.to.the.image "global" $) }}
+*/}}
+{{- define "base.images.image" -}}
+{{- $registryName := .imageRoot.registry -}}
+{{- $repositoryName := .imageRoot.repository -}}
+{{- $tag := .imageRoot.tag | toString -}}
+{{- if .global }}
+    {{- if .global.imageRegistry }}
+     {{- $registryName = .global.imageRegistry -}}
+    {{- end -}}
+{{- end -}}
+{{- if not $registryName }}
+    {{- if .Values.image.registry }}
+        {{- $registryName = .Values.image.registry -}}
+    {{- end -}}
+{{- end -}}
+{{- if $registryName }}
+{{- printf "%s/%s:%s" $registryName $repositoryName $tag -}}
+{{- else -}}
+{{- printf "%s:%s" $repositoryName $tag -}}
+{{- end -}}
+{{- end -}}
+{{- define "base.images.pullPolicy" -}}
+{{- $pullPolicy := .imageRoot.pullPolicy -}}
+{{- if not $pullPolicy }}
+    {{- if .Values.image.pullPolicy }}
+        {{- $pullPolicy = .Values.image.pullPolicy -}}
+    {{- end -}}
+{{- end -}}
+{{- if .global }}
+    {{- if .global.pullPolicy }}
+     {{- $pullPolicy = .global.pullPolicy -}}
+    {{- end -}}
+{{- end -}}
+{{- $pullPolicy  -}}
+{{- end -}}

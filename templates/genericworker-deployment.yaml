@@ -35,8 +35,8 @@ spec:
         - name: {{ include "redash.name" . }}-genericworker
           securityContext:
             {{- toYaml .Values.genericWorker.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          image: "{{ include "base.images.image" ( dict  "imageRoot" .Values.image "global" .Values.global  "Values" .Values ) }}"
+          imagePullPolicy: "{{ include "base.images.pullPolicy" ( dict  "imageRoot" .Values.image "global" .Values.global  "Values" .Values ) }}"
           command: ["/bin/sh"]
           args: ["-c", ". /config/dynamicenv.sh && /app/bin/docker-entrypoint worker"]
           volumeMounts:
