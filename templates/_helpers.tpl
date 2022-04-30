@@ -133,7 +133,7 @@ Shared environment block used across each component.
     {{- end }}
       key: redis-password
 - name: PLYWOOD_SERVER_URL
-  value: {{ include "redash.plywood.fullname" . }}
+  value: http://{{ include "redash.plywood.fullname" . }}
 - name: REDASH_REDIS_HOSTNAME
   value: {{ include "redash.redis.fullname" . }}
 - name: REDASH_REDIS_PORT
@@ -565,7 +565,7 @@ Create the name of the service account to use
 required "A secure random value for .postgresql.postgresqlPassword is required" .Values.postgresql.postgresqlPassword
 
 {{- define "redash.plywood.fullname" -}}
-{{- template "plywood.fullname" . -}}
+{{- printf "%s-%s" .Release.Name "plywood" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 
