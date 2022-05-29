@@ -1,17 +1,17 @@
 apiVersion: v1
-name: redash
-version: 3.0.0
-appVersion: 10.0.0.b50633
-description: Redash is an open source tool built for teams to query, visualize and collaborate.
+name: datareporter
+version: 0.0.1
+appVersion: 0.0.1-9849e1d7
+description: Datareporter is an open source tool built for teams to query, visualize and collaborate.
 keywords:
-  - redash
+  - datareporter
   - analytics
   - visualization
-home: https://redash.io/
+home: https://datareporter.com/
 sources:
-  - https://github.com/getredash/redash
+  - https://github.com/dataminelab/datareporter
 icon: https://redash.io/assets/images/elements/redash-logo.svg
 maintainers:
-  - name: Owen Barton
-    email: owen.barton@civicactions.com
+  - name: Radek Maciaszek
+    email: radek@dataminelab.com
 engine: gotpl
