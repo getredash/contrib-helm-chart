@@ -1,9 +1,0 @@
-dependencies:
-  - name: redis
-    version: "^10.8.2"
-    repository: "https://charts.bitnami.com/bitnami"
-    condition: redis.enabled
-  - name: postgresql
-    version: "^8.10.14"
-    repository: "https://charts.bitnami.com/bitnami"
-    condition: postgresql.enabled
