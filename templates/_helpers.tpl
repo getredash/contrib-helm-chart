@@ -574,7 +574,12 @@ required "A secure random value for .postgresql.postgresqlPassword is required" 
 {{- define "base.images.image" -}}
 {{- $registryName := .imageRoot.registry -}}
 {{- $repositoryName := .imageRoot.repository -}}
-{{- $tag := .imageRoot.tag | toString -}}
+{{- $tag := "" -}}
+{{- if  .imageRoot.tag -}}
+{{- $tag = .imageRoot.tag | toString -}}
+{{- else -}}
+{{  $tag = .Chart.AppVersion }}
+{{- end -}}
 {{- if .global }}
     {{- if .global.imageRegistry }}
      {{- $registryName = .global.imageRegistry -}}
