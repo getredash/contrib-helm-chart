@@ -387,9 +387,17 @@ Shared environment block used across each component.
 - name: REDASH_SCHEDULED_QUERY_TIME_LIMIT
   value: {{ default  .Values.redash.scheduledQueryTimeLimit | quote }}
 {{- end }}
+{{- if .Values.redash.scheduledQueryRetryIntervals }}
+- name: REDASH_SCHEDULED_QUERY_RETRY_INTERVALS
+  value: {{ default  .Values.redash.scheduledQueryRetryIntervals | quote }}
+{{- end }}
 {{- if .Values.redash.adhocQueryTimeLimit }}
 - name: REDASH_ADHOC_QUERY_TIME_LIMIT
   value: {{ default  .Values.redash.adhocQueryTimeLimit | quote }}
+{{- end }}
+{{- if .Values.redash.adhocQueryRetryIntervals }}
+- name: REDASH_ADHOC_QUERY_RETRY_INTERVALS
+  value: {{ default  .Values.redash.adhocQueryRetryIntervals | quote }}
 {{- end }}
 {{- if .Values.redash.enabledDestinations }}
 - name: REDASH_ENABLED_DESTINATIONS

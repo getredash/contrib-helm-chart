@@ -194,9 +194,15 @@ redash:
   # -- `REDASH_SCHEDULED_QUERY_TIME_LIMIT` value. Time limit for scheduled queries (in seconds).
   # @default -- None
   scheduledQueryTimeLimit: ""
+  # -- `REDASH_SCHEDULED_QUERY_RETRY_INTERVALS` value. Retry intervals for scheduled queries (in seconds).
+  # @default -- None
+  scheduledQueryRetryIntervals: ""
   # -- `REDASH_ADHOC_QUERY_TIME_LIMIT` value. Time limit for adhoc queries (in seconds).
   # @default -- None
   adhocQueryTimeLimit: ""
+  # -- `REDASH_ADHOC_QUERY_RETRY_INTERVALS` value. Retry intervals for adhoc queries (in seconds).
+  # @default -- None
+  adhocQueryRetryIntervals: ""
   # -- `REDASH_ENABLED_DESTINATIONS` value.
   # @default -- ”,”.join(default_destinations)
   enabledDestinations: ""
