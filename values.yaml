@@ -409,7 +409,6 @@ adhocWorker:
   # adhocWorker.volumeMounts -- VolumeMounts for ad-hoc worker pod assignment [ref](https://kubernetes.io/docs/concepts/storage/volumes/)
   volumeMounts: []
 
-
 ## Configuration for Redash scheduled workers
 scheduledWorker:
   # scheduledWorker.env -- Redash scheduled worker specific environment variables.
