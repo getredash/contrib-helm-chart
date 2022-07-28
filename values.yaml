@@ -15,7 +15,7 @@ imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
-# env -- Redash global envrionment variables - applied to both server and worker containers.
+# env -- Redash global environment variables - applied to both server and worker containers.
 env:
   PYTHONUNBUFFERED: 0
 
@@ -367,7 +367,7 @@ ingress:
 
 ## Configuration for Redash ad-hoc workers
 adhocWorker:
-  # adhocWorker.env -- Redash ad-hoc worker specific envrionment variables.
+  # adhocWorker.env -- Redash ad-hoc worker specific environment variables.
   env:
     QUEUES: "queries"
     WORKERS_COUNT: 2
@@ -412,7 +412,7 @@ adhocWorker:
 
 ## Configuration for Redash scheduled workers
 scheduledWorker:
-  # scheduledWorker.env -- Redash scheduled worker specific envrionment variables.
+  # scheduledWorker.env -- Redash scheduled worker specific environment variables.
   env:
     QUEUES: "scheduled_queries,schemas"
     WORKERS_COUNT: 1
@@ -456,7 +456,7 @@ scheduledWorker:
 
 ## Configuration for Redash scheduler
 scheduler:
-  # scheduler.env -- Redash scheduler specific envrionment variables.
+  # scheduler.env -- Redash scheduler specific environment variables.
   env: {}
 
   # scheduler.replicaCount -- Number of scheduler pods to run
@@ -498,7 +498,7 @@ scheduler:
 
 ## Configuration for Redash generic workers
 genericWorker:
-  # genericWorker.env -- Redash generic worker specific envrionment variables.
+  # genericWorker.env -- Redash generic worker specific environment variables.
   env:
     QUEUES: "periodic,emails,default"
     WORKERS_COUNT: 1
@@ -600,7 +600,7 @@ hookUpgradeJob:
 
 # externalPostgreSQL -- External PostgreSQL configuration. To use an external PostgreSQL instead of the automatically deployed postgresql chart: set postgresql.enabled to false then uncomment and configure the externalPostgreSQL connection URL (e.g. postgresql://user:pass@host:5432/database)
 externalPostgreSQL:
-# externalPostgreSQLSecret -- Read external PostgreSQL configuration from a secret. This should point at a secret file with a single key which specifyies the connection string.
+# externalPostgreSQLSecret -- Read external PostgreSQL configuration from a secret. This should point at a secret file with a single key which specifies the connection string.
 externalPostgreSQLSecret:
   {}
   # name: redash-postgres
@@ -639,7 +639,7 @@ postgresql:
 
 # externalRedis -- External Redis configuration. To use an external Redis instead of the automatically deployed redis chart: set redis.enabled to false then uncomment and configure the externalRedis connection URL (e.g. redis://user:pass@host:6379/database).
 externalRedis:
-# externalRedisSecret -- Read external Redis configuration from a secret. This should point at a secret file with a single key which specifyies the connection string.
+# externalRedisSecret -- Read external Redis configuration from a secret. This should point at a secret file with a single key which specifies the connection string.
 externalRedisSecret:
   {}
   # name: redash-redis
