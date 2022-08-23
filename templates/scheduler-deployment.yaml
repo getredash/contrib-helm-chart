@@ -6,7 +6,9 @@ metadata:
     {{- include "redash.labels" . | nindent 4 }}
     app.kubernetes.io/component: scheduler
 spec:
-  replicas: {{ .Values.scheduler.replicaCount }}
+  replicas: 1
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       {{- include "redash.selectorLabels" . | nindent 6 }}

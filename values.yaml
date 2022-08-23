@@ -458,9 +458,6 @@ scheduler:
   # scheduler.env -- Redash scheduler specific environment variables.
   env: {}
 
-  # scheduler.replicaCount -- Number of scheduler pods to run
-  replicaCount: 1
-
   # scheduler.resources -- scheduler resource requests and limits [ref](http://kubernetes.io/docs/user-guide/compute-resources/)
   resources:
   # limits:
