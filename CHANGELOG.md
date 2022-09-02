@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.0.1 (unreleased)
+
+- Change scheduler deployment strategy type to Recreate. (#121)
+
 ## 3.0.0
 
 - Initial release supporting Redash v10.x
