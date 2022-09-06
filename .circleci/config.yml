@@ -12,7 +12,7 @@ jobs:
         default: "v1.16.15"
         type: string
     machine:
-      image: ubuntu-1604:201903-01
+      image: ubuntu-2204:2022.07.1
 
     environment:
       HELM_VERSION: << parameters.helm >>
@@ -166,7 +166,7 @@ jobs:
 
   publish:
     machine:
-      image: circleci/classic:201808-01
+      image: ubuntu-2204:2022.07.1
 
     environment:
       YQ_VERSION: v4.8.0
