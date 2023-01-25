@@ -4,6 +4,7 @@ metadata:
   name: "{{ .Release.Name }}-upgrade"
   labels:
     {{- include "redash.labels" . | nindent 4 }}
+    {{- include "datadog.labels" . | indent 4 }}
     app.kubernetes.io/component: upgrade
   annotations:
     # This is what defines this resource as a hook.
@@ -17,6 +18,7 @@ spec:
       name: "{{ .Release.Name }}"
       labels:
         {{- include "redash.selectorLabels" . | nindent 8 }}
+        {{- include "datadog.labels" . | indent 8 }}
       {{- if .Values.hookUpgradeJob.podAnnotations }}
       annotations:
       {{ toYaml .Values.hookUpgradeJob.podAnnotations | nindent 8 }}

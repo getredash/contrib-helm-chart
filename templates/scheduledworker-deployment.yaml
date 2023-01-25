@@ -4,6 +4,7 @@ metadata:
   name: {{ include "redash.scheduledWorker.fullname" . }}
   labels:
     {{- include "redash.labels" . | nindent 4 }}
+    {{- include "datadog.labels" . | indent 4 }}
     app.kubernetes.io/component: scheduledworker
 spec:
   # Must stay at 1, if several scheduler are spawn there will be a conflict with an already active rqscheduler found with the same key in redis
@@ -16,9 +17,11 @@ spec:
     metadata:
       labels:
         {{- include "redash.selectorLabels" . | nindent 8 }}
+        {{- include "datadog.labels" . | indent 8 }}
         app.kubernetes.io/component: scheduledworker
-      {{- if .Values.scheduledWorker.podAnnotations }}
       annotations:
+      {{- include "datadog.annotations.scheduledworker" . | indent 8 }}
+      {{- if .Values.scheduledWorker.podAnnotations }}
       {{ toYaml .Values.scheduledWorker.podAnnotations | nindent 8 }}
       {{- end }}
     spec:

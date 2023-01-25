@@ -4,6 +4,7 @@ metadata:
   name: {{ include "redash.adhocWorker.fullname" . }}
   labels:
     {{- include "redash.labels" . | nindent 4 }}
+    {{- include "datadog.labels" . | indent 4 }}
     app.kubernetes.io/component: adhocworker
 spec:
   replicas: {{ .Values.adhocWorker.replicaCount }}
@@ -15,9 +16,11 @@ spec:
     metadata:
       labels:
         {{- include "redash.selectorLabels" . | nindent 8 }}
+        {{- include "datadog.labels" . | indent 8 }}
         app.kubernetes.io/component: adhocworker
-      {{- if .Values.adhocWorker.podAnnotations }}
       annotations:
+      {{- include "datadog.annotations.adhocworker" . | indent 8 }}
+      {{- if .Values.adhocWorker.podAnnotations }}
       {{ toYaml .Values.adhocWorker.podAnnotations | nindent 8 }}
       {{- end }}
     spec:
