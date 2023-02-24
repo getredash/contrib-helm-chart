@@ -13,3 +13,4 @@ spec:
         - source:
             principals:
               - "cluster.local/ns/infra/sa/uberproxy"
+              - "cluster.local/ns/{{ .Release.Namespace }}/sa/{{ include "redash.serviceAccountName" . }}"

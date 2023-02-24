@@ -27,12 +27,13 @@ spec:
         - configMap:
             name: {{ .Release.Name }}-groups
           name: {{ .Release.Name }}-groups
+      serviceAccountName: {{ include "redash.serviceAccountName" . }}
       restartPolicy: Never
       containers:
       - name: {{ include "redash.name" . }}-config
         image: "{{ .Values.hookConfigJob.image.repository }}:{{ .Values.hookConfigJob.image.tag }}"
         imagePullPolicy: {{ .Values.hookConfigJob.image.pullPolicy }}
-        command: ["python3", "redash-config-gitops.py"]
+        command: ["envoy-preflight", "python3", "redash-config-gitops.py"]
         args:
           - --host=http://{{ .Release.Name }}
           - --apikey=$(APIKEY)
@@ -47,6 +48,11 @@ spec:
               secretKeyRef:
                 name: {{ .Release.Name }}
                 key: apikey
+          # variables below are required by envoy-preflight (to shut down the Envoy proxy once the job completes)
+          - name: ENVOY_ADMIN_API
+            value: "http://127.0.0.1:15000/"
+          - name: ISTIO_QUIT_API
+            value: "http://127.0.0.1:15000/"
         envFrom:
         - secretRef:
             name: {{ .Release.Name }}-datasources
