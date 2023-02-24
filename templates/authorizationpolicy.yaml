@@ -13,4 +13,5 @@ spec:
         - source:
             principals:
               - "cluster.local/ns/infra/sa/uberproxy"
+              # The config Job needs to call Redash's API
               - "cluster.local/ns/{{ .Release.Namespace }}/sa/{{ include "redash.serviceAccountName" . }}"
