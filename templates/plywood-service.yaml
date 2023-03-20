@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "redash.plywood.fullname" . }}
+  labels:
+    {{- include "redash.labels" . | nindent 4 }}
+  annotations:
+    app.kubernetes.io/component: plywood
+  {{- with .Values.plywood.service.annotations }}
+  {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.plywood.service.type }}
+  ports:
+    - port: {{ .Values.plywood.service.port }}
+      targetPort: {{ .Values.plywood.server.httpPort }}
+      protocol: TCP
+      name: http
+  {{- if .Values.plywood.service.loadBalancerIP }}
+  loadBalancerIP: {{ .Values.plywood.service.loadBalancerIP }}
+  {{- end }}
+  selector:
+    {{- include "redash.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: plywood

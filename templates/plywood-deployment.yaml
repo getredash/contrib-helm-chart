@@ -1,19 +1,27 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "redash.fullname" . }}-plywood
+  name: {{ include "redash.plywood.fullname" . }}
   labels:
     {{- include "redash.labels" . | nindent 4 }}
     app.kubernetes.io/component: plywood
 spec:
-  replicas: {{ .Values.replicaCount }}
+  replicas: {{ .Values.plywood.replicaCount }}
   selector:
     matchLabels:
       {{- include "redash.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
+        app.kubernetes.io/component: plywood
         {{- include "redash.selectorLabels" . | nindent 8 }}
+        {{- if .Values.plywood.podLabels }}
+        {{- tpl (toYaml .Values.plywood.podLabels) $ | nindent 8 }}
+        {{- end }}
+      {{- if .Values.plywood.podAnnotations }}
+      annotations:
+      {{ toYaml .Values.plywood.podAnnotations | nindent 8 }}
+      {{- end }}
     spec:
     {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
@@ -23,14 +31,14 @@ spec:
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
-        - name: {{ .Chart.Name }}-plywood
+        - name: {{ include "redash.plywood.fullname" . }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ include "base.images.image" (merge ( dict  "imageRoot" .Values.plywood.image "global" .Values.global  ) . ) }}"
           imagePullPolicy: "{{ include "base.images.pullPolicy" ( dict  "imageRoot" .Values.plywood.image "global" .Values.global  "Values" .Values ) }}"
           ports:
             - name: http
-              containerPort: 3000
+              containerPort: {{ .Values.plywood.server.port }}
               protocol: TCP
           livenessProbe:
             httpGet:
@@ -40,17 +48,20 @@ spec:
             httpGet:
               path: /api/v1/status
               port: http
+          env:
+            - name: PORT
+              value: "{{ .Values.plywood.server.port }}"
           resources:
-            {{- toYaml .Values.resources | nindent 12 }}
-      {{- with .Values.nodeSelector }}
+            {{- toYaml .Values.plywood.resources | nindent 12 }}
+      {{- with .Values.plywood.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-    {{- with .Values.affinity }}
+    {{- with .Values.plywood.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
     {{- end }}
-    {{- with .Values.tolerations }}
+    {{- with .Values.plywood.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
     {{- end }}
