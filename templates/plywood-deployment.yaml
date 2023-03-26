@@ -10,6 +10,7 @@ spec:
   selector:
     matchLabels:
       {{- include "redash.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: plywood
   template:
     metadata:
       labels:
