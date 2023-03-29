@@ -45,6 +45,8 @@ spec:
             {{- with .Values.scheduledWorker.volumeMounts }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
+          livenessProbe:
+{{ toYaml .Values.scheduledWorker.livenessProbe | indent 12 }}
           env:
           {{- include "redash.env" . | nindent 12 }}
           {{- range $key, $value := .Values.scheduledWorker.env }}

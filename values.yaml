@@ -409,6 +409,16 @@ adhocWorker:
   # adhocWorker.volumeMounts -- VolumeMounts for ad-hoc worker pod assignment [ref](https://kubernetes.io/docs/concepts/storage/volumes/)
   volumeMounts: []
 
+  # adhocWorker.livenessProbe -- liveness probe to ensure adhoc workers are running fine
+  livenessProbe:
+  # exec:
+  #   command:
+  #   - /bin/sh
+  #   - -c
+  #   - /app/bin/docker-entrypoint workers_healthcheck
+  # initialDelaySeconds: 60
+  # periodSeconds: 100
+
 ## Configuration for Redash scheduled workers
 scheduledWorker:
   # scheduledWorker.env -- Redash scheduled worker specific environment variables.
@@ -452,6 +462,16 @@ scheduledWorker:
 
   # scheduledWorker.volumeMounts -- VolumeMounts for scheduled worker pod assignment [ref](https://kubernetes.io/docs/concepts/storage/volumes/)
   volumeMounts: []
+
+  # scheduledWorker.livenessProbe -- liveness probe to ensure scheduled workers are running fine
+  livenessProbe:
+  # exec:
+  #   command:
+  #   - /bin/sh
+  #   - -c
+  #   - /app/bin/docker-entrypoint workers_healthcheck
+  # initialDelaySeconds: 60
+  # periodSeconds: 100
 
 ## Configuration for Redash scheduler
 scheduler:
@@ -538,6 +558,16 @@ genericWorker:
 
   # genericWorker.volumeMounts -- VolumeMounts for generic worker pod assignment [ref](https://kubernetes.io/docs/concepts/storage/volumes/)
   volumeMounts: []
+
+  # genericWorker.livenessProbe -- liveness probe to ensure generic workers are running fine
+  livenessProbe:
+  # exec:
+  #   command:
+  #   - /bin/sh
+  #   - -c
+  #   - /app/bin/docker-entrypoint workers_healthcheck
+  # initialDelaySeconds: 60
+  # periodSeconds: 100
 
 ## Configuration for hook-install-job
 hookInstallJob:
