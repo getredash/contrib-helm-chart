@@ -17,6 +17,8 @@ spec:
     metadata:
       name: "{{ .Release.Name }}"
       labels:
+        # Disable Istio side-car preventing job to finish properly
+        sidecar.istio.io/inject: "false"
         {{- include "redash.selectorLabels" . | nindent 8 }}
         {{- include "datadog.labels" . | indent 8 }}
       {{- if .Values.hookUpgradeJob.podAnnotations }}
