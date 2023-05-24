@@ -100,18 +100,18 @@ Shared environment block used across each component.
   {{- end }}
 {{- else }}
 - name: REDASH_DATABASE_USER
-  value: "{{ .Values.postgresql.postgresqlUsername }}"
+  value: "{{ .Values.postgresql.auth.username }}"
 - name: REDASH_DATABASE_PASSWORD
   valueFrom:
     secretKeyRef:
       name: {{ .Release.Name }}-postgresql
-      key: postgresql-password
+      key: password
 - name: REDASH_DATABASE_HOSTNAME
   value: {{ include "redash.postgresql.fullname" . }}
 - name: REDASH_DATABASE_PORT
   value: "{{ .Values.postgresql.service.port }}"
 - name: REDASH_DATABASE_DB
-  value: "{{ .Values.postgresql.postgresqlDatabase }}"
+  value: "{{ .Values.postgresql.auth.database }}"
 {{- end }}
 {{- if not .Values.redis.enabled }}
 - name: REDASH_REDIS_URL

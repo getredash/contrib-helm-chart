@@ -615,12 +615,13 @@ postgresql:
   image:
     # postgresql.image.tag -- Bitnami supported version close to the one specified in Redash [setup docker-compose.yml](https://github.com/getredash/setup/blob/master/data/docker-compose.yml)
     tag: "9.6.17-debian-10-r3"
-  # postgresql.postgresqlUsername -- PostgreSQL username for redash user (when postgresql chart enabled)
-  postgresqlUsername: redash
-  # postgresql.postgresqlPassword -- REQUIRED: PostgreSQL password for redash user (when postgresql chart enabled)
-  postgresqlPassword:
-  # postgresql.postgresqlDatabase -- PostgreSQL database name (when postgresql chart enabled)
-  postgresqlDatabase: redash
+  auth:
+    # postgresql.auth.username -- PostgreSQL username for redash user (when postgresql chart enabled)
+    username: redash
+    # postgresql.auth.password -- REQUIRED: PostgreSQL password for redash user (when postgresql chart enabled)
+    password:
+    # postgresql.auth.database -- PostgreSQL database name (when postgresql chart enabled)
+    database: redash
   service:
     type: ClusterIP
     port: 5432
