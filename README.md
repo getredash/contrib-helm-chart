@@ -63,10 +63,10 @@ The command removes all the Kubernetes components associated with the chart and 
 
 ## Requirements
 
-| Repository                         | Name       | Version  |
-| ---------------------------------- | ---------- | -------- |
-| https://charts.bitnami.com/bitnami | postgresql | ^8.10.14 |
-| https://charts.bitnami.com/bitnami | redis      | ^10.8.2  |
+| Repository                                                                  | Name       | Version  |
+| --------------------------------------------------------------------------- | ---------- | -------- |
+| https://raw.githubusercontent.com/bitnami/charts/archive-full-index/bitnami | postgresql | ^8.10.14 |
+| https://raw.githubusercontent.com/bitnami/charts/archive-full-index/bitnami | redis      | ^10.8.2  |
 
 ## Configuration
 
