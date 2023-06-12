@@ -5,7 +5,7 @@ jobs:
     parameters:
       helm:
         description: "Helm version to test with"
-        default: "v3.7.0"
+        default: "v3.12.0"
         type: string
       k8s:
         description: "Kubernetes version to test with"
@@ -19,7 +19,7 @@ jobs:
       K8S_VERSION: << parameters.k8s >>
       REDASH_UPGRADE_SOURCE: 8.0.2.b37747
       KUBECONFIG: /home/circleci/.kube/config
-      MINIKUBE_VERSION: v1.23.2
+      MINIKUBE_VERSION: v1.30.1
       MINIKUBE_WANTUPDATENOTIFICATION: false
       MINIKUBE_WANTREPORTERRORPROMPT: false
       MINIKUBE_HOME: /home/circleci
@@ -40,9 +40,8 @@ jobs:
       - run:
           name: Install helm
           command: |
-            GET=get
-            if [[ $HELM_VERSION =~ ^v3\. ]]; then GET=get-helm-3; fi
-            curl -Lo get-helm.sh "https://raw.githubusercontent.com/helm/helm/master/scripts/${GET}" && chmod +x get-helm.sh
+            curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+            chmod 700 get_helm.sh
             ./get-helm.sh --version "${HELM_VERSION}"
             rm get-helm.sh
 
@@ -169,8 +168,8 @@ jobs:
       image: ubuntu-2204:2023.04.2
 
     environment:
-      YQ_VERSION: v4.8.0
-      HELM_VERSION: v3.3.4
+      YQ_VERSION: v4.34.1
+      HELM_VERSION: v3.12.0
       GITHUB_PAGES_BRANCH: gh-pages
 
     working_directory: ~/redash
@@ -205,9 +204,8 @@ jobs:
       - run:
           name: Install helm
           command: |
-            GET=get
-            if [[ $HELM_VERSION =~ ^v3\. ]]; then GET=get-helm-3; fi
-            curl -Lo get-helm.sh "https://raw.githubusercontent.com/helm/helm/master/scripts/${GET}" && chmod +x get-helm.sh
+            curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+            chmod 700 get_helm.sh
             ./get-helm.sh --version "${HELM_VERSION}"
             rm get-helm.sh
 
@@ -245,23 +243,23 @@ workflows:
       # We ensure a single variant passes before running the others
       # This makes tests take a bit longer but conserves resources
       - test:
-          name: h3k19
+          name: h3k24
           helm: v3.7.0
           k8s: v1.19.15
       - test:
-          name: h3k20
+          name: h3k25
           helm: v3.7.0
           k8s: v1.20.11
           requires:
             - h3k19
       - test:
-          name: h3k21
+          name: h3k26
           helm: v3.7.0
           k8s: v1.21.5
           requires:
             - h3k19
       - test:
-          name: h3k22
+          name: h3k27
           helm: v3.7.0
           k8s: v1.22.2
           requires:
@@ -277,4 +275,3 @@ workflows:
             branches:
               only:
                 - master
-                - v2
