@@ -244,49 +244,34 @@ workflows:
     jobs:
       # We ensure a single variant passes before running the others
       # This makes tests take a bit longer but conserves resources
-      # We test Helm 2 on oldest and newest k8s only, Helm 3 on all versions.
-      - test:
-          name: h2k19
-          helm: v2.17.0
-          k8s: v1.19.15
       - test:
           name: h3k19
           helm: v3.7.0
           k8s: v1.19.15
-          requires:
-            - h2k19
       - test:
           name: h3k20
           helm: v3.7.0
           k8s: v1.20.11
           requires:
-            - h2k19
+            - h3k19
       - test:
           name: h3k21
           helm: v3.7.0
           k8s: v1.21.5
           requires:
-            - h2k19
-      - test:
-          name: h2k22
-          helm: v2.17.0
-          k8s: v1.22.2
-          requires:
-            - h2k19
+            - h3k19
       - test:
           name: h3k22
           helm: v3.7.0
           k8s: v1.22.2
           requires:
-            - h2k19
+            - h3k19
       - publish:
           # The publish step depends on all the test steps passing
           requires:
-            - h2k19
             - h3k19
             - h3k20
             - h3k21
-            - h2k22
             - h3k22
           filters:
             branches:
