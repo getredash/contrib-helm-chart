@@ -89,14 +89,6 @@ jobs:
             EOT
 
       - run:
-          name: Install Tiller
-          command: |
-            # Only applicable to Helm v2
-            if [[ $HELM_VERSION == v2* ]]; then
-              helm init --wait
-            fi
-
-      - run:
           name: Install chart dependencies
           command: |
             helm repo add bitnami "https://raw.githubusercontent.com/bitnami/charts/archive-full-index/bitnami"

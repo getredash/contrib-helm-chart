@@ -37,65 +37,59 @@ redash:
   secretKey: ""
   # -- `REDASH_SAML_SCHEME_OVERRIDE` value. This setting will allow you to override the saml auth url scheme that gets constructed by flask. this is a useful feature if, for example, you're behind a proxy protocol enabled tcp load balancer (aws elb that terminates ssl) and your nginx proxy or similar adds a x-forwarded-proto of http even though your redash url for saml auth is https..
   samlSchemeOverride: ""
-  # -- `REDASH_PROXIES_COUNT` value.
+  # -- `REDASH_DISABLE_PUBLIC_URLS` value. Whether to disable access to public urls.
+  # @default -- "false"
+  disablePublicUrls: ""
+  # -- `REDASH_BLOCKED_DOMAINS` value. Comma separated of email domains that cannot create user accounts.
+  # @default -- "qq.com"
+  blockedDomains: ""
+  # -- `REDASH_PROXIES_COUNT` value. Passed to werkzeug's [proxyfix](https://werkzeug.palletsprojects.com/en/2.1.x/middleware/proxy_fix/) to make sure we get the right referral address even behind proxies like nginx..
   # @default -- 1
   proxiesCount: ""
-  # -- `REDASH_STATSD_HOST` value.
+  # -- `REDASH_STATSD_HOST` value. Host for statsd daemon.
   # @default -- 127.0.0.1
   statsdHost: ""
-  # -- `REDASH_STATSD_PORT` value.
+  # -- `REDASH_STATSD_PORT` value. Port for statsd daemon.
   # @default -- 8125
   statsdPort: ""
-  # -- `REDASH_STATSD_PREFIX` value.
+  # -- `REDASH_STATSD_PREFIX` value. Prefix for metrics sent to statsd daemon.
   # @default -- redash
   statsdPrefix: ""
   # -- `REDASH_STATSD_USE_TAGS` value. Whether to use tags in statsd metrics (influxdb’s format).
   # @default -- false
   statsdUseTags: ""
-  # -- `REDASH_CELERY_BROKER` value.
-  # @default -- REDIS_URL
-  celeryBroker: ""
-  # -- `REDASH_CELERY_BACKEND` value.
-  # @default -- CELERY_BROKER
-  celeryBackend: ""
-  # -- `REDASH_CELERY_TASK_RESULT_EXPIRES` value. How many seconds to keep celery task results in cache (in seconds).
-  # @default -- 3600 \* 4
-  celeryTaskResultExpires: ""
-  # -- `REDASH_QUERY_RESULTS_CLEANUP_ENABLED` value.
+  # -- `REDASH_QUERY_RESULTS_CLEANUP_ENABLED` value. Whether the job to cleanup unused query results should run automatically.
   # @default -- true
   queryResultsCleanupEnabled: ""
-  # -- `REDASH_QUERY_RESULTS_CLEANUP_COUNT` value.
+  # -- `REDASH_QUERY_RESULTS_CLEANUP_COUNT` value. The number of results to cleanup during each call to `cleanup_query_results`.
   # @default -- 100
   queryResultsCleanupCount: ""
-  # -- `REDASH_QUERY_RESULTS_CLEANUP_MAX_AGE` value.
+  # -- `REDASH_QUERY_RESULTS_CLEANUP_MAX_AGE` value. Integer number of days, past which a query result may be cleaned up if it is not referenced by another query..
   # @default -- 7
   queryResultsCleanupMaxAge: ""
-  # -- `REDASH_SCHEMAS_REFRESH_QUEUE` value. The celery queue for refreshing the data source schemas.
-  # @default -- celery
-  schemasRefreshQueue: ""
-  # -- `REDASH_SCHEMAS_REFRESH_SCHEDULE` value. How often to refresh the data sources schemas (in minutes).
+  # -- `REDASH_SCHEMAS_REFRESH_SCHEDULE` value. How often to refresh the data source schemas (in minutes).
   # @default -- 30
   schemasRefreshSchedule: ""
-  # -- `REDASH_AUTH_TYPE` value.
+  # -- `REDASH_AUTH_TYPE` value. May be either `api_key` or `hmac`. implemented [here](https://github.com/getredash/redash/pull/385).
   # @default -- api_key
   authType: ""
-  # -- `REDASH_ENFORCE_HTTPS` value.
+  # -- `REDASH_ENFORCE_HTTPS` value. This is passed to [flask-talisman](https://github.com/googlecloudplatform/flask-talisman).
   # @default -- false
   enforceHttps: ""
-  # -- `REDASH_INVITATION_TOKEN_MAX_AGE` value.
+  # -- `REDASH_INVITATION_TOKEN_MAX_AGE` value. An integer number of seconds after which an invitation link will expire.
   # @default -- 60 _ 60 _ 24 \* 7
   invitationTokenMaxAge: ""
-  # -- `REDASH_MULTI_ORG` value.
+  # -- `REDASH_MULTI_ORG` value. Whether to enable multi-org mode. **note**: multi-org mode is not documented or supported at this time.
   # @default -- false
   multiOrg: ""
-  # -- `REDASH_GOOGLE_CLIENT_ID` value.
+  # -- `REDASH_GOOGLE_CLIENT_ID` value. The client id to use for google login, be sure to set a client secret as well.
   googleClientId: ""
-  # -- `REDASH_GOOGLE_CLIENT_SECRET` value. Stored as a Secret value.
+  # -- `REDASH_GOOGLE_CLIENT_SECRET` value. The client secret to use for google login, be sure to set a client id as well. Stored as a Secret value.
   googleClientSecret: ""
-  # -- `REDASH_REMOTE_USER_LOGIN_ENABLED` value.
+  # -- `REDASH_REMOTE_USER_LOGIN_ENABLED` value. Enables the use of an externally-provided and trusted remote user via an http header. the "user" must be an email address. [more details](https://github.com/getredash/redash/blob/e6ebef1e5ab866ce1e706eaee6260edaffdc2bd7/redash/settings/__init__.py#l185-l207).
   # @default -- false
   remoteUserLoginEnabled: ""
-  # -- `REDASH_REMOTE_USER_HEADER` value.
+  # -- `REDASH_REMOTE_USER_HEADER` value. Name of header to use if `redash_remote_user_login_enabled` is true.
   # @default -- X-Forwarded-Remote-User
   remoteUserHeader: ""
   # -- `REDASH_LDAP_LOGIN_ENABLED` value.
@@ -124,15 +118,15 @@ redash:
   # -- `REDASH_LDAP_SEARCH_DN` value.
   # @default -- REDASH_SEARCH_DN
   ldapSearchDn: ""
-  # -- `REDASH_STATIC_ASSETS_PATH` value.
+  # -- `REDASH_STATIC_ASSETS_PATH` value. Directory that contains all front-end assets. relative to the ./redash directory.
   # @default -- ”../client/dist/”
   staticAssetsPath: ""
-  # -- `REDASH_JOB_EXPIRY_TIME` value.
+  # -- `REDASH_JOB_EXPIRY_TIME` value. Ttl in seconds for jobs placed in queue. if a job is not picked up by a worker within this ttl it will expire..
   # @default -- 3600 \* 12
   jobExpiryTime: ""
-  # -- REQUIRED `REDASH_COOKIE_SECRET` value. Stored as a Secret value.
+  # -- REQUIRED `REDASH_COOKIE_SECRET` value. Required. used for various cryptographic features of the web server. read more about how redash uses secret keys [here]({% link _kb/open-source/admin-guide/secrets.md %}). Stored as a Secret value.
   cookieSecret: ""
-  # -- `REDASH_LOG_LEVEL` value.
+  # -- `REDASH_LOG_LEVEL` value. Logging messages which are less severe than level will be ignored. read more about python logging [here](https://docs.python.org/3/library/logging.html).
   # @default -- INFO
   logLevel: ""
   # -- `REDASH_MAIL_SERVER` value.
@@ -162,15 +156,15 @@ redash:
   # -- `REDASH_MAIL_ASCII_ATTACHMENTS` value.
   # @default -- false
   mailAsciiAttachments: ""
-  # -- `REDASH_HOST` value.
+  # -- `REDASH_HOST` value. The url host used in emails sent to users (invites, alerts, notifications) etc..
   host: ""
-  # -- `REDASH_ALERTS_DEFAULT_MAIL_SUBJECT_TEMPLATE` value.
+  # -- `REDASH_ALERTS_DEFAULT_MAIL_SUBJECT_TEMPLATE` value. Subject used for email alert notifications. `{state}` and `{alert_name}` are the only available variables..
   # @default -- ({state}) {alert_name}
   alertsDefaultMailSubjectTemplate: ""
-  # -- `REDASH_THROTTLE_LOGIN_PATTERN` value.
+  # -- `REDASH_THROTTLE_LOGIN_PATTERN` value. The [flask-limiter](https://flask-limiter.readthedocs.io/en/stable/) string pattern used to rate limit requests to the /login route..
   # @default -- 50/hour
   throttleLoginPattern: ""
-  # -- `REDASH_LIMITER_STORAGE` value.
+  # -- `REDASH_LIMITER_STORAGE` value. Mapped directly to flask-limiter's [storage_uri](https://flask-limiter.readthedocs.io/en/stable/configuration.html?highlight=limiter_storage#ratelimit_storage_uri)..
   # @default -- REDIS_URL
   limiterStorage: ""
   # -- `REDASH_CORS_ACCESS_CONTROL_ALLOW_ORIGIN` value.
@@ -184,12 +178,12 @@ redash:
   # -- `REDASH_CORS_ACCESS_CONTROL_ALLOW_HEADERS` value.
   # @default -- Content-Type
   corsAccessControlAllowHeaders: ""
-  # -- `REDASH_ENABLED_QUERY_RUNNERS` value.
+  # -- `REDASH_ENABLED_QUERY_RUNNERS` value. Comma-separated list of query runners to be enabled (e.g. `redash.query_runner.pg,redash.query_runner.mysql`).
   # @default -- ”,”.join(default_query_runners)
   enabledQueryRunners: ""
-  # -- `REDASH_ADDITIONAL_QUERY_RUNNERS` value.
+  # -- `REDASH_ADDITIONAL_QUERY_RUNNERS` value. Comma-separated list of non-default query runners to be enabled.
   additionalQueryRunners: ""
-  # -- `REDASH_DISABLED_QUERY_RUNNERS` value.
+  # -- `REDASH_DISABLED_QUERY_RUNNERS` value. Comma-separated list of query runners that will not appear in redash.
   disabledQueryRunners: ""
   # -- `REDASH_SCHEDULED_QUERY_TIME_LIMIT` value. Time limit for scheduled queries (in seconds).
   # @default -- None
@@ -197,25 +191,25 @@ redash:
   # -- `REDASH_ADHOC_QUERY_TIME_LIMIT` value. Time limit for adhoc queries (in seconds).
   # @default -- None
   adhocQueryTimeLimit: ""
-  # -- `REDASH_ENABLED_DESTINATIONS` value.
+  # -- `REDASH_ENABLED_DESTINATIONS` value. Comma-separated list of alert destinations to be enabled (e.g. `redash.destinations.email,redash.destinations.slack` ).
   # @default -- ”,”.join(default_destinations)
   enabledDestinations: ""
-  # -- `REDASH_ADDITIONAL_DESTINATIONS` value.
+  # -- `REDASH_ADDITIONAL_DESTINATIONS` value. Comma-separated list of non-default alert destinations to be enabled.
   additionalDestinations: ""
-  # -- `REDASH_EVENT_REPORTING_WEBHOOKS` value.
+  # -- `REDASH_EVENT_REPORTING_WEBHOOKS` value. Comma-separated list of webhook urls that to which events will be forwarded.
   eventReportingWebhooks: ""
   # -- `REDASH_SENTRY_DSN` value.
   sentryDsn: ""
   # -- `REDASH_ALLOW_SCRIPTS_IN_USER_INPUT` value. Disable sanitization of text input, allowing full html.
   # @default -- false
   allowScriptsInUserInput: ""
-  # -- `REDASH_DASHBOARD_REFRESH_INTERVALS` value.
+  # -- `REDASH_DASHBOARD_REFRESH_INTERVALS` value. Comma-separated list of integer seconds that will be allowed for dashboard refresh.
   # @default -- 60,300,600,1800,3600,43200,86400
   dashboardRefreshIntervals: ""
-  # -- `REDASH_QUERY_REFRESH_INTERVALS` value.
+  # -- `REDASH_QUERY_REFRESH_INTERVALS` value. Comma-separated list of integer seconds that will be allowed for scheduled query refresh.
   # @default -- 60, 300, 600, 900, 1800, 3600, 7200, 10800, 14400, 18000, 21600, 25200, 28800, 32400, 36000, 39600, 43200, 86400, 604800, 1209600, 2592000
   queryRefreshIntervals: ""
-  # -- `REDASH_PASSWORD_LOGIN_ENABLED` value.
+  # -- `REDASH_PASSWORD_LOGIN_ENABLED` value. Toggle to allow password login. often disabled if google login, saml, ldap, or remote_user_login are enabled..
   # @default -- true
   passwordLoginEnabled: ""
   # -- `REDASH_SAML_METADATA_URL` value.
@@ -224,7 +218,7 @@ redash:
   samlEntityId: ""
   # -- `REDASH_SAML_NAMEID_FORMAT` value.
   samlNameidFormat: ""
-  # -- `REDASH_DATE_FORMAT` value.
+  # -- `REDASH_DATE_FORMAT` value. Moment.js format to be used throughout the web application.
   # @default -- DD/MM/YY
   dateFormat: ""
   # -- `REDASH_JWT_LOGIN_ENABLED` value.
@@ -246,31 +240,25 @@ redash:
   # -- `REDASH_FEATURE_SHOW_QUERY_RESULTS_COUNT` value. Disable/enable showing count of query results in status.
   # @default -- true
   featureShowQueryResultsCount: ""
-  # -- `REDASH_VERSION_CHECK` value.
+  # -- `REDASH_VERSION_CHECK` value. Toggle whether to periodically check if a newer version of redash is available..
   # @default -- true
   versionCheck: ""
   # -- `REDASH_FEATURE_DISABLE_REFRESH_QUERIES` value. Disable scheduled query execution.
   # @default -- false
   featureDisableRefreshQueries: ""
-  # -- `REDASH_FEATURE_SHOW_PERMISSIONS_CONTROL` value.
+  # -- `REDASH_FEATURE_SHOW_PERMISSIONS_CONTROL` value. Enable experimental multiple owners support.
   # @default -- false
   featureShowPermissionsControl: ""
-  # -- `REDASH_FEATURE_ALLOW_CUSTOM_JS_VISUALIZATIONS` value.
+  # -- `REDASH_FEATURE_ALLOW_CUSTOM_JS_VISUALIZATIONS` value. Enable the custom visualization option. this appears as a sub-type of "chart" visualizations in the ui..
   # @default -- false
   featureAllowCustomJsVisualizations: ""
-  # -- `REDASH_FEATURE_DUMB_RECENTS` value.
-  # @default -- false
-  featureDumbRecents: ""
-  # -- `REDASH_FEATURE_AUTO_PUBLISH_NAMED_QUERIES` value.
+  # -- `REDASH_FEATURE_AUTO_PUBLISH_NAMED_QUERIES` value. Automatically publish a new query after its name is changed from "new query".
   # @default -- true
   featureAutoPublishNamedQueries: ""
-  # -- `REDASH_FEATURE_EXTENDED_ALERT_OPTIONS` value. Disable/enable custom template for alert.
-  # @default -- false
-  featureExtendedAlertOptions: ""
-  # -- `REDASH_BIGQUERY_HTTP_TIMEOUT` value.
+  # -- `REDASH_BIGQUERY_HTTP_TIMEOUT` value. Http timeout for the bigquery query runner.
   # @default -- 600
   bigqueryHttpTimeout: ""
-  # -- `REDASH_SCHEMA_RUN_TABLE_SIZE_CALCULATIONS` value.
+  # -- `REDASH_SCHEMA_RUN_TABLE_SIZE_CALCULATIONS` value. Enable showing the size of each table in the schema browser..
   # @default -- false
   schemaRunTableSizeCalculations: ""
   # -- `REDASH_WEB_WORKERS` value. How many processes will gunicorn spawn to handle web requests.

@@ -155,6 +155,14 @@ Shared environment block used across each component.
 - name: REDASH_SAML_SCHEME_OVERRIDE
   value: {{ default  .Values.redash.samlSchemeOverride | quote }}
 {{- end }}
+{{- if .Values.redash.disablePublicUrls }}
+- name: REDASH_DISABLE_PUBLIC_URLS
+  value: {{ default  .Values.redash.disablePublicUrls | quote }}
+{{- end }}
+{{- if .Values.redash.blockedDomains }}
+- name: REDASH_BLOCKED_DOMAINS
+  value: {{ default  .Values.redash.blockedDomains | quote }}
+{{- end }}
 {{- if .Values.redash.proxiesCount }}
 - name: REDASH_PROXIES_COUNT
   value: {{ default  .Values.redash.proxiesCount | quote }}
@@ -175,18 +183,6 @@ Shared environment block used across each component.
 - name: REDASH_STATSD_USE_TAGS
   value: {{ default  .Values.redash.statsdUseTags | quote }}
 {{- end }}
-{{- if .Values.redash.celeryBroker }}
-- name: REDASH_CELERY_BROKER
-  value: {{ default  .Values.redash.celeryBroker | quote }}
-{{- end }}
-{{- if .Values.redash.celeryBackend }}
-- name: REDASH_CELERY_BACKEND
-  value: {{ default  .Values.redash.celeryBackend | quote }}
-{{- end }}
-{{- if .Values.redash.celeryTaskResultExpires }}
-- name: REDASH_CELERY_TASK_RESULT_EXPIRES
-  value: {{ default  .Values.redash.celeryTaskResultExpires | quote }}
-{{- end }}
 {{- if .Values.redash.queryResultsCleanupEnabled }}
 - name: REDASH_QUERY_RESULTS_CLEANUP_ENABLED
   value: {{ default  .Values.redash.queryResultsCleanupEnabled | quote }}
@@ -198,10 +194,6 @@ Shared environment block used across each component.
 {{- if .Values.redash.queryResultsCleanupMaxAge }}
 - name: REDASH_QUERY_RESULTS_CLEANUP_MAX_AGE
   value: {{ default  .Values.redash.queryResultsCleanupMaxAge | quote }}
-{{- end }}
-{{- if .Values.redash.schemasRefreshQueue }}
-- name: REDASH_SCHEMAS_REFRESH_QUEUE
-  value: {{ default  .Values.redash.schemasRefreshQueue | quote }}
 {{- end }}
 {{- if .Values.redash.schemasRefreshSchedule }}
 - name: REDASH_SCHEMAS_REFRESH_SCHEDULE
@@ -487,17 +479,9 @@ Shared environment block used across each component.
 - name: REDASH_FEATURE_ALLOW_CUSTOM_JS_VISUALIZATIONS
   value: {{ default  .Values.redash.featureAllowCustomJsVisualizations | quote }}
 {{- end }}
-{{- if .Values.redash.featureDumbRecents }}
-- name: REDASH_FEATURE_DUMB_RECENTS
-  value: {{ default  .Values.redash.featureDumbRecents | quote }}
-{{- end }}
 {{- if .Values.redash.featureAutoPublishNamedQueries }}
 - name: REDASH_FEATURE_AUTO_PUBLISH_NAMED_QUERIES
   value: {{ default  .Values.redash.featureAutoPublishNamedQueries | quote }}
-{{- end }}
-{{- if .Values.redash.featureExtendedAlertOptions }}
-- name: REDASH_FEATURE_EXTENDED_ALERT_OPTIONS
-  value: {{ default  .Values.redash.featureExtendedAlertOptions | quote }}
 {{- end }}
 {{- if .Values.redash.bigqueryHttpTimeout }}
 - name: REDASH_BIGQUERY_HTTP_TIMEOUT
@@ -510,10 +494,6 @@ Shared environment block used across each component.
 {{- if .Values.redash.webWorkers }}
 - name: REDASH_WEB_WORKERS
   value: {{ default  .Values.redash.webWorkers | quote }}
-{{- end }}
-{{- if .Values.redash.sqlAlchemyEnablePoolPrePing }}
-- name: SQLALCHEMY_ENABLE_POOL_PRE_PING
-  value: {{ default .Values.redash.sqlAlchemyEnablePoolPrePing | quote }}
 {{- end }}
 ## End primary Redash configuration
 {{- end -}}
