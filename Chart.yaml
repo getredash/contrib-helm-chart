@@ -1,7 +1,7 @@
 apiVersion: v1
 name: datareporter
-version: 0.0.2
-appVersion: 0.0.2-9849e1d7
+version: 0.0.3
+appVersion: a24edf10835275c27fc0a1f1b1581037e45996e9
 description: Datareporter is an open source tool built for teams to query, visualize and collaborate.
 keywords:
   - datareporter
