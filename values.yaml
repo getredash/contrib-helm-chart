@@ -621,8 +621,7 @@ postgresql:
     # postgresql.persistence.existingClaim -- Provide an existing PostgreSQL PersistentVolumeClaim
     # existingClaim: ""
 
-# externalRedis -- External Redis configuration. To use an external Redis instead of the automatically deployed redis chart: set redis.enabled to false then uncomment and configure the externalRedis connection URL (e.g. redis://user:pass@host:6379/database).
-externalRedis:
+# externalRedis -- External Redis configuration. To use an external Redis instead of the automatically deployed redis chart: set redis.enabled to false then uncomment and configure the externalRedis connection URL (e.g. redis://user:pass@host:6379/database, for SSL without login "rediss://host:6379/0") externalRedis:
 # externalRedisSecret -- Read external Redis configuration from a secret. This should point at a secret file with a single key which specifies the connection string.
 externalRedisSecret:
   {}
