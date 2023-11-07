@@ -51,10 +51,13 @@ spec:
             - name: "{{ $key }}"
               value: "{{ $value }}"
           {{- end }}
+          {{ if (include "redash.envFrom" .) }}
           envFrom:
           {{- include "redash.envFrom" . | nindent 12 }}
-          resources:
-{{ toYaml .Values.scheduledWorker.resources | indent 12 }}
+          {{- end }}
+          {{- if .Values.scheduledWorker.resources }}
+          resources: {{ toYaml .Values.scheduledWorker.resources | nindent 12 }}
+          {{- end }}
       volumes:
         - name: config
           configMap:

@@ -33,6 +33,8 @@ redash:
   ## Start primary Redash configuration
   ## Note that we document the Redash defaults, but don't explicitly set them.
   ## This allows multiple versions of Redash (which may have different defaults) to be more easily used
+  # -- disables all chart managed secrets providing an ability to set them using redash.envSecretName. Useful, while using together with external secrets
+  selfManagedSecrets: false
   # -- REQUIRED `REDASH_SECRET_KEY` value. Secret key used for data encryption. Stored as a Secret value.
   secretKey: ""
   # -- `REDASH_SAML_SCHEME_OVERRIDE` value. This setting will allow you to override the saml auth url scheme that gets constructed by flask. this is a useful feature if, for example, you're behind a proxy protocol enabled tcp load balancer (aws elb that terminates ssl) and your nginx proxy or similar adds a x-forwarded-proto of http even though your redash url for saml auth is https..

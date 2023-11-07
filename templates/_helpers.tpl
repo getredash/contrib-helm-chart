@@ -88,7 +88,8 @@ Get the secret name.
 {{/*
 Shared environment block used across each component.
 */}}
-{{- define "redash.env" -}}
+{{- define "redash.env" }}
+{{- if not .Values.redash.selfManagedSecrets }}
 {{- if not .Values.postgresql.enabled }}
 - name: REDASH_DATABASE_URL
   {{- if .Values.externalPostgreSQLSecret }}
@@ -139,17 +140,20 @@ Shared environment block used across each component.
 - name: REDASH_REDIS_DB
   value: "{{ .Values.redis.databaseNumber }}"
 {{- end }}
+{{- end }}
 {{- range $key, $value := .Values.env }}
 - name: "{{ $key }}"
   value: "{{ $value }}"
 {{- end }}
 ## Start primary Redash configuration
+{{- if not .Values.redash.selfManagedSecrets }}
 {{- if or .Values.redash.secretKey .Values.redash.existingSecret }}
 - name: REDASH_SECRET_KEY
   valueFrom:
     secretKeyRef:
       name: {{ include "redash.secretName" . }}
       key: secretKey
+{{- end }}
 {{- end }}
 {{- if .Values.redash.samlSchemeOverride }}
 - name: REDASH_SAML_SCHEME_OVERRIDE
@@ -219,12 +223,14 @@ Shared environment block used across each component.
 - name: REDASH_GOOGLE_CLIENT_ID
   value: {{ default  .Values.redash.googleClientId | quote }}
 {{- end }}
+{{- if not .Values.redash.selfManagedSecrets }}
 {{- if or .Values.redash.googleClientSecret .Values.redash.existingSecret }}
 - name: REDASH_GOOGLE_CLIENT_SECRET
   valueFrom:
     secretKeyRef:
       name: {{ include "redash.secretName" . }}
       key: googleClientSecret
+{{- end }}
 {{- end }}
 {{- if .Values.redash.remoteUserLoginEnabled }}
 - name: REDASH_REMOTE_USER_LOGIN_ENABLED
@@ -246,12 +252,14 @@ Shared environment block used across each component.
 - name: REDASH_LDAP_BIND_DN
   value: {{ default  .Values.redash.ldapBindDn | quote }}
 {{- end }}
+{{- if not .Values.redash.selfManagedSecrets }}
 {{- if or .Values.redash.ldapBindDnPassword .Values.redash.existingSecret }}
 - name: REDASH_LDAP_BIND_DN_PASSWORD
   valueFrom:
     secretKeyRef:
       name: {{ include "redash.secretName" . }}
       key: ldapBindDnPassword
+{{- end }}
 {{- end }}
 {{- if .Values.redash.ldapDisplayNameKey }}
 - name: REDASH_LDAP_DISPLAY_NAME_KEY
@@ -281,12 +289,14 @@ Shared environment block used across each component.
 - name: REDASH_JOB_EXPIRY_TIME
   value: {{ default  .Values.redash.jobExpiryTime | quote }}
 {{- end }}
+{{- if not .Values.redash.selfManagedSecrets }}
 {{- if or .Values.redash.cookieSecret .Values.redash.existingSecret }}
 - name: REDASH_COOKIE_SECRET
   valueFrom:
     secretKeyRef:
       name: {{ include "redash.secretName" . }}
       key: cookieSecret
+{{- end }}
 {{- end }}
 {{- if .Values.redash.logLevel }}
 - name: REDASH_LOG_LEVEL
@@ -312,12 +322,14 @@ Shared environment block used across each component.
 - name: REDASH_MAIL_USERNAME
   value: {{ default  .Values.redash.mailUsername | quote }}
 {{- end }}
+{{- if not .Values.redash.selfManagedSecrets }}
 {{- if or .Values.redash.mailPassword .Values.redash.existingSecret }}
 - name: REDASH_MAIL_PASSWORD
   valueFrom:
     secretKeyRef:
       name: {{ include "redash.secretName" . }}
       key: mailPassword
+{{- end }}
 {{- end }}
 {{- if .Values.redash.mailDefaultSender }}
 - name: REDASH_MAIL_DEFAULT_SENDER
