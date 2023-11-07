@@ -51,8 +51,10 @@ spec:
             - name: "{{ $key }}"
               value: "{{ $value }}"
           {{- end }}
+          {{- if (include "redash.envFrom" .) }}
           envFrom:
           {{- include "redash.envFrom" . | nindent 12 }}
+          {{- end }}
           ports:
             - containerPort: {{ .Values.server.httpPort }}
           livenessProbe:
@@ -74,8 +76,9 @@ spec:
             periodSeconds: 10
             successThreshold: 1
             failureThreshold: 3
-          resources:
-{{ toYaml .Values.server.resources | indent 12 }}
+          {{- if .Values.server.resources }}
+          resources: {{ toYaml .Values.server.resources | nindent 12 }}
+          {{- end }}
       volumes:
         - name: config
           configMap:
