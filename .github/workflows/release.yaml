@@ -28,7 +28,7 @@ jobs:
           version: v1.6.1
           packages_with_index: true
           config: .github/cr.yaml
-          charts_dir: .
+          charts_dir: ./charts
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
       - name: Changes
