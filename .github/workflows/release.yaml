@@ -25,9 +25,10 @@ jobs:
         uses: helm/chart-releaser-action@v1.6.0
         id: release
         with:
+          version: v1.6.1
           packages_with_index: true
           config: .github/cr.yaml
-          charts_dir: ./charts
+          charts_dir: .
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
       - name: Changes
