@@ -10,7 +10,7 @@ keywords:
 home: https://datareporter.com/
 sources:
   - https://github.com/dataminelab/datareporter
-icon: https://redash.io/assets/images/elements/redash-logo.svg
+icon: https://datareporter.com/favicon-32x32.png
 maintainers:
   - name: Radek Maciaszek
     email: radek@dataminelab.com

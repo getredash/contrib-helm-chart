@@ -32,7 +32,6 @@ jobs:
         with:
           version: v1.6.1
           packages_with_index: true
-          config: .github/cr.yaml
           charts_dir: ./charts
           pages_branch: gh-pages
         env:
