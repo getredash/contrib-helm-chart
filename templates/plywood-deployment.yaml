@@ -52,6 +52,7 @@ spec:
           env:
             - name: PORT
               value: "{{ .Values.plywood.server.port }}"
+            {{- toYaml .Values.plywood.env | nindent 12 }}
           resources:
             {{- toYaml .Values.plywood.resources | nindent 12 }}
       {{- with .Values.plywood.nodeSelector }}

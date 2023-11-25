@@ -34,6 +34,7 @@ plywood:
   # requests:
   #   cpu: 100m
   #  memory: 500Mi
+  env:
 
   # scheduledWorker.podSecurityContext -- Security contexts for scheduled worker pod assignment [ref](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
   podSecurityContext: { }
