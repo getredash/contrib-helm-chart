@@ -29,6 +29,7 @@ jobs:
         id: release
         with:
           packages_with_index: true
+          config: .github/cr.yaml
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
       - name: Changes
