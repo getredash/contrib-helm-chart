@@ -31,7 +31,6 @@ jobs:
         id: release
         with:
           version: v1.6.1
-          packages_with_index: true
           charts_dir: ./charts
           pages_branch: gh-pages
         env:
