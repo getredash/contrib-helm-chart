@@ -26,5 +26,11 @@ jobs:
 
       - name: Run chart-releaser
         uses: helm/chart-releaser-action@v1.6.0
+        id: release
+        with:
+          packages_with_index: true
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+      - name: Changes
+        run: |
+          echo ${{join(steps.release.outputs.*, '\n')}}
