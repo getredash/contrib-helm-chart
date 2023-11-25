@@ -17,8 +17,8 @@ jobs:
         run: |
           git config user.name "$GITHUB_ACTOR"
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
-          git branch --track main origin/master
           git fetch --tags
+          git branch --track master origin/master
           git describe --tags --abbrev=0 HEAD~
 
       - name: Install Helm
