@@ -2,14 +2,14 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "redash.name" -}}
+{{- define "datareporter.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "redash.chart" -}}
+{{- define "datareporter.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
@@ -19,7 +19,7 @@ We truncate at 43 chars because some Kubernetes name fields are limited to 64 (b
 and we use this as a base for component names (which can add up to 20 chars).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "redash.fullname" -}}
+{{- define "datareporter.fullname" -}}
 {{- if .Values.fullnameOverride -}}
 {{- .Values.fullnameOverride | trunc 43 | trimSuffix "-" -}}
 {{- else -}}
@@ -35,60 +35,60 @@ If release name contains chart name it will be used as a full name.
 {{/*
 Create a default fully qualified adhocWorker name.
 */}}
-{{- define "redash.adhocWorker.fullname" -}}
-{{- template "redash.fullname" . -}}-adhocworker
+{{- define "datareporter.adhocWorker.fullname" -}}
+{{- template "datareporter.fullname" . -}}-adhocworker
 {{- end -}}
 
 {{/*
 Create a default fully qualified scheduledworker name.
 */}}
-{{- define "redash.scheduledWorker.fullname" -}}
-{{- template "redash.fullname" . -}}-scheduledworker
+{{- define "datareporter.scheduledWorker.fullname" -}}
+{{- template "datareporter.fullname" . -}}-scheduledworker
 {{- end -}}
 
 {{/*
 Create a default fully qualified genericWorker name.
 */}}
-{{- define "redash.genericWorker.fullname" -}}
-{{- template "redash.fullname" . -}}-genericworker
+{{- define "datareporter.genericWorker.fullname" -}}
+{{- template "datareporter.fullname" . -}}-genericworker
 {{- end -}}
 
 {{/*
 Create a default fully qualified scheduler name.
 */}}
-{{- define "redash.scheduler.fullname" -}}
-{{- template "redash.fullname" . -}}-scheduler
+{{- define "datareporter.scheduler.fullname" -}}
+{{- template "datareporter.fullname" . -}}-scheduler
 {{- end -}}
 
 {{/*
 Create a default fully qualified postgresql name.
 */}}
-{{- define "redash.postgresql.fullname" -}}
+{{- define "datareporter.postgresql.fullname" -}}
 {{- printf "%s-%s" .Release.Name "postgresql" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 {{/*
 Create a default fully qualified redis name.
 */}}
-{{- define "redash.redis.fullname" -}}
+{{- define "datareporter.redis.fullname" -}}
 {{- printf "%s-%s" .Release.Name "redis-master" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 {{/*
 Get the secret name.
 */}}
-{{- define "redash.secretName" -}}
-{{- if .Values.redash.existingSecret }}
-    {{- printf "%s" .Values.redash.existingSecret -}}
+{{- define "datareporter.secretName" -}}
+{{- if .Values.datareporter.existingSecret }}
+    {{- printf "%s" .Values.datareporter.existingSecret -}}
 {{- else -}}
-    {{- printf "%s" (include "redash.fullname" .) -}}
+    {{- printf "%s" (include "datareporter.fullname" .) -}}
 {{- end -}}
 {{- end -}}
 
 {{/*
 Shared environment block used across each component.
 */}}
-{{- define "redash.env" -}}
+{{- define "datareporter.env" -}}
 {{- if not .Values.postgresql.enabled }}
 - name: REDASH_DATABASE_URL
   {{- if .Values.externalPostgreSQLSecret }}
@@ -107,7 +107,7 @@ Shared environment block used across each component.
       name: {{ .Release.Name }}-postgresql
       key: postgresql-password
 - name: REDASH_DATABASE_HOSTNAME
-  value: {{ include "redash.postgresql.fullname" . }}
+  value: {{ include "datareporter.postgresql.fullname" . }}
 - name: REDASH_DATABASE_PORT
   value: "{{ .Values.postgresql.service.port }}"
 - name: REDASH_DATABASE_DB
@@ -133,19 +133,19 @@ Shared environment block used across each component.
     {{- end }}
       key: redis-password
 - name: REDASH_REDIS_HOSTNAME
-  value: {{ include "redash.redis.fullname" . }}
+  value: {{ include "datareporter.redis.fullname" . }}
 - name: REDASH_REDIS_PORT
   value: "{{ .Values.redis.master.port }}"
 - name: REDASH_REDIS_DB
   value: "{{ .Values.redis.databaseNumber }}"
 {{- end }}
 - name: PLYWOOD_SERVER_URL
-  value: http://{{ include "redash.plywood.fullname" . }}:{{ .Values.plywood.service.port}}
+  value: http://{{ include "datareporter.plywood.fullname" . }}:{{ .Values.plywood.service.port}}
 {{- range $key, $value := .Values.env }}
 - name: "{{ $key }}"
   value: "{{ $value }}"
 {{- end }}
-## Start primary Redash configuration
+## Start primary datareporter configuration
 {{- if or .Values.redash.secretKey .Values.redash.existingSecret }}
 - name: REDASH_SECRET_KEY
   valueFrom:

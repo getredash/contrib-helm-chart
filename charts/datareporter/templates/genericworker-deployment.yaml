@@ -1,20 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "redash.genericWorker.fullname" . }}
+  name: {{ include "datareporter.genericWorker.fullname" . }}
   labels:
-    {{- include "redash.labels" . | nindent 4 }}
+    {{- include "datareporter.labels" . | nindent 4 }}
     app.kubernetes.io/component: genericworker
 spec:
   replicas: {{ .Values.genericWorker.replicaCount }}
   selector:
     matchLabels:
-      {{- include "redash.selectorLabels" . | nindent 6 }}
+      {{- include "datareporter.selectorLabels" . | nindent 6 }}
       app.kubernetes.io/component: genericworker
   template:
     metadata:
       labels:
-        {{- include "redash.selectorLabels" . | nindent 8 }}
+        {{- include "datareporter.selectorLabels" . | nindent 8 }}
         app.kubernetes.io/component: genericworker
         {{- if .Values.genericWorker.podLabels }}
         {{- tpl (toYaml .Values.genericWorker.podLabels) $ | nindent 8 }}
@@ -28,11 +28,11 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
     {{- end }}
-      serviceAccountName: {{ include "redash.serviceAccountName" . }}
+      serviceAccountName: {{ include "datareporter.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.genericWorker.podSecurityContext | nindent 8 }}
       containers:
-        - name: {{ include "redash.name" . }}-genericworker
+        - name: {{ include "datareporter.name" . }}-genericworker
           securityContext:
             {{- toYaml .Values.genericWorker.securityContext | nindent 12 }}
           image: "{{ include "base.images.image" ( dict  "imageRoot" .Values.datareporter.image "global" .Values.global  "Values" .Values  "Chart" .Chart ) }}"
@@ -46,19 +46,19 @@ spec:
             {{- toYaml . | nindent 12 }}
             {{- end }}
           env:
-          {{- include "redash.env" . | nindent 12 }}
+          {{- include "datareporter.env" . | nindent 12 }}
           {{- range $key, $value := .Values.genericWorker.env }}
             - name: "{{ $key }}"
               value: "{{ $value }}"
           {{- end }}
           envFrom:
-          {{- include "redash.envFrom" . | nindent 12 }}
+          {{- include "datareporter.envFrom" . | nindent 12 }}
           resources:
 {{ toYaml .Values.genericWorker.resources | indent 12 }}
       volumes:
         - name: config
           configMap:
-            name: {{ include "redash.fullname" . }}
+            name: {{ include "datareporter.fullname" . }}
         {{- with .Values.genericWorker.volumes }}
         {{- toYaml . | nindent 8 }}
         {{- end }}

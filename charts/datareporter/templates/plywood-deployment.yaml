@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "redash.plywood.fullname" . }}
+  name: {{ include "datareporter.plywood.fullname" . }}
   labels:
-    {{- include "redash.labels" . | nindent 4 }}
+    {{- include "datareporter.labels" . | nindent 4 }}
     app.kubernetes.io/component: plywood
 spec:
   replicas: {{ .Values.plywood.replicaCount }}
   selector:
     matchLabels:
-      {{- include "redash.selectorLabels" . | nindent 6 }}
+      {{- include "datareporter.selectorLabels" . | nindent 6 }}
       app.kubernetes.io/component: plywood
   template:
     metadata:
       labels:
         app.kubernetes.io/component: plywood
-        {{- include "redash.selectorLabels" . | nindent 8 }}
+        {{- include "datareporter.selectorLabels" . | nindent 8 }}
         {{- if .Values.plywood.podLabels }}
         {{- tpl (toYaml .Values.plywood.podLabels) $ | nindent 8 }}
         {{- end }}
@@ -28,11 +28,11 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
     {{- end }}
-      serviceAccountName: {{ include "redash.serviceAccountName" . }}
+      serviceAccountName: {{ include "datareporter.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
-        - name: {{ include "redash.plywood.fullname" . }}
+        - name: {{ include "datareporter.plywood.fullname" . }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ include "base.images.image" (merge ( dict  "imageRoot" .Values.plywood.image "global" .Values.global  ) . ) }}"

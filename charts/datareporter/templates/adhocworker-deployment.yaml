@@ -1,9 +1,9 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "redash.adhocWorker.fullname" . }}
+  name: {{ include "datareporter.adhocWorker.fullname" . }}
   labels:
-    {{- include "redash.labels" . | nindent 4 }}
+    {{- include "datareporter.labels" . | nindent 4 }}
     app.kubernetes.io/component: adhocworker
 spec:
   replicas: {{ .Values.adhocWorker.replicaCount }}
