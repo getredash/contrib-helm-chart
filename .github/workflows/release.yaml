@@ -3,7 +3,7 @@ name: Release Charts
 on:
   push:
     branches:
-      - master
+      - feautre/chart-release-workflow
 
 jobs:
   release:
@@ -27,8 +27,7 @@ jobs:
         with:
           packages_with_index: true
           config: .github/cr.yaml
-          skip_upload: true
-          charts_dir: charts
+          charts_dir: ./charts
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
       - name: Changes
