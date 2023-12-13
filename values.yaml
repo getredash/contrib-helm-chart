@@ -327,6 +327,8 @@ service:
   loadBalancerIP:
   # service.type -- Kubernetes Service type
   type: ClusterIP
+  # service.externalTraffucPolicy -- external traffic policy for Load Balancer
+  externalTrafficPolicy: ""
   # service.port -- Service external port
   port: 80
 
