@@ -175,7 +175,7 @@ redash:
   # redash.disabledQueryRunners -- `REDASH_DISABLED_QUERY_RUNNERS` value. Defaults to ``.
   disabledQueryRunners:
   # redash.adhocQueryTimeLimit -- `REDASH_ADHOC_QUERY_TIME_LIMIT` value. Defaults to `None`.
-  adhocQueryTimeLimit:
+  adhocQueryTimeLimit: 180
   # redash.enabledDestinations -- `REDASH_ENABLED_DESTINATIONS` value. Defaults to `”,”.join(default_destinations)`.
   enabledDestinations:
   # redash.additionalDestinations -- `REDASH_ADDITIONAL_DESTINATIONS` value. Defaults to ``.
