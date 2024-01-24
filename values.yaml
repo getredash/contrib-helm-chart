@@ -537,3 +537,15 @@ redis:
     service:
       ports:
         redis: 6379
+
+# extraObjects -- Additional kubernetes manifests to deploy alongside the chart. Useful to include external secrets for dependencies.
+extraObjects: []
+# - apiVersion: mumoshu.github.io/v1alpha1
+#   kind: AWSSecret
+#   metadata:
+#     name: redash-postgres
+#   spec:
+#     stringDataFrom:
+#       secretsManagerSecretRef:
+#         secretId: redash-postgres-prod
+#         versionId: 00000000-1111-2222-3333-444444444444
