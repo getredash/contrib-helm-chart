@@ -5,11 +5,11 @@ jobs:
     parameters:
       helm:
         description: "Helm version to test with"
-        default: "v3.12.0"
+        default: "v3.14.0"
         type: string
       k8s:
         description: "Kubernetes version to test with"
-        default: "v1.16.15"
+        default: "v1.28.6"
         type: string
     machine:
       image: ubuntu-2204:2023.04.2
@@ -19,7 +19,7 @@ jobs:
       K8S_VERSION: << parameters.k8s >>
       REDASH_UPGRADE_SOURCE: 8.0.2.b37747
       KUBECONFIG: /home/circleci/.kube/config
-      MINIKUBE_VERSION: v1.30.1
+      MINIKUBE_VERSION: v1.32.0
       MINIKUBE_WANTUPDATENOTIFICATION: false
       MINIKUBE_WANTREPORTERRORPROMPT: false
       MINIKUBE_HOME: /home/circleci
@@ -91,7 +91,6 @@ jobs:
       - run:
           name: Install chart dependencies
           command: |
-            helm repo add bitnami "https://raw.githubusercontent.com/bitnami/charts/archive-full-index/bitnami"
             helm dependency build .
 
       - run:
@@ -105,7 +104,8 @@ jobs:
               env:
                 REDASH_WEB_WORKERS: 1
             postgresql:
-              postgresqlPassword: $(openssl rand -base64 32)
+              auth:
+                password: $(openssl rand -base64 32)
             adhocWorker:
               env:
                 WORKERS_COUNT: 1
@@ -161,7 +161,7 @@ jobs:
 
     environment:
       YQ_VERSION: v4.34.1
-      HELM_VERSION: v3.12.0
+      HELM_VERSION: v3.14.0
       GITHUB_PAGES_BRANCH: gh-pages
 
     working_directory: ~/redash
@@ -235,34 +235,34 @@ workflows:
       # We ensure a single variant passes before running the others
       # This makes tests take a bit longer but conserves resources
       - test:
-          name: h3k24
-          helm: v3.7.0
-          k8s: v1.19.15
-      - test:
-          name: h3k25
-          helm: v3.7.0
-          k8s: v1.20.11
-          requires:
-            - h3k24
-      - test:
           name: h3k26
-          helm: v3.7.0
-          k8s: v1.21.5
-          requires:
-            - h3k24
+          helm: v3.14.0
+          k8s: v1.26.13
       - test:
           name: h3k27
-          helm: v3.7.0
-          k8s: v1.22.2
+          helm: v3.14.0
+          k8s: v1.27.10
           requires:
-            - h3k24
+            - h3k26
+      - test:
+          name: h3k28
+          helm: v3.14.0
+          k8s: v1.28.6
+          requires:
+            - h3k26
+      - test:
+          name: h3k29
+          helm: v3.14.0
+          k8s: v1.29.1
+          requires:
+            - h3k26
       - publish:
           # The publish step depends on all the test steps passing
           requires:
-            - h3k24
-            - h3k25
             - h3k26
             - h3k27
+            - h3k28
+            - h3k29
           filters:
             branches:
               only:
