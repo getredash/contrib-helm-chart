@@ -37,7 +37,7 @@ spec:
         - name: {{ include "redash.name" . }}-scheduler
           securityContext:
             {{- toYaml .Values.scheduler.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          image: {{ .Values.image.registry }}/{{ .Values.image.repo }}:{{ .Values.image.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command: ["/bin/sh"]
           args: ["-c", ". /config/dynamicenv.sh && /app/bin/docker-entrypoint scheduler"]

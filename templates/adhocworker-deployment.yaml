@@ -35,7 +35,7 @@ spec:
         - name: {{ include "redash.name" . }}-adhocworker
           securityContext:
             {{- toYaml .Values.adhocWorker.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          image: {{ .Values.image.registry }}/{{ .Values.image.repo }}:{{ .Values.image.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command: ["/bin/sh"]
           args: ["-c", ". /config/dynamicenv.sh && /app/bin/docker-entrypoint worker"]
@@ -45,8 +45,7 @@ spec:
             {{- with .Values.adhocWorker.volumeMounts }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
-          livenessProbe:
-{{ toYaml .Values.adhocWorker.livenessProbe | indent 12 }}
+          livenessProbe: {{ toYaml .Values.adhocWorker.livenessProbe | nindent 12 }}
           env:
           {{- include "redash.env" . | nindent 12 }}
           {{- range $key, $value := .Values.adhocWorker.env }}
@@ -68,14 +67,11 @@ spec:
         {{- toYaml . | nindent 8 }}
         {{- end }}
     {{- if .Values.adhocWorker.nodeSelector }}
-      nodeSelector:
-{{ toYaml .Values.adhocWorker.nodeSelector | indent 8 }}
+      nodeSelector: {{ toYaml .Values.adhocWorker.nodeSelector | nindent 8 }}
     {{- end }}
     {{- with .Values.adhocWorker.affinity }}
-      affinity:
-{{ toYaml . | indent 8 }}
+      affinity: {{ toYaml . | nindent 8 }}
     {{- end }}
     {{- with .Values.adhocWorker.tolerations }}
-      tolerations:
-{{ toYaml . | indent 8 }}
+      tolerations: {{ toYaml . | nindent 8 }}
     {{- end }}
