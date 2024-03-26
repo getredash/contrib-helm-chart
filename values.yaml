@@ -1,9 +1,9 @@
 ## Default values for Redash.
-## This is a YAML-formatted file.
 
 image:
-  # image.repository -- Redash image name used for server and worker pods
-  repository: redash/redash
+  registry: docker.io
+  # image.repo -- Redash image name used for server and worker pods
+  repo: redash/redash
   # image.tag -- Redash image [tag](https://hub.docker.com/r/redash/redash/tags)
   tag: 10.0.0.b50363
   # image.pullPolicy - Image pull policy
@@ -18,6 +18,7 @@ fullnameOverride: ""
 # env -- Redash global environment variables - applied to both server and worker containers.
 env:
   PYTHONUNBUFFERED: 0
+  REDASH_PRODUCTION: "true"
 
 ## Service account and security context configuration
 serviceAccount:
@@ -558,11 +559,11 @@ genericWorker:
   # initialDelaySeconds: 60
   # periodSeconds: 100
 
-## Configuration for hook-install-job
-hookInstallJob:
-  # hookInstallJob.ttlSecondsAfterFinished -- ttl for install job [ref](https://kubernetes.io/docs/concepts/workloads/controllers/ttlafterfinished/)
+## Configuration for migrations hook
+migrations:
+  # migrations.ttlSecondsAfterFinished -- ttl for install job [ref](https://kubernetes.io/docs/concepts/workloads/controllers/ttlafterfinished/)
   ttlSecondsAfterFinished: 600
-  # hookInstallJob.resources -- Scheduled worker resource requests and limits [ref](http://kubernetes.io/docs/user-guide/compute-resources/)
+  # migrations.resources -- Scheduled worker resource requests and limits [ref](http://kubernetes.io/docs/user-guide/compute-resources/)
   resources:
   # limits:
   #   cpu: 500m
@@ -571,49 +572,20 @@ hookInstallJob:
   #   cpu: 100m
   #  memory: 500Mi
 
-  # hookInstallJob.podSecurityContext -- Security contexts for scheduled worker pod assignment [ref](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
+  # migrations.podSecurityContext -- Security contexts for scheduled worker pod assignment [ref](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
   podSecurityContext: {}
   securityContext: {}
 
-  # hookInstallJob.nodeSelector -- Node labels for scheduled worker pod assignment [ref](https://kubernetes.io/docs/user-guide/node-selection/)
+  # migrations.nodeSelector -- Node labels for scheduled worker pod assignment [ref](https://kubernetes.io/docs/user-guide/node-selection/)
   nodeSelector: {}
 
-  # hookInstallJob.tolerations -- Tolerations for server pod assignment [ref](https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/)
+  # migrations.tolerations -- Tolerations for server pod assignment [ref](https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/)
   tolerations: []
 
-  # hookInstallJob.affinity -- Affinity for scheduled worker pod assignment [ref](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity)
+  # migrations.affinity -- Affinity for scheduled worker pod assignment [ref](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity)
   affinity: {}
 
-  # hookInstallJob.podAnnotations -- Annotations for scheduled worker pod assignment [ref](https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/)
-  podAnnotations: {}
-
-## Configuration for hook-upgrade-job
-hookUpgradeJob:
-  # hookUpgradeJob.ttlSecondsAfterFinished -- ttl for install job [ref](https://kubernetes.io/docs/concepts/workloads/controllers/ttlafterfinished/)
-  ttlSecondsAfterFinished: 600
-  # hookUpgradeJob.resources -- Scheduled worker resource requests and limits [ref](http://kubernetes.io/docs/user-guide/compute-resources/)
-  resources:
-  # limits:
-  #   cpu: 500m
-  #   memory: 3Gi
-  # requests:
-  #   cpu: 100m
-  #  memory: 500Mi
-
-  # hookUpgradeJob.podSecurityContext -- Security contexts for scheduled worker pod assignment [ref](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
-  podSecurityContext: {}
-  securityContext: {}
-
-  # hookUpgradeJob.nodeSelector -- Node labels for scheduled worker pod assignment [ref](https://kubernetes.io/docs/user-guide/node-selection/)
-  nodeSelector: {}
-
-  # hookUpgradeJob.tolerations -- Tolerations for server pod assignment [ref](https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/)
-  tolerations: []
-
-  # hookUpgradeJob.affinity -- Affinity for scheduled worker pod assignment [ref](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity)
-  affinity: {}
-
-  # hookUpgradeJob.podAnnotations -- Annotations for scheduled worker pod assignment [ref](https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/)
+  # migrations.podAnnotations -- Annotations for scheduled worker pod assignment [ref](https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/)
   podAnnotations: {}
 
 # externalPostgreSQL -- External PostgreSQL configuration. To use an external PostgreSQL instead of the automatically deployed postgresql chart: set postgresql.enabled to false then uncomment and configure the externalPostgreSQL connection URL (e.g. postgresql://user:pass@host:5432/database)
@@ -627,33 +599,21 @@ externalPostgreSQLSecret:
 # envSecretName -- DEPRECIATED, use externalPostgreSQLSecret/externalRedisSecret instead. Contents of this secret will be loaded as environment variables into the container. Useful e.g. to set to set PostgreSQL password in externalPostgreSQL parameter: postgresql://user:$(POSTGRESQL_PASSWORD)@host:5432/database [ref](https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/#using-environment-variables-inside-of-your-config)
 # envSecretName:
 
-## Configuration values for the postgresql dependency. This PostgreSQL instance is used by default for all Redash state storage [ref](https://github.com/kubernetes/charts/blob/master/stable/postgresql/README.md)
+## Configuration values for the postgresql dependency. This PostgreSQL instance is used by default for all Redash state storage [ref](https://github.com/bitnami/charts/blob/main/bitnami/postgresql/README.md)
 postgresql:
   # postgresql.enabled -- Whether to deploy a PostgreSQL server to satisfy the applications database requirements. To use an external PostgreSQL set this to false and configure the externalPostgreSQL parameter.
   enabled: true
-  image:
-    # postgresql.image.tag -- Bitnami supported version close to the one specified in Redash [setup docker-compose.yml](https://github.com/getredash/setup/blob/master/data/docker-compose.yml)
-    tag: "9.6.17-debian-10-r3"
-  # postgresql.postgresqlUsername -- PostgreSQL username for redash user (when postgresql chart enabled)
-  postgresqlUsername: redash
-  # postgresql.postgresqlPassword -- REQUIRED: PostgreSQL password for redash user (when postgresql chart enabled)
-  postgresqlPassword:
-  # postgresql.postgresqlDatabase -- PostgreSQL database name (when postgresql chart enabled)
-  postgresqlDatabase: redash
-  service:
-    type: ClusterIP
-    port: 5432
-  persistence:
-    # postgresql.persistence.enabled -- Use a PVC to persist PostgreSQL data (when postgresql chart enabled)
-    enabled: true
-    # postgresql.persistence.storageClass - Storage Class for PostgreSQL backing PVC. If undefined (the default) or set to null, no storageClassName spec is set, choosing the default provisioner.  (gp2 on AWS, standard on GKE, AWS & OpenStack).
-    storageClass: ""
-    # postgresql.persistence.accessMode -- Use PostgreSQL volume as ReadOnly or ReadWrite
-    accessMode: ReadWriteOnce
-    # postgresql.persistence.size -- PVC Storage Request size for PostgreSQL volume
-    size: 10Gi
-    # postgresql.persistence.existingClaim -- Provide an existing PostgreSQL PersistentVolumeClaim
-    # existingClaim: ""
+  primary:
+    service:
+      ports:
+        postgresql: 5432
+  auth:
+    # postgresql.auth.username -- PostgreSQL username for redash user (when postgresql chart enabled)
+    username: redash
+    # postgresql.auth.password -- REQUIRED: PostgreSQL password for redash user (when postgresql chart enabled)
+    password:
+  # postgresql.auth.database -- PostgreSQL database name (when postgresql chart enabled)
+    database: redash
 
 # externalRedis -- External Redis configuration. To use an external Redis instead of the automatically deployed redis chart: set redis.enabled to false then uncomment and configure the externalRedis connection URL (e.g. redis://user:pass@host:6379/database).
 externalRedis:
@@ -663,17 +623,12 @@ externalRedisSecret:
   # name: redash-redis
   # key: connectionString
 
-## Configuration values for the redis dependency. This Redis instance is used by default for caching and temporary storage [ref](https://github.com/kubernetes/charts/blob/master/stable/redis/README.md)
+## Configuration values for the redis dependency. This Redis instance is used by default for caching and temporary storage [ref](https://github.com/bitnami/charts/blob/main/bitnami/redis/README.md)
 redis:
   # redis.enabled -- Whether to deploy a Redis server to satisfy the applications database requirements. To use an external Redis set this to false and configure the externalRedis parameter.
   enabled: true
-  # redis.password -- If the password is not specified, a random password will be generated (when redis chart enabled)
-  # password:
-  # redis.databaseNumber -- Redis database number to use (when redis chart enabled)
-  databaseNumber: 0
+  database: 0
   master:
-    # redis.master.port -- Redis master port to use (when redis chart enabled)
-    port: 6379
-  cluster:
-    # redis.databaseNumber -- Enable Redis clustering (when redis chart enabled)
-    enabled: false
+    service:
+      ports:
+        redis: 6379

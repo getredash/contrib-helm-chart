@@ -101,7 +101,7 @@ Shared environment block used across each component.
   {{- end }}
 {{- else }}
 - name: REDASH_DATABASE_USER
-  value: "{{ .Values.postgresql.postgresqlUsername }}"
+  value: "{{ .Values.postgresql.auth.username }}"
 - name: REDASH_DATABASE_PASSWORD
   valueFrom:
     secretKeyRef:
@@ -110,9 +110,9 @@ Shared environment block used across each component.
 - name: REDASH_DATABASE_HOSTNAME
   value: {{ include "redash.postgresql.fullname" . }}
 - name: REDASH_DATABASE_PORT
-  value: "{{ .Values.postgresql.service.port }}"
+  value: "{{ .Values.postgresql.primary.service.ports.postgresql }}"
 - name: REDASH_DATABASE_DB
-  value: "{{ .Values.postgresql.postgresqlDatabase }}"
+  value: "{{ .Values.postgresql.auth.database }}"
 {{- end }}
 {{- if not .Values.redis.enabled }}
 - name: REDASH_REDIS_URL
@@ -136,9 +136,9 @@ Shared environment block used across each component.
 - name: REDASH_REDIS_HOSTNAME
   value: {{ include "redash.redis.fullname" . }}
 - name: REDASH_REDIS_PORT
-  value: "{{ .Values.redis.master.port }}"
+  value: "{{ .Values.redis.master.service.ports.redis }}"
 - name: REDASH_REDIS_DB
-  value: "{{ .Values.redis.databaseNumber }}"
+  value: "{{ .Values.redis.database }}"
 {{- end }}
 {{- end }}
 {{- range $key, $value := .Values.env }}
@@ -551,5 +551,5 @@ Create the name of the service account to use
 {{- end -}}
 {{- end -}}
 
-# This ensures a random value is provided for postgresqlPassword:
-required "A secure random value for .postgresql.postgresqlPassword is required" .Values.postgresql.postgresqlPassword
+# This ensures a random value is provided for postgresql.auth.password:
+required "A secure random value for .postgresql.auth.assword is required" .Values.postgresql.auth.password

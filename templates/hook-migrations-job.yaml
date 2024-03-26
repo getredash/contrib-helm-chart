@@ -1,25 +1,25 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: "{{ .Release.Name }}-upgrade"
+  name: "{{ .Release.Name }}-migrations"
   labels:
     {{- include "redash.labels" . | nindent 4 }}
-    app.kubernetes.io/component: upgrade
+    app.kubernetes.io/component: migrations
   annotations:
     # This is what defines this resource as a hook.
-    "helm.sh/hook": post-upgrade
+    "helm.sh/hook": post-install,post-upgrade
     "helm.sh/hook-weight": "-5"
     "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
 spec:
-  ttlSecondsAfterFinished: {{ .Values.hookUpgradeJob.ttlSecondsAfterFinished }}
+  ttlSecondsAfterFinished: {{ .Values.migrations.ttlSecondsAfterFinished }}
   template:
     metadata:
       name: "{{ .Release.Name }}"
       labels:
         {{- include "redash.selectorLabels" . | nindent 8 }}
-      {{- if .Values.hookUpgradeJob.podAnnotations }}
+      {{- if .Values.migrations.podAnnotations }}
       annotations:
-      {{ toYaml .Values.hookUpgradeJob.podAnnotations | nindent 8 }}
+      {{ toYaml .Values.migrations.podAnnotations | nindent 8 }}
       {{- end }}
     spec:
       {{- with .Values.imagePullSecrets }}
@@ -29,12 +29,12 @@ spec:
       serviceAccountName: {{ include "redash.serviceAccountName" . }}
       restartPolicy: Never
       securityContext:
-        {{- toYaml .Values.hookUpgradeJob.podSecurityContext | nindent 8 }}
+        {{- toYaml .Values.migrations.podSecurityContext | nindent 8 }}
       containers:
       - name: {{ include "redash.name" . }}-server
         securityContext:
-          {{- toYaml .Values.hookUpgradeJob.securityContext | nindent 10 }}
-        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          {{- toYaml .Values.migrations.securityContext | nindent 10 }}
+        image: {{ .Values.image.registry }}/{{ .Values.image.repo }}:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         command: ["/bin/bash", "/config/install-upgrade.sh", "upgrade"]
         volumeMounts:
@@ -57,15 +57,12 @@ spec:
         - name: config
           configMap:
             name: {{ include "redash.fullname" . }}
-    {{- with .Values.hookUpgradeJob.nodeSelector }}
-      nodeSelector:
-{{ toYaml . | indent 8 }}
+    {{- with .Values.migrations.nodeSelector }}
+      nodeSelector: {{ toYaml . | nindent 8 }}
     {{- end }}
-    {{- with .Values.hookUpgradeJob.affinity }}
-      affinity:
-{{ toYaml . | indent 8 }}
+    {{- with .Values.migrations.affinity }}
+      affinity: {{ toYaml . | nindent 8 }}
     {{- end }}
-    {{- with .Values.hookUpgradeJob.tolerations }}
-      tolerations:
-{{ toYaml . | indent 8 }}
+    {{- with .Values.migrations.tolerations }}
+      tolerations: {{ toYaml . | nindent 8 }}
     {{- end }}

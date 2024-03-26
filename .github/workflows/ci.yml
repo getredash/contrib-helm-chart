@@ -1,0 +1,99 @@
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+jobs:
+  test-on-minikube:
+    strategy:
+      matrix:
+        k8s: 
+          - v1.26.13
+          - v1.27.10
+          - v1.28.6
+          - v1.29.1
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: medyagh/setup-minikube@v0.0.14
+        with:
+          kubernetes-version: ${{ matrix.k8s }}
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - uses: azure/setup-helm@v3
+      - name: testing helm chart
+        run: |
+          helm lint .
+          helm dependency build .
+          cat > test-values.yaml <<- EOM
+            redash:
+              cookieSecret: $(openssl rand -base64 32)
+              secretKey: $(openssl rand -base64 32)
+              env:
+                REDASH_WEB_WORKERS: 1
+            postgresql:
+              auth:
+                password: $(openssl rand -base64 32)
+            adhocWorker:
+              env:
+                WORKERS_COUNT: 1
+            scheduledWorker:
+              env:
+                WORKERS_COUNT: 1
+          EOM
+          helm upgrade --install redash . --wait -f test-values.yaml
+          sleep 10
+          helm test redash
+          helm delete redash
+          helm upgrade --install redashup . --wait -f test-values.yaml
+          kubectl get pod -l "app.kubernetes.io/instance=redashup,app.kubernetes.io/component=server" -o jsonpath="{..image}"
+          sleep 10
+          helm test redashup
+          kubectl delete pod -l "app.kubernetes.io/instance=redashup,app.kubernetes.io/component=test-connection"
+          helm upgrade --install redashup . --wait --reset-values -f test-values.yaml
+          kubectl get pod -l "app.kubernetes.io/instance=redashup,app.kubernetes.io/component=server" -o jsonpath="{..image}"
+          sleep 10
+          helm test redashup
+          kubectl top node || true
+          kubectl top pod -A || true
+          kubectl get all -A || true
+          echo "TEST LOGS"
+          kubectl describe pod "$(kubectl get pods -l 'app.kubernetes.io/component=test-connection' -o jsonpath='{.items[0].metadata.name}')"
+          kubectl logs --tail=20 -l "app.kubernetes.io/component=test-connection" || true
+          echo "INSTALL LOGS"
+          kubectl logs --tail=40 -l "job-name=redash-install" || true
+          echo "UPGRADE LOGS"
+          kubectl logs --tail=40 -l "job-name=redash-upgrade" || true
+          echo "SERVER LOGS"
+          kubectl logs --tail=20 -l "app.kubernetes.io/component=server" || true
+          echo "MINIKUBE LOGS"
+          minikube logs -n10 || true
+  publish-chart:
+    needs: test-on-minikube
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: azure/setup-helm@v3
+      - id: get-chart-version
+        uses: mikefarah/yq@master
+        with:
+          cmd: yq '.version' Chart.yaml
+      - id: skip-check
+        env:
+          VERSION: v${{ steps.get-chart-version.outputs.result }}
+        run: |
+          if git show-ref --tags --quiet --verify -- "refs/tags/$VERSION"; then
+            echo "Release already exists, skipping publish job"
+            echo skip=true >> "$GITHUB_OUTPUT"
+          else
+            echo "Tagging release"
+            git tag "$VERSION"
+            git push origin "$VERSION"
+            echo skip=false >> "$GITHUB_OUTPUT"
+          fi
+      - uses: helm/chart-releaser-action@v1.6.0
+        if: steps.skip-check.outputs.skip == 'false'
+        with:
+          CR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
