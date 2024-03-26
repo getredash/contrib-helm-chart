@@ -36,7 +36,7 @@ spec:
           {{- toYaml .Values.migrations.securityContext | nindent 10 }}
         image: {{ .Values.image.registry }}/{{ .Values.image.repo }}:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
-        command: ["/bin/bash", "/config/install-upgrade.sh", "upgrade"]
+        command: ["/bin/bash", "/config/install-upgrade.sh"]
         volumeMounts:
           - name: config
             mountPath: /config

@@ -106,7 +106,7 @@ Shared environment block used across each component.
   valueFrom:
     secretKeyRef:
       name: {{ .Release.Name }}-postgresql
-      key: postgresql-password
+      key: password
 - name: REDASH_DATABASE_HOSTNAME
   value: {{ include "redash.postgresql.fullname" . }}
 - name: REDASH_DATABASE_PORT

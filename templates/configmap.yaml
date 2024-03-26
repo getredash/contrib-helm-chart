@@ -33,21 +33,12 @@ data:
       ATTEMPTS=$((ATTEMPTS+1))
 
       # Install and upgrade
-      if [[ "${1}" == "install" ]]; then
-        echo "Installing Redash:"
-        timeout $CREATE_TIMEOUT /app/manage.py database create_tables
-        echo "Tables created"
-        echo "Running Redash database migrations after install"
-        timeout $UPGRADE_TIMEOUT /app/manage.py db upgrade
-        echo "Upgrade complete"
-      fi
-
-      # Upgrade
-      if [[ "${1}" == "upgrade" ]]; then
-        echo "Running Redash database migrations:"
-        timeout $UPGRADE_TIMEOUT /app/manage.py db upgrade
-        echo "Upgrade complete"
-      fi
+      echo "Installing Redash:"
+      timeout $CREATE_TIMEOUT /app/manage.py database create_tables
+      echo "Tables created"
+      echo "Running Redash database migrations after install"
+      timeout $UPGRADE_TIMEOUT /app/manage.py db upgrade
+      echo "Upgrade complete"
 
       STATUS=$(timeout $STATUS_TIMEOUT /app/manage.py status 2>&1)
       RETCODE=$?
