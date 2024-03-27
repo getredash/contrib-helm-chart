@@ -32,6 +32,9 @@ spec:
       securityContext:
         {{- toYaml .Values.server.podSecurityContext | nindent 8 }}
       containers:
+        {{- with .Values.server.extraContainers -}}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
         - name: {{ include "redash.name" . }}-server
           securityContext:
             {{- toYaml .Values.server.securityContext | nindent 12 }}
