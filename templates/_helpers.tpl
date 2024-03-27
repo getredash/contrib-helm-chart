@@ -33,24 +33,10 @@ If release name contains chart name it will be used as a full name.
 {{- end -}}
 
 {{/*
-Create a default fully qualified adhocWorker name.
+Create a default fully qualified worker name.
 */}}
-{{- define "redash.adhocWorker.fullname" -}}
-{{- template "redash.fullname" . -}}-adhocworker
-{{- end -}}
-
-{{/*
-Create a default fully qualified scheduledworker name.
-*/}}
-{{- define "redash.scheduledWorker.fullname" -}}
-{{- template "redash.fullname" . -}}-scheduledworker
-{{- end -}}
-
-{{/*
-Create a default fully qualified genericWorker name.
-*/}}
-{{- define "redash.genericWorker.fullname" -}}
-{{- template "redash.fullname" . -}}-genericworker
+{{- define "redash.worker.fullname" -}}
+{{- template "redash.fullname" . -}}-{{ .workerName }}worker
 {{- end -}}
 
 {{/*
@@ -92,14 +78,14 @@ Shared environment block used across each component.
 {{- if not .Values.redash.selfManagedSecrets }}
 {{- if not .Values.postgresql.enabled }}
 - name: REDASH_DATABASE_URL
-  {{- if .Values.externalPostgreSQLSecret }}
+  {{ if .Values.externalPostgreSQLSecret -}}
   valueFrom:
     secretKeyRef:
       {{- .Values.externalPostgreSQLSecret | toYaml | nindent 6 }}
-  {{- else }}
+  {{ else -}}
   value: {{ default "" .Values.externalPostgreSQL | quote }}
   {{- end }}
-{{- else }}
+{{ else -}}
 - name: REDASH_DATABASE_USER
   value: "{{ .Values.postgresql.auth.username }}"
 - name: REDASH_DATABASE_PASSWORD
@@ -526,6 +512,9 @@ Common labels
 {{- define "redash.labels" -}}
 helm.sh/chart: {{ include "redash.chart" . }}
 {{ include "redash.selectorLabels" . }}
+{{- if .workerName }}
+app.kubernetes.io/component: {{ .workerName }}worker
+{{- end }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -552,4 +541,4 @@ Create the name of the service account to use
 {{- end -}}
 
 # This ensures a random value is provided for postgresql.auth.password:
-required "A secure random value for .postgresql.auth.assword is required" .Values.postgresql.auth.password
+required "A secure random value for .postgresql.auth.password is required" .Values.postgresql.auth.password

@@ -34,10 +34,7 @@ jobs:
             postgresql:
               auth:
                 password: $(openssl rand -base64 32)
-            adhocWorker:
-              env:
-                WORKERS_COUNT: 1
-            scheduledWorker:
+            worker:
               env:
                 WORKERS_COUNT: 1
           EOM

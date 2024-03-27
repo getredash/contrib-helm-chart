@@ -1,0 +1,79 @@
+{{ range $workerName, $config := .Values.workers -}}
+{{- $workerConfig := merge (deepCopy $.Values.worker) $config }}
+{{- $context := deepCopy $ | merge (dict "workerName" $workerName)}}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "redash.worker.fullname" $context }}
+  labels:
+    {{- include "redash.labels" $context | nindent 4 }}
+spec:
+  replicas: {{ $workerConfig.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "redash.selectorLabels" $context | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "redash.selectorLabels" $context | nindent 8 }}
+        {{- if $workerConfig.podLabels }}
+        {{- tpl (toYaml $workerConfig.podLabels) $ | nindent 8 }}
+        {{- end }}
+      {{- if $workerConfig.podAnnotations }}
+      annotations:
+      {{ toYaml $workerConfig.podAnnotations | nindent 8 }}
+      {{- end }}
+    spec:
+    {{- with $.Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      serviceAccountName: {{ include "redash.serviceAccountName" $context }}
+      securityContext:
+        {{- toYaml $workerConfig.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ include "redash.name" $context }}-{{ $workerName }}worker
+          securityContext:
+            {{- toYaml $workerConfig.securityContext | nindent 12 }}
+          image: {{ $.Values.image.registry }}/{{ $.Values.image.repo }}:{{ $.Values.image.tag }}
+          imagePullPolicy: {{ $.Values.image.pullPolicy }}
+          command: ["/bin/sh"]
+          args: ["-c", ". /config/dynamicenv.sh && /app/bin/docker-entrypoint worker"]
+          volumeMounts:
+            - name: config
+              mountPath: /config
+            {{- with $workerConfig.volumeMounts }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          livenessProbe: {{ toYaml $workerConfig.livenessProbe | nindent 12 }}
+          env:
+          {{- include "redash.env" $ | nindent 12 }}
+          {{- range $key, $value := $workerConfig.env }}
+            - name: "{{ $key }}"
+              value: "{{ $value }}"
+          {{- end }}
+          {{ if (include "redash.envFrom" $) }}
+          envFrom:
+          {{- include "redash.envFrom" $ | nindent 12 }}
+          {{- end }}
+          {{- if $workerConfig.resources }}
+          resources: {{ toYaml $workerConfig.resources | nindent 12 }}
+          {{- end }}
+      volumes:
+        - name: config
+          configMap:
+            name: {{ include "redash.fullname" $context }}
+        {{- with $workerConfig.volumes }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- if $workerConfig.nodeSelector }}
+      nodeSelector: {{ toYaml $workerConfig.nodeSelector | nindent 8 }}
+      {{- end }}
+      {{- with $workerConfig.affinity }}
+      affinity: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $workerConfig.tolerations }}
+      tolerations: {{ toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}

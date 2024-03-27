@@ -37,7 +37,7 @@ redash:
   # -- disables all chart managed secrets providing an ability to set them using redash.envSecretName. Useful, while using together with external secrets
   selfManagedSecrets: false
   # -- REQUIRED `REDASH_SECRET_KEY` value. Secret key used for data encryption. Stored as a Secret value.
-  secretKey: ""
+  secretKey: test
   # -- `REDASH_SAML_SCHEME_OVERRIDE` value. This setting will allow you to override the saml auth url scheme that gets constructed by flask. this is a useful feature if, for example, you're behind a proxy protocol enabled tcp load balancer (aws elb that terminates ssl) and your nginx proxy or similar adds a x-forwarded-proto of http even though your redash url for saml auth is https..
   samlSchemeOverride: ""
   # -- `REDASH_DISABLE_PUBLIC_URLS` value. Whether to disable access to public urls.
@@ -128,7 +128,7 @@ redash:
   # @default -- 3600 \* 12
   jobExpiryTime: ""
   # -- REQUIRED `REDASH_COOKIE_SECRET` value. Required. used for various cryptographic features of the web server. read more about how redash uses secret keys [here]({% link _kb/open-source/admin-guide/secrets.md %}). Stored as a Secret value.
-  cookieSecret: ""
+  cookieSecret: test
   # -- `REDASH_LOG_LEVEL` value. Logging messages which are less severe than level will be ignored. read more about python logging [here](https://docs.python.org/3/library/logging.html).
   # @default -- INFO
   logLevel: ""
@@ -358,17 +358,30 @@ ingress:
   #    hosts:
   #      - chart-example.local
 
-## Configuration for Redash ad-hoc workers
-adhocWorker:
-  # adhocWorker.env -- Redash ad-hoc worker specific environment variables.
-  env:
-    QUEUES: "queries"
-    WORKERS_COUNT: 2
+## Configuration for Redash workers
+workers:
+  adhoc:
+    # workers.adhoc.env -- Redash ad-hoc worker specific environment variables.
+    env:
+      QUEUES: "queries"
+      WORKERS_COUNT: 2
+  scheduled:
+    # workers.scheduled.env -- Redash scheduled worker specific environment variables.
+    env:
+      QUEUES: "scheduled_queries,schemas"
+      WORKERS_COUNT: 1
+  generic:
+    # workers.generic.env -- Redash generic worker specific environment variables.
+    env:
+      QUEUES: "periodic,emails,default"
+      WORKERS_COUNT: 1
 
-  # adhocWorker.replicaCount -- Number of ad-hoc worker pods to run
+## Common worker configuration, which can be overidden for each worker at workers.<workerName>
+worker:
+  # worker.replicaCount -- Default number of worker pods to run
   replicaCount: 1
 
-  # adhocWorker.resources -- Ad-hoc worker resource requests and limits [ref](http://kubernetes.io/docs/user-guide/compute-resources/)
+  # worker.resources -- Worker default resource requests and limits [ref](http://kubernetes.io/docs/user-guide/compute-resources/)
   resources:
     # limits:
     #   cpu: 500m
@@ -377,86 +390,32 @@ adhocWorker:
     #   cpu: 100m
     #  memory: 500Mi
 
-  # adhocWorker.podSecurityContext -- Security contexts for ad-hoc worker pod assignment [ref](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
+  # worker.podSecurityContext -- Default worker's security context pod assignment [ref](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
   podSecurityContext: {}
   securityContext: {}
 
-  # adhocWorker.nodeSelector -- Node labels for ad-hoc worker pod assignment [ref](https://kubernetes.io/docs/user-guide/node-selection/)
+  # worker.nodeSelector -- Default node labels for worker pod assignment [ref](https://kubernetes.io/docs/user-guide/node-selection/)
   nodeSelector: {}
 
-  # adhocWorker.tolerations -- Tolerations for ad-hoc worker pod assignment [ref](https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/)
+  # worker.tolerations -- Default tolerations for worker pod assignment [ref](https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/)
   tolerations: []
 
-  # adhocWorker.affinity -- Affinity for ad-hoc worker pod assignment [ref](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity)
+  # worker.affinity -- Default affinity for worker pod assignment [ref](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity)
   affinity: {}
 
-  # adhocWorker.podAnnotations -- Annotations for adhoc worker pod assignment [ref](https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/)
+  # worker.podAnnotations -- Default annotations for worker pod assignment [ref](https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/)
   podAnnotations: {}
 
-  # adhocWorker.podLabels -- Labels for adhoc worker pod assignment [ref](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/)
+  # worker.podLabels -- Default labels for worker pod assignment [ref](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/)
   podLabels: {}
 
-  # adhocWorker.volumes -- Volumes for ad-hoc pod worker assignment [ref](https://kubernetes.io/docs/concepts/storage/volumes/)
+  # worker.volumes -- Default volumes for pod worker assignment [ref](https://kubernetes.io/docs/concepts/storage/volumes/)
   volumes: []
 
-  # adhocWorker.volumeMounts -- VolumeMounts for ad-hoc worker pod assignment [ref](https://kubernetes.io/docs/concepts/storage/volumes/)
+  # worker.volumeMounts -- Default VolumeMounts for worker pod assignment [ref](https://kubernetes.io/docs/concepts/storage/volumes/)
   volumeMounts: []
 
-  # adhocWorker.livenessProbe -- liveness probe to ensure adhoc workers are running fine
-  livenessProbe:
-  # exec:
-  #   command:
-  #   - /bin/sh
-  #   - -c
-  #   - /app/bin/docker-entrypoint workers_healthcheck
-  # initialDelaySeconds: 60
-  # periodSeconds: 100
-
-## Configuration for Redash scheduled workers
-scheduledWorker:
-  # scheduledWorker.env -- Redash scheduled worker specific environment variables.
-  env:
-    QUEUES: "scheduled_queries,schemas"
-    WORKERS_COUNT: 1
-
-  # scheduledWorker.replicaCount -- Number of scheduled worker pods to run
-  replicaCount: 1
-
-  # scheduledWorker.resources -- Scheduled worker resource requests and limits [ref](http://kubernetes.io/docs/user-guide/compute-resources/)
-  resources:
-    # limits:
-    #   cpu: 500m
-    #   memory: 3Gi
-    # requests:
-    #   cpu: 100m
-    #  memory: 500Mi
-
-  # scheduledWorker.podSecurityContext -- Security contexts for scheduled worker pod assignment [ref](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
-  podSecurityContext: {}
-  securityContext: {}
-
-  # scheduledWorker.nodeSelector -- Node labels for scheduled worker pod assignment [ref](https://kubernetes.io/docs/user-guide/node-selection/)
-  nodeSelector: {}
-
-  # scheduledWorker.tolerations -- Tolerations for scheduled worker pod assignment [ref](https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/)
-  tolerations: []
-
-  # scheduledWorker.affinity -- Affinity for scheduled worker pod assignment [ref](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity)
-  affinity: {}
-
-  # scheduledWorker.podAnnotations -- Annotations for scheduled worker pod assignment [ref](https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/)
-  podAnnotations: {}
-
-  # scheduledWorker.podLabels -- Labels for scheduled worker pod assignment [ref](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/)
-  podLabels: {}
-
-  # scheduledWorker.volumes -- Volumes for scheduled pod  worker assignment [ref](https://kubernetes.io/docs/concepts/storage/volumes/)
-  volumes: []
-
-  # scheduledWorker.volumeMounts -- VolumeMounts for scheduled worker pod assignment [ref](https://kubernetes.io/docs/concepts/storage/volumes/)
-  volumeMounts: []
-
-  # scheduledWorker.livenessProbe -- liveness probe to ensure scheduled workers are running fine
+  # worker.livenessProbe -- Default worker's liveness probe to ensure workers are running fine
   livenessProbe:
   # exec:
   #   command:
@@ -504,60 +463,6 @@ scheduler:
 
   # scheduler.volumeMounts -- VolumeMounts for scheduler pod assignment [ref](https://kubernetes.io/docs/concepts/storage/volumes/)
   volumeMounts: []
-
-## Configuration for Redash generic workers
-genericWorker:
-  # genericWorker.env -- Redash generic worker specific environment variables.
-  env:
-    QUEUES: "periodic,emails,default"
-    WORKERS_COUNT: 1
-
-  # genericWorker.replicaCount -- Number of generic worker pods to run
-  replicaCount: 1
-
-  # genericWorker.resources -- Generic worker resource requests and limits [ref](http://kubernetes.io/docs/user-guide/compute-resources/)
-  resources:
-  # limits:
-  #   cpu: 500m
-  #   memory: 3Gi
-  # requests:
-  #   cpu: 100m
-  #  memory: 500Mi
-
-  # genericWorker.podSecurityContext -- Security contexts for generic worker pod assignment [ref](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
-  podSecurityContext: {}
-  securityContext: {}
-
-  # genericWorker.nodeSelector -- Node labels for generic worker pod assignment [ref](https://kubernetes.io/docs/user-guide/node-selection/)
-  nodeSelector: {}
-
-  # genericWorker.tolerations -- Tolerations for generic worker pod assignment [ref](https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/)
-  tolerations: []
-
-  # genericWorker.affinity -- Affinity for generic worker pod assignment [ref](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity)
-  affinity: {}
-
-  # genericWorker.podAnnotations -- Annotations for generic worker pod assignment [ref](https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/)
-  podAnnotations: {}
-
-  # genericWorker.podLabels -- Labels for generic worker pod assignment [ref](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/)
-  podLabels: {}
-
-  # genericWorker.volumes -- Volumes for generic worker pod assignment [ref](https://kubernetes.io/docs/concepts/storage/volumes/)
-  volumes: []
-
-  # genericWorker.volumeMounts -- VolumeMounts for generic worker pod assignment [ref](https://kubernetes.io/docs/concepts/storage/volumes/)
-  volumeMounts: []
-
-  # genericWorker.livenessProbe -- liveness probe to ensure generic workers are running fine
-  livenessProbe:
-  # exec:
-  #   command:
-  #   - /bin/sh
-  #   - -c
-  #   - /app/bin/docker-entrypoint workers_healthcheck
-  # initialDelaySeconds: 60
-  # periodSeconds: 100
 
 ## Configuration for migrations hook
 migrations:
