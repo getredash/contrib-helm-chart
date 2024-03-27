@@ -33,6 +33,9 @@ spec:
       securityContext:
         {{- toYaml $workerConfig.podSecurityContext | nindent 8 }}
       containers:
+        {{- with $workerConfig.extraContainers -}}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
         - name: {{ include "redash.name" $context }}-{{ $workerName }}worker
           securityContext:
             {{- toYaml $workerConfig.securityContext | nindent 12 }}
