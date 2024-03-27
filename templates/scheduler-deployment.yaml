@@ -34,6 +34,9 @@ spec:
       securityContext:
         {{- toYaml .Values.scheduler.podSecurityContext | nindent 8 }}
       containers:
+        {{- with .Values.scheduler.extraContainers -}}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
         - name: {{ include "redash.name" . }}-scheduler
           securityContext:
             {{- toYaml .Values.scheduler.securityContext | nindent 12 }}
