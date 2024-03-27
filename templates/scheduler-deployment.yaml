@@ -70,15 +70,15 @@ spec:
         {{- with .Values.scheduler.volumes }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-    {{- if .Values.scheduler.nodeSelector }}
+      {{- if .Values.scheduler.nodeSelector }}
       nodeSelector:
-{{ toYaml .Values.scheduler.nodeSelector | indent 8 }}
-    {{- end }}
-    {{- with .Values.scheduler.affinity }}
+      {{ toYaml .Values.scheduler.nodeSelector | nindent 8 }}
+      {{- end }}
+      {{- with .Values.scheduler.affinity }}
       affinity:
-{{ toYaml . | indent 8 }}
-    {{- end }}
-    {{- with .Values.scheduler.tolerations }}
+      {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.scheduler.tolerations }}
       tolerations:
-{{ toYaml . | indent 8 }}
-    {{- end }}
+      {{ toYaml . | nindent 8 }}
+      {{- end }}

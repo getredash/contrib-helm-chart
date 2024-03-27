@@ -68,6 +68,7 @@ jobs:
   publish-chart:
     needs: test-on-minikube
     runs-on: ubuntu-22.04
+    if: github.ref == 'refs/heads/master'
     steps:
       - uses: actions/checkout@v4
         with:
