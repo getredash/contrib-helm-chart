@@ -38,14 +38,12 @@ spec:
             {{- toYaml $workerConfig.securityContext | nindent 12 }}
           image: {{ $.Values.image.registry }}/{{ $.Values.image.repo }}:{{ $.Values.image.tag }}
           imagePullPolicy: {{ $.Values.image.pullPolicy }}
-          command: ["/bin/sh"]
-          args: ["-c", ". /config/dynamicenv.sh && /app/bin/docker-entrypoint worker"]
+          args: 
+            - worker
+          {{- with $workerConfig.volumeMounts }}
           volumeMounts:
-            - name: config
-              mountPath: /config
-            {{- with $workerConfig.volumeMounts }}
             {{- toYaml . | nindent 12 }}
-            {{- end }}
+          {{- end }}
           livenessProbe: {{ toYaml $workerConfig.livenessProbe | nindent 12 }}
           env:
           {{- include "redash.env" $ | nindent 12 }}
@@ -60,13 +58,10 @@ spec:
           {{- if $workerConfig.resources }}
           resources: {{ toYaml $workerConfig.resources | nindent 12 }}
           {{- end }}
+      {{- with $workerConfig.volumes }}
       volumes:
-        - name: config
-          configMap:
-            name: {{ include "redash.fullname" $context }}
-        {{- with $workerConfig.volumes }}
         {{- toYaml . | nindent 8 }}
-        {{- end }}
+      {{- end }}
       {{- if $workerConfig.nodeSelector }}
       nodeSelector: {{ toYaml $workerConfig.nodeSelector | nindent 8 }}
       {{- end }}

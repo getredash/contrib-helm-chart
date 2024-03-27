@@ -35,9 +35,11 @@ redash:
   cookieSecret: $(openssl rand -base64 32)
   secretKey: $(openssl rand -base64 32)
 postgresql:
-  postgresqlPassword: $(openssl rand -base64 32)
+  auth:
+    password: $(openssl rand -base64 32)
 redis:
-  password: $(openssl rand -base64 32)
+  auth:
+    password: $(openssl rand -base64 32)
 EOM
 ```
 
@@ -84,6 +86,17 @@ helm upgrade --reuse-values my-release redash/redash
 ```
 
 Below are notes on manual configuration changes or steps needed for major chart version updates.
+
+### From 3.0 to 3.1
+
+- Upgraded Redis and PostgreSQL dependency charts, which have new parameters names. Please follow [README.md](./README.md) and official [Redis](https://github.com/bitnami/charts/tree/main/bitnami/redis) and [PostgreSQL](https://github.com/bitnami/charts/tree/main/bitnami/postgresql) charts guides.
+- Merged workers configuration to simplify their setup:
+  - `adhocWorker` => `workers.adhoc`
+  - `genericWorker` => `workers.generic`
+  - `scheduledWorker` => `workers.scheduled`
+  - default config for all workers is at `worker` section
+- replaced `hookInstallJob` and `hookUpgradeJob` with `migrations`
+- Moved custom entrypoint scripts to [Redash repo](https://github.com/getredash/redash/pull/6674)
 
 ### From 2.x to 3.x
 
