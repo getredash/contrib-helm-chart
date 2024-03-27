@@ -77,7 +77,7 @@ Shared environment block used across each component.
 {{- define "redash.env" }}
 {{- if not .Values.redash.selfManagedSecrets }}
 {{- if not .Values.postgresql.enabled }}
-- name: REDASH_DATABASE_URL
+- name: REDASH_DB_URL
   {{ if .Values.externalPostgreSQLSecret -}}
   valueFrom:
     secretKeyRef:
@@ -85,23 +85,23 @@ Shared environment block used across each component.
   {{ else -}}
   value: {{ default "" .Values.externalPostgreSQL | quote }}
   {{- end }}
-{{ else -}}
-- name: REDASH_DATABASE_USER
+{{- else -}}
+- name: REDASH_DB_USER
   value: "{{ .Values.postgresql.auth.username }}"
-- name: REDASH_DATABASE_PASSWORD
+- name: REDASH_DB_PASSWORD
   valueFrom:
     secretKeyRef:
       name: {{ .Release.Name }}-postgresql
       key: password
-- name: REDASH_DATABASE_HOSTNAME
+- name: REDASH_DB_HOSTNAME
   value: {{ include "redash.postgresql.fullname" . }}
-- name: REDASH_DATABASE_PORT
+- name: REDASH_DB_PORT
   value: "{{ .Values.postgresql.primary.service.ports.postgresql }}"
-- name: REDASH_DATABASE_DB
+- name: REDASH_DB_NAME
   value: "{{ .Values.postgresql.auth.database }}"
 {{- end }}
 {{- if not .Values.redis.enabled }}
-- name: REDASH_REDIS_URL
+- name: REDASH_CACHE_URL
   {{- if .Values.externalRedisSecret }}
   valueFrom:
     secretKeyRef:
@@ -110,7 +110,7 @@ Shared environment block used across each component.
   value: {{ default "" .Values.externalRedis | quote }}
   {{- end }}
 {{- else }}
-- name: REDASH_REDIS_PASSWORD
+- name: REDASH_CACHE_PASSWORD
   valueFrom:
     secretKeyRef:
     {{- if .Values.redis.existingSecret }}
@@ -119,11 +119,11 @@ Shared environment block used across each component.
       name: {{ .Release.Name }}-redis
     {{- end }}
       key: redis-password
-- name: REDASH_REDIS_HOSTNAME
+- name: REDASH_CACHE_HOSTNAME
   value: {{ include "redash.redis.fullname" . }}
-- name: REDASH_REDIS_PORT
+- name: REDASH_CACHE_PORT
   value: "{{ .Values.redis.master.service.ports.redis }}"
-- name: REDASH_REDIS_DB
+- name: REDASH_CACHE_NAME
   value: "{{ .Values.redis.database }}"
 {{- end }}
 {{- end }}

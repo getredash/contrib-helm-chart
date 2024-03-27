@@ -24,30 +24,24 @@ spec:
       {{ toYaml .Values.server.podAnnotations | nindent 8 }}
       {{- end }}
     spec:
-    {{- with .Values.imagePullSecrets }}
-      imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
-    {{- end }}
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets: {{- toYaml . | nindent 8 }}
+      {{- end }}
       serviceAccountName: {{ include "redash.serviceAccountName" . }}
-      securityContext:
-        {{- toYaml .Values.server.podSecurityContext | nindent 8 }}
+      securityContext: {{- toYaml .Values.server.podSecurityContext | nindent 8 }}
       containers:
         {{- with .Values.server.extraContainers -}}
         {{- toYaml . | nindent 8 }}
         {{- end }}
         - name: {{ include "redash.name" . }}-server
-          securityContext:
-            {{- toYaml .Values.server.securityContext | nindent 12 }}
+          securityContext: {{- toYaml .Values.server.securityContext | nindent 12 }}
           image: {{ .Values.image.registry }}/{{ .Values.image.repo }}:{{ .Values.image.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          command: ["/bin/sh"]
-          args: ["-c", ". /config/dynamicenv.sh && /app/bin/docker-entrypoint server"]
-          volumeMounts:
-            - name: config
-              mountPath: /config
-            {{- with .Values.server.volumeMounts }}
-            {{- toYaml . | nindent 12 }}
-            {{- end }}
+          {{- with .Values.server.volumeMounts }}
+          volumeMounts: {{- toYaml . | nindent 12 }}
+          {{- end }}
+          args:
+            - server
           env:
           {{- include "redash.env" . | nindent 12 }}
           {{- range $key, $value := .Values.server.env }}
@@ -82,21 +76,15 @@ spec:
           {{- if .Values.server.resources }}
           resources: {{ toYaml .Values.server.resources | nindent 12 }}
           {{- end }}
-      volumes:
-        - name: config
-          configMap:
-            name: {{ include "redash.fullname" . }}
-        {{- with .Values.server.volumes }}
-        {{- toYaml . | nindent 8 }}
-        {{- end }}
+      {{- with .Values.server.volumes }}
+      volumes: {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- with .Values.server.nodeSelector }}
       nodeSelector: {{ toYaml . | nindent 8 }}
       {{- end }}
       {{- with .Values.server.affinity }}
-      affinity:
-      {{ toYaml . | nindent 8 }}
+      affinity: {{ toYaml . | nindent 8 }}
       {{- end }}
       {{- with .Values.server.tolerations }}
-      tolerations:
-      {{ toYaml . | nindent 8 }}
+      tolerations: {{ toYaml . | nindent 8 }}
       {{- end }}

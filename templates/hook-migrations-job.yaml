@@ -15,31 +15,24 @@ spec:
   template:
     metadata:
       name: "{{ .Release.Name }}"
-      labels:
-        {{- include "redash.selectorLabels" . | nindent 8 }}
-      {{- if .Values.migrations.podAnnotations }}
-      annotations:
-      {{ toYaml .Values.migrations.podAnnotations | nindent 8 }}
+      labels: {{- include "redash.selectorLabels" . | nindent 8 }}
+      {{- with .Values.migrations.podAnnotations }}
+      annotations: {{ toYaml . | nindent 8 }}
       {{- end }}
     spec:
       {{- with .Values.imagePullSecrets }}
-      imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
+      imagePullSecrets: {{- toYaml . | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ include "redash.serviceAccountName" . }}
       restartPolicy: Never
-      securityContext:
-        {{- toYaml .Values.migrations.podSecurityContext | nindent 8 }}
+      securityContext: {{- toYaml .Values.migrations.podSecurityContext | nindent 8 }}
       containers:
       - name: {{ include "redash.name" . }}-server
-        securityContext:
-          {{- toYaml .Values.migrations.securityContext | nindent 10 }}
-        image: {{ .Values.image.registry }}/{{ .Values.image.repo }}:{{ .Values.image.tag }}
+        securityContext: {{- toYaml .Values.migrations.securityContext | nindent 10 }}
+        image: "{{ .Values.image.registry }}/{{ .Values.image.repo }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
-        command: ["/bin/bash", "/config/install-upgrade.sh"]
-        volumeMounts:
-          - name: config
-            mountPath: /config
+        args:
+          - create_db
         env:
         {{- include "redash.env" . | nindent 10 }}
         {{- range $key, $value := .Values.migrations.env }}
@@ -50,13 +43,15 @@ spec:
         envFrom:
         {{- include "redash.envFrom" . | nindent 10 }}
         {{- end}}
-        {{- if (.Values.migrations.resources) }}
-        resources: {{ toYaml .Values.migrations.resources | nindent 10 }}
+        {{- with .Values.migrations.resources }}
+        resources: {{ toYaml . | nindent 10 }}
         {{- end }}
-      volumes:
-        - name: config
-          configMap:
-            name: {{ include "redash.fullname" . }}
+        {{- with .Values.migrations.volumeMounts }}
+        volumeMounts: {{ toYaml . | nindent 10 }}
+        {{- end }}
+      {{- with .Values.migrations.volumes }}
+      volumes: {{ toYaml . | nindent 8 }}
+      {{- end }}
       {{- with .Values.migrations.nodeSelector }}
       nodeSelector: {{ toYaml . | nindent 8 }}
       {{- end }}
