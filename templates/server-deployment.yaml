@@ -89,15 +89,14 @@ spec:
         {{- with .Values.server.volumes }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-    {{- with .Values.server.nodeSelector }}
-      nodeSelector:
-{{ toYaml . | indent 8 }}
-    {{- end }}
-    {{- with .Values.server.affinity }}
+      {{- with .Values.server.nodeSelector }}
+      nodeSelector: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.server.affinity }}
       affinity:
-{{ toYaml . | indent 8 }}
-    {{- end }}
-    {{- with .Values.server.tolerations }}
+      {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.server.tolerations }}
       tolerations:
-{{ toYaml . | indent 8 }}
-    {{- end }}
+      {{ toYaml . | nindent 8 }}
+      {{- end }}
