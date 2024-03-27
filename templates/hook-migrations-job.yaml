@@ -34,12 +34,14 @@ spec:
       - name: {{ include "redash.name" . }}-server
         securityContext:
           {{- toYaml .Values.migrations.securityContext | nindent 10 }}
-        image: {{ .Values.image.registry }}/{{ .Values.image.repo }}:{{ .Values.image.tag }}
+        image: "{{ .Values.image.registry }}/{{ .Values.image.repo }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
-        command: ["/bin/bash", "/config/install-upgrade.sh"]
-        volumeMounts:
-          - name: config
-            mountPath: /config
+        {{- with .Values.migrations.volumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+        args:
+          - migrate
         env:
         {{- include "redash.env" . | nindent 10 }}
         {{- range $key, $value := .Values.migrations.env }}
@@ -53,10 +55,10 @@ spec:
         {{- if (.Values.migrations.resources) }}
         resources: {{ toYaml .Values.migrations.resources | nindent 10 }}
         {{- end }}
+      {{- with .Values.migrations.volumes }}
       volumes:
-        - name: config
-          configMap:
-            name: {{ include "redash.fullname" . }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- with .Values.migrations.nodeSelector }}
       nodeSelector: {{ toYaml . | nindent 8 }}
       {{- end }}
