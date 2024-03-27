@@ -83,11 +83,12 @@ The following table lists the configurable parameters of the Redash chart and th
 | externalPostgreSQLSecret | object | `{}` | Read external PostgreSQL configuration from a secret. This should point at a secret file with a single key which specifies the connection string. |
 | externalRedis | string | `nil` | External Redis configuration. To use an external Redis instead of the automatically deployed redis chart: set redis.enabled to false then uncomment and configure the externalRedis connection URL (e.g. redis://user:pass@host:6379/database). |
 | externalRedisSecret | object | `{}` | Read external Redis configuration from a secret. This should point at a secret file with a single key which specifies the connection string. |
+| extraObjects | list | `[]` | Additional kubernetes manifests to deploy alongside the chart. Useful to include external secrets for dependencies. |
 | fullnameOverride | string | `""` |  |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
 | image.registry | string | `"docker.io"` |  |
 | image.repo | string | `"redash/redash"` | Redash image name used for server and worker pods |
-| image.tag | string | `"10.0.0.b50363"` | Redash image [tag](https://hub.docker.com/r/redash/redash/tags) |
+| image.tag | string | `"10.1.0.b50633"` | Redash image [tag](https://hub.docker.com/r/redash/redash/tags) |
 | imagePullSecrets | list | `[]` | Name(s) of secrets to use if pulling images from a private registry |
 | ingress.annotations | object | `{}` | Ingress annotations configuration |
 | ingress.enabled | bool | `false` | Enable ingress controller resource |
