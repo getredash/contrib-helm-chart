@@ -563,3 +563,6 @@ redis:
   cluster:
     # redis.databaseNumber -- Enable Redis clustering (when redis chart enabled)
     enabled: false
+
+istio:
+  blockUndefinedDependencies: true

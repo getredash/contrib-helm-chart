@@ -12,3 +12,7 @@ sources:
   - https://github.com/getredash/redash
 icon: https://redash.io/assets/images/elements/redash-logo.svg
 engine: gotpl
+dependencies:
+  - name: base
+    repository: oci://europe-docker.pkg.dev/bbc-registry/helm-charts
+    version: 1.240405.1000-H2e0c5b37
