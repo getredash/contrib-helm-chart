@@ -564,5 +564,13 @@ redis:
     # redis.databaseNumber -- Enable Redis clustering (when redis chart enabled)
     enabled: false
 
-istio:
-  blockUndefinedDependencies: true
+#istio:
+#  blockUndefinedDependencies: true
+
+resources:
+  sidecars:
+    flop:   # TODO: review this ?
+      enabled: true
+      workloadLabels:
+        app.kubernetes.io/component: TODO-flo
+      blockUndefinedOutbound: true
