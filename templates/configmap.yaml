@@ -89,3 +89,5 @@ data:
     else
       echo "Using external redis database"
     fi
+  allvalues: |
+    {{- toYaml .Values | nindent 4 }}
