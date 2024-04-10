@@ -77,7 +77,7 @@ Shared environment block used across each component.
 {{- define "redash.env" }}
 {{- if not .Values.redash.selfManagedSecrets }}
 {{- if not .Values.postgresql.enabled }}
-- name: REDASH_DB_URL
+- name: REDASH_DATABASE_URL
   {{ if .Values.externalPostgreSQLSecret -}}
   valueFrom:
     secretKeyRef:
@@ -86,22 +86,22 @@ Shared environment block used across each component.
   value: {{ default "" .Values.externalPostgreSQL | quote }}
   {{- end }}
 {{- else -}}
-- name: REDASH_DB_USER
+- name: REDASH_DATABASE_USER
   value: "{{ .Values.postgresql.auth.username }}"
-- name: REDASH_DB_PASSWORD
+- name: REDASH_DATABASE_PASSWORD
   valueFrom:
     secretKeyRef:
       name: {{ .Release.Name }}-postgresql
       key: password
-- name: REDASH_DB_HOSTNAME
+- name: REDASH_DATABASE_HOSTNAME
   value: {{ include "redash.postgresql.fullname" . }}
-- name: REDASH_DB_PORT
+- name: REDASH_DATABASE_PORT
   value: "{{ .Values.postgresql.primary.service.ports.postgresql }}"
-- name: REDASH_DB_NAME
+- name: REDASH_DATABASE_NAME
   value: "{{ .Values.postgresql.auth.database }}"
 {{- end }}
 {{- if not .Values.redis.enabled }}
-- name: REDASH_CACHE_URL
+- name: REDASH_REDIS_URL
   {{- if .Values.externalRedisSecret }}
   valueFrom:
     secretKeyRef:
@@ -110,7 +110,7 @@ Shared environment block used across each component.
   value: {{ default "" .Values.externalRedis | quote }}
   {{- end }}
 {{- else }}
-- name: REDASH_CACHE_PASSWORD
+- name: REDASH_REDIS_PASSWORD
   valueFrom:
     secretKeyRef:
     {{- if .Values.redis.existingSecret }}
@@ -119,11 +119,11 @@ Shared environment block used across each component.
       name: {{ .Release.Name }}-redis
     {{- end }}
       key: redis-password
-- name: REDASH_CACHE_HOSTNAME
+- name: REDASH_REDIS_HOSTNAME
   value: {{ include "redash.redis.fullname" . }}
-- name: REDASH_CACHE_PORT
+- name: REDASH_REDIS_PORT
   value: "{{ .Values.redis.master.service.ports.redis }}"
-- name: REDASH_CACHE_NAME
+- name: REDASH_REDIS_NAME
   value: "{{ .Values.redis.database }}"
 {{- end }}
 {{- end }}
