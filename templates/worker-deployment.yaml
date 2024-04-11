@@ -15,7 +15,7 @@ spec:
     metadata:
       labels: {{ include "redash.selectorLabels" $context | nindent 8 }}
       {{- if $workerConfig.podLabels }}
-        {{ tpl (toYaml $workerConfig.podLabels) $ | nindent 8 }}
+      {{ tpl (toYaml $workerConfig.podLabels) $ | nindent 8 }}
       {{- end }}
       {{- with $workerConfig.podAnnotations -}}
       annotations: {{ toYaml . | nindent 8 }}
@@ -32,7 +32,7 @@ spec:
         {{- end }}
         - name: {{ include "redash.name" $context }}-{{ $workerName }}worker
           securityContext: {{ toYaml $workerConfig.securityContext | nindent 12 }}
-          image: {{ $.Values.image.registry }}/{{ $.Values.image.repo }}:{{ $.Values.image.tag }}
+          image: {{ $.Values.image.registry }}/{{ $.Values.image.repo }}:{{ $.Values.image.tag | default $.Chart.AppVersion }}
           imagePullPolicy: {{ $.Values.image.pullPolicy }}
           args: 
             - worker
@@ -46,23 +46,22 @@ spec:
             - name: "{{ $key }}"
               value: "{{ $value }}"
           {{- end }}
-          {{ if (include "redash.envFrom" $) }}
-          envFrom:
-          {{- include "redash.envFrom" $ | nindent 12 }}
+          {{- with (include "redash.envFrom" $) }}
+          envFrom: {{ . | nindent 12 }}
           {{- end }}
           {{- with $workerConfig.resources }}
           resources: {{ toYaml . | nindent 12 }}
           {{- end }}
-      {{ with $workerConfig.volumes -}}
-      volumes:{{ toYaml . | nindent 8 }}
-      {{- end -}}
-      {{ with $workerConfig.nodeSelector -}}
+      {{- with $workerConfig.volumes }}
+      volumes: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $workerConfig.nodeSelector }}
       nodeSelector: {{ toYaml . | nindent 8 }}
-      {{- end -}}
-      {{ with $workerConfig.affinity -}}
+      {{- end }}
+      {{- with $workerConfig.affinity }}
       affinity: {{ toYaml . | nindent 8 }}
-      {{- end -}}
-      {{ with $workerConfig.tolerations -}}
+      {{- end }}
+      {{- with $workerConfig.tolerations }}
       tolerations: {{ toYaml . | nindent 8 }}
       {{- end }}
 {{- end }}

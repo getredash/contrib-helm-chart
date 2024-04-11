@@ -18,28 +18,28 @@ spec:
       labels:
         {{- include "redash.selectorLabels" . | nindent 8 }}
         app.kubernetes.io/component: scheduler
-        {{- if .Values.scheduler.podLabels }}
-        {{- tpl (toYaml .Values.scheduler.podLabels) $ | nindent 8 }}
+        {{- with .Values.scheduler.podLabels }}
+        {{- tpl (toYaml .) $ | nindent 8 }}
         {{- end }}
       {{- if .Values.scheduler.podAnnotations }}
       annotations: {{ toYaml .Values.scheduler.podAnnotations | nindent 8 }}
       {{- end }}
     spec:
-      {{- with .Values.imagePullSecrets }}
-      imagePullSecrets: {{- toYaml . | nindent 8 }}
-      {{- end }}
+      {{ with .Values.imagePullSecrets -}}
+      imagePullSecrets: {{ toYaml . | nindent 8 }}
+      {{ end -}}
       serviceAccountName: {{ include "redash.serviceAccountName" . }}
-      securityContext: {{- toYaml .Values.scheduler.podSecurityContext | nindent 8 }}
+      securityContext: {{ toYaml .Values.scheduler.podSecurityContext | nindent 8 }}
       containers:
         {{- with .Values.scheduler.extraContainers -}}
-        {{- toYaml . | nindent 8 }}
+        {{ toYaml . | nindent 8 }}
         {{- end }}
         - name: {{ include "redash.name" . }}-scheduler
-          securityContext: {{- toYaml .Values.scheduler.securityContext | nindent 12 }}
-          image: {{ .Values.image.registry }}/{{ .Values.image.repo }}:{{ .Values.image.tag }}
+          securityContext: {{ toYaml .Values.scheduler.securityContext | nindent 12 }}
+          image: {{ .Values.image.registry }}/{{ .Values.image.repo }}:{{ .Values.image.tag | default .Chart.AppVersion }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           {{- with .Values.scheduler.volumeMounts }}
-          volumeMounts: {{- toYaml . | nindent 12 }}
+          volumeMounts: {{ toYaml . | nindent 12 }}
           {{- end }}
           args:
             - scheduler
@@ -49,15 +49,14 @@ spec:
             - name: "{{ $key }}"
               value: "{{ $value }}"
           {{- end }}
-          {{- if (include "redash.envFrom" .) }}
-          envFrom:
-          {{- include "redash.envFrom" . | nindent 12 }}
+          {{- with (include "redash.envFrom" .) }}
+          envFrom: {{ . | nindent 12 }}
           {{- end }}
-          {{- if .Values.scheduler.resources }}
-          resources: {{ toYaml .Values.scheduler.resources | nindent 12 }}
+          {{- with .Values.scheduler.resources }}
+          resources: {{ toYaml . | nindent 12 }}
           {{- end }}
       {{- with .Values.scheduler.volumes }}
-      volumes: {{- toYaml . | nindent 8 }}
+      volumes: {{ toYaml . | nindent 8 }}
       {{- end }}
       {{- with .Values.scheduler.nodeSelector }}
       nodeSelector: {{ toYaml . | nindent 8 }}

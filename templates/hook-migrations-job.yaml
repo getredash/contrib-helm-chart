@@ -15,21 +15,21 @@ spec:
   template:
     metadata:
       name: "{{ .Release.Name }}"
-      labels: {{- include "redash.selectorLabels" . | nindent 8 }}
+      labels: {{ include "redash.selectorLabels" . | nindent 8 }}
       {{- with .Values.migrations.podAnnotations }}
       annotations: {{ toYaml . | nindent 8 }}
       {{- end }}
     spec:
       {{- with .Values.imagePullSecrets }}
-      imagePullSecrets: {{- toYaml . | nindent 8 }}
+      imagePullSecrets: {{ toYaml . | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ include "redash.serviceAccountName" . }}
       restartPolicy: Never
-      securityContext: {{- toYaml .Values.migrations.podSecurityContext | nindent 8 }}
+      securityContext: {{ toYaml .Values.migrations.podSecurityContext | nindent 8 }}
       containers:
       - name: {{ include "redash.name" . }}-server
-        securityContext: {{- toYaml .Values.migrations.securityContext | nindent 10 }}
-        image: "{{ .Values.image.registry }}/{{ .Values.image.repo }}:{{ .Values.image.tag }}"
+        securityContext: {{ toYaml .Values.migrations.securityContext | nindent 10 }}
+        image: "{{ .Values.image.registry }}/{{ .Values.image.repo }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         args:
           - create_db
