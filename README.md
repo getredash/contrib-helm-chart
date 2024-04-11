@@ -8,7 +8,7 @@ This chart bootstraps a [Redash](https://github.com/getredash/redash) deployment
 
 This is a contributed project developed by volunteers and not officially supported by Redash.
 
-Current chart version is `3.0.1`
+Current chart version is `3.1.0-alpha1`
 
 * <https://github.com/getredash/redash>
 
@@ -67,8 +67,8 @@ The command removes all the Kubernetes components associated with the chart and 
 
 | Repository | Name | Version |
 |------------|------|---------|
-| oci://registry-1.docker.io/bitnamicharts | postgresql | ^13.4.1 |
-| oci://registry-1.docker.io/bitnamicharts | redis | ^18.9.0 |
+| oci://registry-1.docker.io/bitnamicharts | postgresql | ^15.2.0 |
+| oci://registry-1.docker.io/bitnamicharts | redis | ^19.1.0 |
 
 ## Configuration
 
@@ -87,8 +87,8 @@ The following table lists the configurable parameters of the Redash chart and th
 | fullnameOverride | string | `""` |  |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
 | image.registry | string | `"docker.io"` |  |
-| image.repo | string | `"redash/redash"` | Redash image name used for server and worker pods |
-| image.tag | string | `"10.1.0.b50633"` | Redash image [tag](https://hub.docker.com/r/redash/redash/tags) |
+| image.repo | string | `"redash/preview"` | Redash image name used for server and worker pods |
+| image.tag | string | `nil` | Redash image [tag](https://hub.docker.com/r/redash/redash/tags) |
 | imagePullSecrets | list | `[]` | Name(s) of secrets to use if pulling images from a private registry |
 | ingress.annotations | object | `{}` | Ingress annotations configuration |
 | ingress.enabled | bool | `false` | Enable ingress controller resource |
