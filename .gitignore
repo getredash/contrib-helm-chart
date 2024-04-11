@@ -1,4 +1,4 @@
-charts
+charts/**/charts
 keys
 my-values.yaml
 .idea

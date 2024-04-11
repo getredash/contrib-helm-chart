@@ -23,6 +23,7 @@ jobs:
       - uses: azure/setup-helm@v4
       - name: testing helm chart
         run: |
+          cd charts/redash
           helm lint .
           helm dependency build .
           cat > test-values.yaml <<- EOM
@@ -74,24 +75,10 @@ jobs:
         with:
           fetch-depth: 0
       - uses: azure/setup-helm@v4
-      - id: get-chart-version
-        uses: mikefarah/yq@master
-        with:
-          cmd: yq '.version' Chart.yaml
-      - id: skip-check
-        env:
-          VERSION: v${{ steps.get-chart-version.outputs.result }}
+      - name: configure git
         run: |
-          if git show-ref --tags --quiet --verify -- "refs/tags/$VERSION"; then
-            echo "Release already exists, skipping publish job"
-            echo skip=true >> "$GITHUB_OUTPUT"
-          else
-            echo "Tagging release"
-            git tag "$VERSION"
-            git push origin "$VERSION"
-            echo skip=false >> "$GITHUB_OUTPUT"
-          fi
+          git config user.name "$GITHUB_ACTOR"
+          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
       - uses: helm/chart-releaser-action@v1.6.0
-        if: steps.skip-check.outputs.skip == 'false'
         env:
           CR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
