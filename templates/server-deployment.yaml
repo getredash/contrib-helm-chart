@@ -19,44 +19,36 @@ spec:
         {{- if .Values.server.podLabels }}
         {{- tpl (toYaml .Values.server.podLabels) $ | nindent 8 }}
         {{- end }}
-      {{- if .Values.server.podAnnotations }}
-      annotations:
-      {{ toYaml .Values.server.podAnnotations | nindent 8 }}
+      {{- with .Values.server.podAnnotations }}
+      annotations: {{ toYaml . | nindent 8 }}
       {{- end }}
     spec:
-    {{- with .Values.imagePullSecrets }}
-      imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
-    {{- end }}
+      {{ with .Values.imagePullSecrets -}}
+      imagePullSecrets: {{ toYaml . | nindent 8 }}
+      {{ end -}}
       serviceAccountName: {{ include "redash.serviceAccountName" . }}
-      securityContext:
-        {{- toYaml .Values.server.podSecurityContext | nindent 8 }}
+      securityContext: {{ toYaml .Values.server.podSecurityContext | nindent 8 }}
       containers:
         {{- with .Values.server.extraContainers -}}
         {{- toYaml . | nindent 8 }}
         {{- end }}
         - name: {{ include "redash.name" . }}-server
-          securityContext:
-            {{- toYaml .Values.server.securityContext | nindent 12 }}
-          image: {{ .Values.image.registry }}/{{ .Values.image.repo }}:{{ .Values.image.tag }}
+          securityContext: {{ toYaml .Values.server.securityContext | nindent 12 }}
+          image: {{ .Values.image.registry }}/{{ .Values.image.repo }}:{{ .Values.image.tag | default .Chart.AppVersion }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          command: ["/bin/sh"]
-          args: ["-c", ". /config/dynamicenv.sh && /app/bin/docker-entrypoint server"]
-          volumeMounts:
-            - name: config
-              mountPath: /config
-            {{- with .Values.server.volumeMounts }}
-            {{- toYaml . | nindent 12 }}
-            {{- end }}
+          {{- with .Values.server.volumeMounts }}
+          volumeMounts: {{ toYaml . | nindent 12 }}
+          {{- end }}
+          args:
+            - server
           env:
           {{- include "redash.env" . | nindent 12 }}
           {{- range $key, $value := .Values.server.env }}
             - name: "{{ $key }}"
               value: "{{ $value }}"
           {{- end }}
-          {{- if (include "redash.envFrom" .) }}
-          envFrom:
-          {{- include "redash.envFrom" . | nindent 12 }}
+          {{ with (include "redash.envFrom" .) -}}
+          envFrom: {{ . | nindent 12 }}
           {{- end }}
           ports:
             - containerPort: {{ .Values.server.httpPort }}
@@ -79,24 +71,18 @@ spec:
             periodSeconds: 10
             successThreshold: 1
             failureThreshold: 3
-          {{- if .Values.server.resources }}
+          {{- with .Values.server.resources }}
           resources: {{ toYaml .Values.server.resources | nindent 12 }}
           {{- end }}
-      volumes:
-        - name: config
-          configMap:
-            name: {{ include "redash.fullname" . }}
-        {{- with .Values.server.volumes }}
-        {{- toYaml . | nindent 8 }}
-        {{- end }}
+      {{- with .Values.server.volumes }}
+      volumes: {{ toYaml . | nindent 8 }}
+      {{- end }}
       {{- with .Values.server.nodeSelector }}
       nodeSelector: {{ toYaml . | nindent 8 }}
       {{- end }}
       {{- with .Values.server.affinity }}
-      affinity:
-      {{ toYaml . | nindent 8 }}
+      affinity: {{ toYaml . | nindent 8 }}
       {{- end }}
       {{- with .Values.server.tolerations }}
-      tolerations:
-      {{ toYaml . | nindent 8 }}
+      tolerations: {{ toYaml . | nindent 8 }}
       {{- end }}

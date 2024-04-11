@@ -1,9 +1,9 @@
 dependencies:
   - name: redis
-    version: "^18.9.0"
+    version: "^19.1.0"
     repository: oci://registry-1.docker.io/bitnamicharts
     condition: redis.enabled
   - name: postgresql
-    version: "^13.4.1"
+    version: "^15.2.0"
     repository: oci://registry-1.docker.io/bitnamicharts
     condition: postgresql.enabled

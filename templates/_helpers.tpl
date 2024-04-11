@@ -85,7 +85,7 @@ Shared environment block used across each component.
   {{ else -}}
   value: {{ default "" .Values.externalPostgreSQL | quote }}
   {{- end }}
-{{ else -}}
+{{- else -}}
 - name: REDASH_DATABASE_USER
   value: "{{ .Values.postgresql.auth.username }}"
 - name: REDASH_DATABASE_PASSWORD
@@ -97,7 +97,7 @@ Shared environment block used across each component.
   value: {{ include "redash.postgresql.fullname" . }}
 - name: REDASH_DATABASE_PORT
   value: "{{ .Values.postgresql.primary.service.ports.postgresql }}"
-- name: REDASH_DATABASE_DB
+- name: REDASH_DATABASE_NAME
   value: "{{ .Values.postgresql.auth.database }}"
 {{- end }}
 {{- if not .Values.redis.enabled }}
@@ -123,7 +123,7 @@ Shared environment block used across each component.
   value: {{ include "redash.redis.fullname" . }}
 - name: REDASH_REDIS_PORT
   value: "{{ .Values.redis.master.service.ports.redis }}"
-- name: REDASH_REDIS_DB
+- name: REDASH_REDIS_NAME
   value: "{{ .Values.redis.database }}"
 {{- end }}
 {{- end }}
