@@ -73,7 +73,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: azure/setup-helm@v3
+      - uses: azure/setup-helm@v4
       - id: get-chart-version
         uses: mikefarah/yq@master
         with:
@@ -93,5 +93,5 @@ jobs:
           fi
       - uses: helm/chart-releaser-action@v1.6.0
         if: steps.skip-check.outputs.skip == 'false'
-        with:
+        env:
           CR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
