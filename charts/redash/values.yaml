@@ -20,6 +20,12 @@ env:
   PYTHONUNBUFFERED: 0
   REDASH_PRODUCTION: "true"
 
+# volumes -- Redash global volumes configuration - applied to all containers
+volumes: []
+
+# volumeMounts -- Redash global volume mounts configuration - applied to all containers
+volumeMounts: []
+
 ## Service account and security context configuration
 serviceAccount:
   # serviceAccount.create -- Specifies whether a service account should be created
@@ -493,6 +499,12 @@ scheduler:
 
 ## Configuration for migrations hook
 migrations:
+  # migrations.volumes -- volumes that will be mounted to migrations pods only
+  volumes: []
+
+  # migrations.volumeMounts -- volume mounts for migrations pods
+  volumeMounts: []
+
   # migrations.ttlSecondsAfterFinished -- ttl for install job [ref](https://kubernetes.io/docs/concepts/workloads/controllers/ttlafterfinished/)
   ttlSecondsAfterFinished: 600
   # migrations.resources -- Scheduled worker resource requests and limits [ref](http://kubernetes.io/docs/user-guide/compute-resources/)

@@ -43,10 +43,12 @@ spec:
         {{- with .Values.migrations.resources }}
         resources: {{ toYaml . | nindent 10 }}
         {{- end }}
-        {{- with .Values.migrations.volumeMounts }}
+        {{- $volumeMounts := concat .Values.volumeMounts .Values.migrations.volumeMounts }}
+        {{- with $volumeMounts }}
         volumeMounts: {{ toYaml . | nindent 10 }}
         {{- end }}
-      {{- with .Values.migrations.volumes }}
+      {{- $volumes := concat .Values.volumes .Values.migrations.volumes -}}
+      {{- with $volumes }}
       volumes: {{ toYaml . | nindent 8 }}
       {{- end }}
       {{- with .Values.migrations.nodeSelector }}

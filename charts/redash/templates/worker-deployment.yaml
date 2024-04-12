@@ -36,7 +36,8 @@ spec:
           imagePullPolicy: {{ $.Values.image.pullPolicy }}
           args: 
             - worker
-          {{ with $workerConfig.volumeMounts -}}
+          {{- $volumeMounts := concat $.Values.volumeMounts $workerConfig.volumeMounts }}
+          {{- with $volumeMounts }}
           volumeMounts: {{ toYaml . | nindent 12 }}
           {{- end -}}
           {{- with $workerConfig.livenessProbe }}
@@ -51,7 +52,8 @@ spec:
           {{- with $workerConfig.resources }}
           resources: {{ toYaml . | nindent 12 }}
           {{- end }}
-      {{- with $workerConfig.volumes }}
+      {{- $volumes := concat $.Values.volumes $workerConfig.volumes -}}
+      {{- with $volumes }}
       volumes: {{ toYaml . | nindent 8 }}
       {{- end }}
       {{- with $workerConfig.nodeSelector }}

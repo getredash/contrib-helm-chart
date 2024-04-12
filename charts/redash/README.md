@@ -104,6 +104,8 @@ The following table lists the configurable parameters of the Redash chart and th
 | migrations.securityContext | object | `{}` |  |
 | migrations.tolerations | list | `[]` | Tolerations for server pod assignment [ref](https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/) |
 | migrations.ttlSecondsAfterFinished | int | `600` | ttl for install job [ref](https://kubernetes.io/docs/concepts/workloads/controllers/ttlafterfinished/) |
+| migrations.volumeMounts | list | `[]` | volume mounts for migrations pods |
+| migrations.volumes | list | `[]` | volumes that will be mounted to migrations pods only |
 | nameOverride | string | `""` |  |
 | postgresql.auth.database | string | `"redash"` | PostgreSQL database name (when postgresql chart enabled) |
 | postgresql.auth.password | string | `nil` | REQUIRED: PostgreSQL password for redash user (when postgresql chart enabled) |
@@ -234,6 +236,8 @@ The following table lists the configurable parameters of the Redash chart and th
 | serviceAccount.annotations | object | `{}` | Annotations to add to the service account |
 | serviceAccount.create | bool | `true` | Specifies whether a service account should be created |
 | serviceAccount.name | string | `nil` | The name of the service account to use. If not set and create is true, a name is generated using the fullname template |
+| volumeMounts | list | `[]` | Redash global volume mounts configuration - applied to all containers |
+| volumes | list | `[]` | Redash global volumes configuration - applied to all containers |
 | worker.affinity | object | `{}` | Default affinity for worker pod assignment [ref](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity) |
 | worker.livenessProbe | object | `{}` | Default worker's liveness probe to ensure workers are running fine |
 | worker.nodeSelector | object | `{}` | Default node labels for worker pod assignment [ref](https://kubernetes.io/docs/user-guide/node-selection/) |

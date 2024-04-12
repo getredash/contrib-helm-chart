@@ -36,7 +36,8 @@ spec:
           securityContext: {{ toYaml .Values.server.securityContext | nindent 12 }}
           image: {{ .Values.image.registry }}/{{ .Values.image.repo }}:{{ .Values.image.tag | default .Chart.AppVersion }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          {{- with .Values.server.volumeMounts }}
+          {{- $volumeMounts := concat .Values.volumeMounts .Values.server.volumeMounts }}
+          {{- with $volumeMounts }}
           volumeMounts: {{ toYaml . | nindent 12 }}
           {{- end }}
           args:
@@ -59,7 +60,8 @@ spec:
           {{- with .Values.server.resources }}
           resources: {{ toYaml .Values.server.resources | nindent 12 }}
           {{- end }}
-      {{- with .Values.server.volumes }}
+      {{- $volumes := concat .Values.volumes .Values.server.volumes -}}
+      {{- with $volumes }}
       volumes: {{ toYaml . | nindent 8 }}
       {{- end }}
       {{- with .Values.server.nodeSelector }}
