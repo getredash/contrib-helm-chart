@@ -8,7 +8,7 @@ This chart bootstraps a [Redash](https://github.com/getredash/redash) deployment
 
 This is a contributed project developed by volunteers and not officially supported by Redash.
 
-Current chart version is `3.1.0-alpha1`
+Current chart version is `3.1.0-alpha2`
 
 * <https://github.com/getredash/redash>
 
@@ -104,6 +104,8 @@ The following table lists the configurable parameters of the Redash chart and th
 | migrations.securityContext | object | `{}` |  |
 | migrations.tolerations | list | `[]` | Tolerations for server pod assignment [ref](https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/) |
 | migrations.ttlSecondsAfterFinished | int | `600` | ttl for install job [ref](https://kubernetes.io/docs/concepts/workloads/controllers/ttlafterfinished/) |
+| migrations.volumeMounts | list | `[]` | volume mounts for migrations pods |
+| migrations.volumes | list | `[]` | volumes that will be mounted to migrations pods only |
 | nameOverride | string | `""` |  |
 | postgresql.auth.database | string | `"redash"` | PostgreSQL database name (when postgresql chart enabled) |
 | postgresql.auth.password | string | `nil` | REQUIRED: PostgreSQL password for redash user (when postgresql chart enabled) |
@@ -201,6 +203,7 @@ The following table lists the configurable parameters of the Redash chart and th
 | redis.master.service.ports.redis | int | `6379` |  |
 | scheduler.affinity | object | `{}` | Affinity for scheduler pod assignment [ref](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity) |
 | scheduler.env | object | `{}` | Redash scheduler specific environment variables. |
+| scheduler.livenessProbe | object | `{}` | Liveness probe for scheduler to ensure workers are running fine |
 | scheduler.nodeSelector | object | `{}` | Node labels for scheduler pod assignment [ref](https://kubernetes.io/docs/user-guide/node-selection/) |
 | scheduler.podAnnotations | object | `{}` | Annotations for scheduler pod assignment [ref](https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/) |
 | scheduler.podLabels | object | `{}` | Labels for scheduler pod assignment [ref](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/) |
@@ -213,10 +216,12 @@ The following table lists the configurable parameters of the Redash chart and th
 | server.affinity | object | `{}` | Affinity for server pod assignment [ref](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity) |
 | server.env | object | `{}` | Redash server specific environment variables Don't use this for variables that are in the configuration above, however. |
 | server.httpPort | int | `5000` | Server container port (only useful if you are using a customized image) |
+| server.livenessProbe | object | `{"failureThreshold":10,"initialDelaySeconds":90,"periodSeconds":10,"successThreshold":1,"timeoutSeconds":1}` | Server liveness probe configuration |
 | server.nodeSelector | object | `{}` | Node labels for server pod assignment [ref](https://kubernetes.io/docs/user-guide/node-selection/) |
 | server.podAnnotations | object | `{}` | Annotations for server pod assignment [ref](https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/) |
 | server.podLabels | object | `{}` | Labels for server pod assignment [ref](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/) |
 | server.podSecurityContext | object | `{}` | Security contexts for server pod assignment [ref](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) |
+| server.readinessProbe | object | `{"failureThreshold":3,"initialDelaySeconds":10,"periodSeconds":10,"successThreshold":1,"timeoutSeconds":1}` | Server readiness probe configuration  |
 | server.replicaCount | int | `1` | Number of server pods to run |
 | server.resources | object | `{}` | Server resource requests and limits [ref](http://kubernetes.io/docs/user-guide/compute-resources/) |
 | server.securityContext | object | `{}` |  |
@@ -231,8 +236,10 @@ The following table lists the configurable parameters of the Redash chart and th
 | serviceAccount.annotations | object | `{}` | Annotations to add to the service account |
 | serviceAccount.create | bool | `true` | Specifies whether a service account should be created |
 | serviceAccount.name | string | `nil` | The name of the service account to use. If not set and create is true, a name is generated using the fullname template |
+| volumeMounts | list | `[]` | Redash global volume mounts configuration - applied to all containers |
+| volumes | list | `[]` | Redash global volumes configuration - applied to all containers |
 | worker.affinity | object | `{}` | Default affinity for worker pod assignment [ref](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity) |
-| worker.livenessProbe | string | `nil` | Default worker's liveness probe to ensure workers are running fine |
+| worker.livenessProbe | object | `{}` | Default worker's liveness probe to ensure workers are running fine |
 | worker.nodeSelector | object | `{}` | Default node labels for worker pod assignment [ref](https://kubernetes.io/docs/user-guide/node-selection/) |
 | worker.podAnnotations | object | `{}` | Default annotations for worker pod assignment [ref](https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/) |
 | worker.podLabels | object | `{}` | Default labels for worker pod assignment [ref](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/) |

@@ -34,11 +34,8 @@ spec:
         args:
           - create_db
         env:
-        {{- include "redash.env" . | nindent 10 }}
-        {{- range $key, $value := .Values.migrations.env }}
-          - name: "{{ $key }}"
-            value: "{{ $value }}"
-        {{- end }}
+        {{- $envCtx := mergeOverwrite (deepCopy .) (dict "Values" (dict "env" .Values.migrations.env)) -}}
+        {{- include "redash.env" $envCtx | nindent 10 }}
         {{- if (include "redash.envFrom" .) }}
         envFrom:
         {{- include "redash.envFrom" . | nindent 10 }}
@@ -46,10 +43,12 @@ spec:
         {{- with .Values.migrations.resources }}
         resources: {{ toYaml . | nindent 10 }}
         {{- end }}
-        {{- with .Values.migrations.volumeMounts }}
+        {{- $volumeMounts := concat .Values.volumeMounts .Values.migrations.volumeMounts }}
+        {{- with $volumeMounts }}
         volumeMounts: {{ toYaml . | nindent 10 }}
         {{- end }}
-      {{- with .Values.migrations.volumes }}
+      {{- $volumes := concat .Values.volumes .Values.migrations.volumes -}}
+      {{- with $volumes }}
       volumes: {{ toYaml . | nindent 8 }}
       {{- end }}
       {{- with .Values.migrations.nodeSelector }}

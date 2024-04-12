@@ -74,20 +74,19 @@ Get the secret name.
 {{/*
 Shared environment block used across each component.
 */}}
-{{- define "redash.env" }}
-{{- if not .Values.redash.selfManagedSecrets }}
-{{- if not .Values.postgresql.enabled }}
+{{- define "redash.env" -}}
+{{- if not .Values.redash.selfManagedSecrets -}}
+{{- if not .Values.postgresql.enabled -}}
 - name: REDASH_DATABASE_URL
-  {{ if .Values.externalPostgreSQLSecret -}}
+  {{- if .Values.externalPostgreSQLSecret }}
   valueFrom:
-    secretKeyRef:
-      {{- .Values.externalPostgreSQLSecret | toYaml | nindent 6 }}
-  {{ else -}}
+    secretKeyRef: {{ .Values.externalPostgreSQLSecret | toYaml | nindent 6 }}
+  {{- else }}
   value: {{ default "" .Values.externalPostgreSQL | quote }}
   {{- end }}
 {{- else -}}
 - name: REDASH_DATABASE_USER
-  value: "{{ .Values.postgresql.auth.username }}"
+  value: {{ .Values.postgresql.auth.username | quote }}
 - name: REDASH_DATABASE_PASSWORD
   valueFrom:
     secretKeyRef:
@@ -96,16 +95,15 @@ Shared environment block used across each component.
 - name: REDASH_DATABASE_HOSTNAME
   value: {{ include "redash.postgresql.fullname" . }}
 - name: REDASH_DATABASE_PORT
-  value: "{{ .Values.postgresql.primary.service.ports.postgresql }}"
+  value: {{ .Values.postgresql.primary.service.ports.postgresql | quote }}
 - name: REDASH_DATABASE_NAME
-  value: "{{ .Values.postgresql.auth.database }}"
-{{- end }}
+  value: {{ .Values.postgresql.auth.database | quote }}
+{{- end -}}
 {{- if not .Values.redis.enabled }}
 - name: REDASH_REDIS_URL
   {{- if .Values.externalRedisSecret }}
   valueFrom:
-    secretKeyRef:
-      {{- .Values.externalRedisSecret | toYaml | nindent 6 }}
+    secretKeyRef: {{ .Values.externalRedisSecret | toYaml | nindent 6 }}
   {{- else }}
   value: {{ default "" .Values.externalRedis | quote }}
   {{- end }}
@@ -122,15 +120,15 @@ Shared environment block used across each component.
 - name: REDASH_REDIS_HOSTNAME
   value: {{ include "redash.redis.fullname" . }}
 - name: REDASH_REDIS_PORT
-  value: "{{ .Values.redis.master.service.ports.redis }}"
+  value: {{ .Values.redis.master.service.ports.redis | quote }}
 - name: REDASH_REDIS_NAME
-  value: "{{ .Values.redis.database }}"
-{{- end }}
-{{- end }}
-{{- range $key, $value := .Values.env }}
-- name: "{{ $key }}"
-  value: "{{ $value }}"
-{{- end }}
+  value: {{ .Values.redis.database | quote }}
+{{ end -}}
+{{- end -}}
+{{ range $key, $value := .Values.env -}}
+- name: {{ $key | quote }}
+  value: {{ $value | quote }}
+{{ end -}}
 ## Start primary Redash configuration
 {{- if not .Values.redash.selfManagedSecrets }}
 {{- if or .Values.redash.secretKey .Values.redash.existingSecret }}
@@ -515,8 +513,8 @@ helm.sh/chart: {{ include "redash.chart" . }}
 {{- if .workerName }}
 app.kubernetes.io/component: {{ .workerName }}worker
 {{- end }}
-{{- if .Chart.AppVersion }}
-app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+{{- if or .Chart.AppVersion .Values.image.tag }}
+app.kubernetes.io/version: {{ .Values.image.tag | default .Chart.AppVersion | quote }}
 {{- end }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end -}}

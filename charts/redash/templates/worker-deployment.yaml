@@ -1,6 +1,6 @@
 {{ range $workerName, $config := .Values.workers -}}
-{{- $workerConfig := merge (deepCopy $.Values.worker) $config }}
-{{- $context := deepCopy $ | merge (dict "workerName" $workerName)}}
+{{- $workerConfig := mergeOverwrite (deepCopy $.Values.worker) $config }}
+{{- $context := mergeOverwrite (deepCopy $) (dict "workerName" $workerName)}}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -36,23 +36,24 @@ spec:
           imagePullPolicy: {{ $.Values.image.pullPolicy }}
           args: 
             - worker
-          {{ with $workerConfig.volumeMounts -}}
+          {{- $volumeMounts := concat $.Values.volumeMounts $workerConfig.volumeMounts }}
+          {{- with $volumeMounts }}
           volumeMounts: {{ toYaml . | nindent 12 }}
           {{- end -}}
-          livenessProbe: {{ toYaml $workerConfig.livenessProbe | nindent 12 }}
-          env:
-          {{- include "redash.env" $ | nindent 12 }}
-          {{- range $key, $value := $workerConfig.env }}
-            - name: "{{ $key }}"
-              value: "{{ $value }}"
+          {{- with $workerConfig.livenessProbe }}
+          livenessProbe: {{ toYaml . | nindent 12 }}
           {{- end }}
+          env:
+          {{- $envCtx := mergeOverwrite (deepCopy $) (dict "Values" (dict "env" $workerConfig.env)) -}}
+          {{- include "redash.env" $envCtx | nindent 12 }}
           {{- with (include "redash.envFrom" $) }}
           envFrom: {{ . | nindent 12 }}
           {{- end }}
           {{- with $workerConfig.resources }}
           resources: {{ toYaml . | nindent 12 }}
           {{- end }}
-      {{- with $workerConfig.volumes }}
+      {{- $volumes := concat $.Values.volumes $workerConfig.volumes -}}
+      {{- with $volumes }}
       volumes: {{ toYaml . | nindent 8 }}
       {{- end }}
       {{- with $workerConfig.nodeSelector }}

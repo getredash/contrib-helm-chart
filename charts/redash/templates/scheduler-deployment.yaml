@@ -38,24 +38,26 @@ spec:
           securityContext: {{ toYaml .Values.scheduler.securityContext | nindent 12 }}
           image: {{ .Values.image.registry }}/{{ .Values.image.repo }}:{{ .Values.image.tag | default .Chart.AppVersion }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          {{- with .Values.scheduler.volumeMounts }}
+          {{- $volumeMounts := concat .Values.volumeMounts .Values.scheduler.volumeMounts }}
+          {{- with $volumeMounts }}
           volumeMounts: {{ toYaml . | nindent 12 }}
           {{- end }}
           args:
             - scheduler
           env:
-          {{- include "redash.env" . | nindent 12 }}
-          {{- range $key, $value := .Values.scheduler.env }}
-            - name: "{{ $key }}"
-              value: "{{ $value }}"
-          {{- end }}
+          {{- $envCtx := mergeOverwrite (deepCopy .) (dict "Values" (dict "env" .Values.scheduler.env)) -}}
+          {{- include "redash.env" $envCtx | nindent 12 }}
           {{- with (include "redash.envFrom" .) }}
           envFrom: {{ . | nindent 12 }}
           {{- end }}
           {{- with .Values.scheduler.resources }}
           resources: {{ toYaml . | nindent 12 }}
           {{- end }}
-      {{- with .Values.scheduler.volumes }}
+          {{- with .Values.scheduler.livenessProbe }}
+          livenessProbe: {{ toYaml . | nindent 12 }}
+          {{- end }}
+      {{- $volumes := concat .Values.volumes .Values.scheduler.volumes }}
+      {{- with $volumes }}
       volumes: {{ toYaml . | nindent 8 }}
       {{- end }}
       {{- with .Values.scheduler.nodeSelector }}

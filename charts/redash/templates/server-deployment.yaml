@@ -36,45 +36,32 @@ spec:
           securityContext: {{ toYaml .Values.server.securityContext | nindent 12 }}
           image: {{ .Values.image.registry }}/{{ .Values.image.repo }}:{{ .Values.image.tag | default .Chart.AppVersion }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          {{- with .Values.server.volumeMounts }}
+          {{- $volumeMounts := concat .Values.volumeMounts .Values.server.volumeMounts }}
+          {{- with $volumeMounts }}
           volumeMounts: {{ toYaml . | nindent 12 }}
           {{- end }}
           args:
             - server
           env:
-          {{- include "redash.env" . | nindent 12 }}
-          {{- range $key, $value := .Values.server.env }}
-            - name: "{{ $key }}"
-              value: "{{ $value }}"
-          {{- end }}
-          {{ with (include "redash.envFrom" .) -}}
+          {{- $envCtx := mergeOverwrite (deepCopy .) (dict "Values" (dict "env" .Values.server.env)) -}}
+          {{- include "redash.env" $envCtx | nindent 12 }}
+          {{- with (include "redash.envFrom" .) }}
           envFrom: {{ . | nindent 12 }}
           {{- end }}
           ports:
             - containerPort: {{ .Values.server.httpPort }}
-          livenessProbe:
-            httpGet:
-              path: /ping
-              port: {{ .Values.server.httpPort }}
-            # Redash can take a while to come up initially, so we delay checks.
-            initialDelaySeconds: 90
-            timeoutSeconds: 1
-            periodSeconds: 10
-            successThreshold: 1
-            failureThreshold: 10
-          readinessProbe:
-            httpGet:
-              path: /ping
-              port: {{ .Values.server.httpPort }}
-            initialDelaySeconds: 10
-            timeoutSeconds: 1
-            periodSeconds: 10
-            successThreshold: 1
-            failureThreshold: 3
+          {{- $defaultProbe := dict "httpGet" (dict "path" "/ping" "port" .Values.server.httpPort) -}}
+          {{- with .Values.server.livenessProbe }}
+          livenessProbe: {{ deepCopy . | mergeOverwrite $defaultProbe | toYaml | nindent 12 }}
+          {{- end }}
+          {{- with .Values.server.readinessProbe }}
+          readinessProbe: {{ deepCopy . | mergeOverwrite $defaultProbe | toYaml | nindent 12 }}
+          {{- end }}
           {{- with .Values.server.resources }}
           resources: {{ toYaml .Values.server.resources | nindent 12 }}
           {{- end }}
-      {{- with .Values.server.volumes }}
+      {{- $volumes := concat .Values.volumes .Values.server.volumes -}}
+      {{- with $volumes }}
       volumes: {{ toYaml . | nindent 8 }}
       {{- end }}
       {{- with .Values.server.nodeSelector }}
