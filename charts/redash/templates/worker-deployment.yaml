@@ -39,7 +39,9 @@ spec:
           {{ with $workerConfig.volumeMounts -}}
           volumeMounts: {{ toYaml . | nindent 12 }}
           {{- end -}}
-          livenessProbe: {{ toYaml $workerConfig.livenessProbe | nindent 12 }}
+          {{- with $workerConfig.livenessProbe }}
+          livenessProbe: {{ toYaml . | nindent 12 }}
+          {{- end }}
           env:
           {{- $envCtx := mergeOverwrite (deepCopy $) (dict "Values" (dict "env" $workerConfig.env)) -}}
           {{- include "redash.env" $envCtx | nindent 12 }}
