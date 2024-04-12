@@ -298,6 +298,23 @@ server:
     #   cpu: 100m
     #  memory: 500Mi
 
+  # server.livenessProbe -- Server liveness probe configuration
+  livenessProbe:
+    # Redash can take a while to come up initially, so we delay checks.
+    initialDelaySeconds: 90
+    timeoutSeconds: 1
+    periodSeconds: 10
+    successThreshold: 1
+    failureThreshold: 10
+  
+  # server.readinessProbe -- Server readiness probe configuration 
+  readinessProbe:
+    initialDelaySeconds: 10
+    timeoutSeconds: 1
+    periodSeconds: 10
+    successThreshold: 1
+    failureThreshold: 3
+
   # server.podSecurityContext -- Security contexts for server pod assignment [ref](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
   podSecurityContext: {}
   securityContext: {}
@@ -363,17 +380,17 @@ workers:
   adhoc:
     # workers.adhoc.env -- Redash ad-hoc worker specific environment variables.
     env:
-      QUEUES: "queries"
+      QUEUES: queries
       WORKERS_COUNT: 2
   scheduled:
     # workers.scheduled.env -- Redash scheduled worker specific environment variables.
     env:
-      QUEUES: "scheduled_queries,schemas"
+      QUEUES: scheduled_queries,schemas
       WORKERS_COUNT: 1
   generic:
     # workers.generic.env -- Redash generic worker specific environment variables.
     env:
-      QUEUES: "periodic,emails,default"
+      QUEUES: periodic,emails,default
       WORKERS_COUNT: 1
 
 ## Common worker configuration, which can be overidden for each worker at workers.<workerName>
@@ -416,7 +433,7 @@ worker:
   volumeMounts: []
 
   # worker.livenessProbe -- Default worker's liveness probe to ensure workers are running fine
-  livenessProbe:
+  livenessProbe: {}
   # exec:
   #   command:
   #   - /bin/sh
@@ -442,6 +459,16 @@ scheduler:
   # scheduler.podSecurityContext -- Security contexts for scheduler pod assignment [ref](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
   podSecurityContext: {}
   securityContext: {}
+
+  # scheduler.livenessProbe -- Liveness probe for scheduler to ensure workers are running fine
+  livenessProbe: {}
+  # exec:
+  #   command:
+  #   - /bin/sh
+  #   - -c
+  #   - /app/bin/docker-entrypoint workers_healthcheck
+  # initialDelaySeconds: 60
+  # periodSeconds: 100
 
   # scheduler.nodeSelector -- Node labels for scheduler pod assignment [ref](https://kubernetes.io/docs/user-guide/node-selection/)
   nodeSelector: {}
