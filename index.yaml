@@ -2,6 +2,36 @@ apiVersion: v1
 entries:
   redash:
   - apiVersion: v1
+    appVersion: 24.04.0-dev-b8671264667.25
+    created: "2024-04-13T16:42:56.474578677Z"
+    dependencies:
+    - condition: redis.enabled
+      name: redis
+      repository: oci://registry-1.docker.io/bitnamicharts
+      version: ^19.1.0
+    - condition: postgresql.enabled
+      name: postgresql
+      repository: oci://registry-1.docker.io/bitnamicharts
+      version: ^15.2.0
+    description: Redash is an open source tool built for teams to query, visualize
+      and collaborate.
+    digest: b56ed7f9c912767ec719bb6d7a47db3c98d2f2f1dc6f502cbf2b43caf316c10f
+    home: https://redash.io/
+    icon: https://redash.io/assets/images/elements/redash-logo.svg
+    keywords:
+    - redash
+    - analytics
+    - visualization
+    maintainers:
+    - email: owen.barton@civicactions.com
+      name: Owen Barton
+    name: redash
+    sources:
+    - https://github.com/getredash/redash
+    urls:
+    - https://github.com/getredash/contrib-helm-chart/releases/download/redash-3.1.0-alpha4/redash-3.1.0-alpha4.tgz
+    version: 3.1.0-alpha4
+  - apiVersion: v1
     appVersion: 24.04.0-dev-b8665145752.21
     created: "2024-04-12T22:20:42.464340344Z"
     dependencies:
@@ -721,4 +751,4 @@ entries:
     urls:
     - redash-1.1.0.tgz
     version: 1.1.0
-generated: "2024-04-12T22:20:42.464528996Z"
+generated: "2024-04-13T16:42:56.474841697Z"
