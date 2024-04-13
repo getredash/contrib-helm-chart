@@ -58,7 +58,7 @@ spec:
           readinessProbe: {{ deepCopy . | mergeOverwrite $defaultProbe | toYaml | nindent 12 }}
           {{- end }}
           {{- with .Values.server.resources }}
-          resources: {{ toYaml .Values.server.resources | nindent 12 }}
+          resources: {{ toYaml . | nindent 12 }}
           {{- end }}
       {{- $volumes := concat .Values.volumes .Values.server.volumes -}}
       {{- with $volumes }}
