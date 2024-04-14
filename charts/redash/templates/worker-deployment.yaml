@@ -26,6 +26,9 @@ spec:
       {{- end -}}
       serviceAccountName: {{ include "redash.serviceAccountName" $context }}
       securityContext: {{ toYaml $workerConfig.podSecurityContext | nindent 8 }}
+      {{- with concat $.Values.initContainers $workerConfig.initContainers }}
+      initContainers: {{ toYaml . | nindent 8 }}
+      {{- end }}
       containers:
         {{- with $workerConfig.extraContainers -}}
         {{- toYaml . | nindent 8 }}

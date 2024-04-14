@@ -20,6 +20,9 @@ env:
   PYTHONUNBUFFERED: 0
   REDASH_PRODUCTION: "true"
 
+# initContainers -- Redash global init containers
+initContainers: []
+
 # volumes -- Redash global volumes configuration - applied to all containers
 volumes: []
 
@@ -287,6 +290,9 @@ server:
   # server.httpPort -- Server container port (only useful if you are using a customized image)
   httpPort: 5000
 
+  # server.initContainers -- Server init containers configuration
+  initContainers: []
+
   # server.env -- Redash server specific environment variables
   # Don't use this for variables that are in the configuration above, however.
   env: {}
@@ -404,6 +410,9 @@ worker:
   # worker.replicaCount -- Default number of worker pods to run
   replicaCount: 1
 
+  # worker.initContainers -- Worker default init containers configuration
+  initContainers: []
+
   # worker.resources -- Worker default resource requests and limits [ref](http://kubernetes.io/docs/user-guide/compute-resources/)
   resources:
     # limits:
@@ -453,6 +462,9 @@ scheduler:
   # scheduler.env -- Redash scheduler specific environment variables.
   env: {}
 
+  # scheduler.initContainers -- Redash scheduler init containers configuration.
+  initContainers: []
+
   # scheduler.resources -- scheduler resource requests and limits [ref](http://kubernetes.io/docs/user-guide/compute-resources/)
   resources:
   # limits:
@@ -501,6 +513,9 @@ scheduler:
 migrations:
   # migrations.volumes -- volumes that will be mounted to migrations pods only
   volumes: []
+
+  # migrations.initContainers -- migrations init container configuration
+  initContainers: []
 
   # migrations.volumeMounts -- volume mounts for migrations pods
   volumeMounts: []

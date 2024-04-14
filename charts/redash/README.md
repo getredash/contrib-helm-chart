@@ -8,7 +8,7 @@ This chart bootstraps a [Redash](https://github.com/getredash/redash) deployment
 
 This is a contributed project developed by volunteers and not officially supported by Redash.
 
-Current chart version is `3.1.0-alpha4`
+Current chart version is `3.1.0-alpha5`
 
 * <https://github.com/getredash/redash>
 
@@ -96,7 +96,9 @@ The following table lists the configurable parameters of the Redash chart and th
 | ingress.ingressClassName | string | `""` | Sets the ingress controller class name to use. |
 | ingress.pathType | string | `"Prefix"` | How ingress paths should be treated. |
 | ingress.tls | list | `[]` | Ingress TLS configuration |
+| initContainers | list | `[]` | Redash global init containers |
 | migrations.affinity | object | `{}` | Affinity for scheduled worker pod assignment [ref](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity) |
+| migrations.initContainers | list | `[]` | migrations init container configuration |
 | migrations.nodeSelector | object | `{}` | Node labels for scheduled worker pod assignment [ref](https://kubernetes.io/docs/user-guide/node-selection/) |
 | migrations.podAnnotations | object | `{}` | Annotations for scheduled worker pod assignment [ref](https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/) |
 | migrations.podSecurityContext | object | `{}` | Security contexts for scheduled worker pod assignment [ref](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) |
@@ -203,6 +205,7 @@ The following table lists the configurable parameters of the Redash chart and th
 | redis.master.service.ports.redis | int | `6379` |  |
 | scheduler.affinity | object | `{}` | Affinity for scheduler pod assignment [ref](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity) |
 | scheduler.env | object | `{}` | Redash scheduler specific environment variables. |
+| scheduler.initContainers | list | `[]` | Redash scheduler init containers configuration. |
 | scheduler.livenessProbe | object | `{}` | Liveness probe for scheduler to ensure workers are running fine |
 | scheduler.nodeSelector | object | `{}` | Node labels for scheduler pod assignment [ref](https://kubernetes.io/docs/user-guide/node-selection/) |
 | scheduler.podAnnotations | object | `{}` | Annotations for scheduler pod assignment [ref](https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/) |
@@ -216,6 +219,7 @@ The following table lists the configurable parameters of the Redash chart and th
 | server.affinity | object | `{}` | Affinity for server pod assignment [ref](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity) |
 | server.env | object | `{}` | Redash server specific environment variables Don't use this for variables that are in the configuration above, however. |
 | server.httpPort | int | `5000` | Server container port (only useful if you are using a customized image) |
+| server.initContainers | list | `[]` | Server init containers configuration |
 | server.livenessProbe | object | `{"failureThreshold":10,"initialDelaySeconds":90,"periodSeconds":10,"successThreshold":1,"timeoutSeconds":1}` | Server liveness probe configuration |
 | server.nodeSelector | object | `{}` | Node labels for server pod assignment [ref](https://kubernetes.io/docs/user-guide/node-selection/) |
 | server.podAnnotations | object | `{}` | Annotations for server pod assignment [ref](https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/) |
@@ -239,6 +243,7 @@ The following table lists the configurable parameters of the Redash chart and th
 | volumeMounts | list | `[]` | Redash global volume mounts configuration - applied to all containers |
 | volumes | list | `[]` | Redash global volumes configuration - applied to all containers |
 | worker.affinity | object | `{}` | Default affinity for worker pod assignment [ref](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity) |
+| worker.initContainers | list | `[]` | Worker default init containers configuration |
 | worker.livenessProbe | object | `{}` | Default worker's liveness probe to ensure workers are running fine |
 | worker.nodeSelector | object | `{}` | Default node labels for worker pod assignment [ref](https://kubernetes.io/docs/user-guide/node-selection/) |
 | worker.podAnnotations | object | `{}` | Default annotations for worker pod assignment [ref](https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/) |

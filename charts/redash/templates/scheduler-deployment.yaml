@@ -30,6 +30,10 @@ spec:
       {{ end -}}
       serviceAccountName: {{ include "redash.serviceAccountName" . }}
       securityContext: {{ toYaml .Values.scheduler.podSecurityContext | nindent 8 }}
+      {{- $initContainers := concat .Values.initContainers .Values.scheduler.initContainers }}
+      {{- with $initContainers }}
+      initContainers: {{ toYaml . | nindent 8 }}
+      {{- end }}
       containers:
         {{- with .Values.scheduler.extraContainers -}}
         {{ toYaml . | nindent 8 }}

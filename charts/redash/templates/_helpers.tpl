@@ -128,7 +128,7 @@ Shared environment block used across each component.
   value: {{ .Values.redis.database | quote }}
 {{ end -}}
 {{ range $key, $value := .Values.env -}}
-- name: {{ $key | quote }}
+- name: {{ $key }}
   value: {{ $value | quote }}
 {{ end -}}
 ## Start primary Redash configuration

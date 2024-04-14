@@ -26,6 +26,10 @@ spec:
       serviceAccountName: {{ include "redash.serviceAccountName" . }}
       restartPolicy: Never
       securityContext: {{ toYaml .Values.migrations.podSecurityContext | nindent 8 }}
+      {{- $initContainers := concat .Values.initContainers .Values.migrations.initContainers }}
+      {{- with $initContainers }}
+      initContainers: {{ toYaml . | nindent 8 }}
+      {{- end }}
       containers:
       - name: {{ include "redash.name" . }}-server
         securityContext: {{ toYaml .Values.migrations.securityContext | nindent 10 }}
