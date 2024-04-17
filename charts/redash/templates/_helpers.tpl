@@ -20,8 +20,8 @@ and we use this as a base for component names (which can add up to 20 chars).
 If release name contains chart name it will be used as a full name.
 */}}
 {{- define "redash.fullname" -}}
-{{- if .Values.fullnameOverride -}}
-{{- .Values.fullnameOverride | trunc 43 | trimSuffix "-" -}}
+{{- with .Values.fullnameOverride -}}
+{{- . | trunc 43 | trimSuffix "-" -}}
 {{- else -}}
 {{- $name := default .Chart.Name .Values.nameOverride -}}
 {{- if contains $name .Release.Name -}}
@@ -78,9 +78,9 @@ Shared environment block used across each component.
 {{- if not .Values.postgresql.enabled -}}
 {{- if not .Values.redash.selfManagedSecrets -}}
 - name: REDASH_DATABASE_URL
-  {{- if .Values.externalPostgreSQLSecret }}
+  {{- with .Values.externalPostgreSQLSecret }}
   valueFrom:
-    secretKeyRef: {{ .Values.externalPostgreSQLSecret | toYaml | nindent 6 }}
+    secretKeyRef: {{ toYaml . | nindent 6 }}
   {{- else }}
   value: {{ default "" .Values.externalPostgreSQL | quote }}
   {{- end }}
@@ -103,9 +103,9 @@ Shared environment block used across each component.
 {{- if not .Values.redis.enabled }}
 {{- if not .Values.redash.selfManagedSecrets -}}
 - name: REDASH_REDIS_URL
-  {{- if .Values.externalRedisSecret }}
+  {{- with .Values.externalRedisSecret }}
   valueFrom:
-    secretKeyRef: {{ .Values.externalRedisSecret | toYaml | nindent 6 }}
+    secretKeyRef: {{ toYaml . | nindent 6 }}
   {{- else }}
   value: {{ default "" .Values.externalRedis | quote }}
   {{- end }}
@@ -114,8 +114,8 @@ Shared environment block used across each component.
 - name: REDASH_REDIS_PASSWORD
   valueFrom:
     secretKeyRef:
-    {{- if .Values.redis.existingSecret }}
-      name: {{ .Values.redis.existingSecret }}
+    {{- with .Values.redis.existingSecret }}
+      name: {{ . }}
     {{- else }}
       name: {{ .Release.Name }}-redis
     {{- end }}
@@ -141,73 +141,77 @@ Shared environment block used across each component.
       key: secretKey
 {{- end }}
 {{- end }}
-{{- if .Values.redash.samlSchemeOverride }}
+{{- with .Values.redash.samlSchemeOverride }}
 - name: REDASH_SAML_SCHEME_OVERRIDE
-  value: {{ default  .Values.redash.samlSchemeOverride | quote }}
+  value: {{ quote . }}
 {{- end }}
-{{- if .Values.redash.disablePublicUrls }}
+{{- with .Values.redash.disablePublicUrls }}
 - name: REDASH_DISABLE_PUBLIC_URLS
-  value: {{ default  .Values.redash.disablePublicUrls | quote }}
+  value: {{ quote . }}
 {{- end }}
-{{- if .Values.redash.blockedDomains }}
+{{- with .Values.redash.blockedDomains }}
 - name: REDASH_BLOCKED_DOMAINS
-  value: {{ default  .Values.redash.blockedDomains | quote }}
+  value: {{ quote . }}
 {{- end }}
-{{- if .Values.redash.proxiesCount }}
+{{- with .Values.redash.proxiesCount }}
 - name: REDASH_PROXIES_COUNT
-  value: {{ default  .Values.redash.proxiesCount | quote }}
+  value: {{ quote . }}
 {{- end }}
-{{- if .Values.redash.statsdHost }}
+{{- with .Values.redash.statsdEnabled }}
+- name: REDASH_STATSD_ENABLED
+  value: {{ quote . }}
+{{- end }}
+{{- with .Values.redash.statsdHost }}
 - name: REDASH_STATSD_HOST
-  value: {{ default  .Values.redash.statsdHost | quote }}
+  value: {{ quote . }}
 {{- end }}
-{{- if .Values.redash.statsdPort }}
+{{- with .Values.redash.statsdPort }}
 - name: REDASH_STATSD_PORT
-  value: {{ default  .Values.redash.statsdPort | quote }}
+  value: {{ quote . }}
 {{- end }}
-{{- if .Values.redash.statsdPrefix }}
+{{- with .Values.redash.statsdPrefix }}
 - name: REDASH_STATSD_PREFIX
-  value: {{ default  .Values.redash.statsdPrefix | quote }}
+  value: {{ quote . }}
 {{- end }}
-{{- if .Values.redash.statsdUseTags }}
+{{- with .Values.redash.statsdUseTags }}
 - name: REDASH_STATSD_USE_TAGS
-  value: {{ default  .Values.redash.statsdUseTags | quote }}
+  value: {{ quote . }}
 {{- end }}
-{{- if .Values.redash.queryResultsCleanupEnabled }}
+{{- with .Values.redash.queryResultsCleanupEnabled }}
 - name: REDASH_QUERY_RESULTS_CLEANUP_ENABLED
-  value: {{ default  .Values.redash.queryResultsCleanupEnabled | quote }}
+  value: {{ quote . }}
 {{- end }}
-{{- if .Values.redash.queryResultsCleanupCount }}
+{{- with .Values.redash.queryResultsCleanupCount }}
 - name: REDASH_QUERY_RESULTS_CLEANUP_COUNT
-  value: {{ default  .Values.redash.queryResultsCleanupCount | quote }}
+  value: {{ quote . }}
 {{- end }}
-{{- if .Values.redash.queryResultsCleanupMaxAge }}
+{{- with .Values.redash.queryResultsCleanupMaxAge }}
 - name: REDASH_QUERY_RESULTS_CLEANUP_MAX_AGE
-  value: {{ default  .Values.redash.queryResultsCleanupMaxAge | quote }}
+  value: {{ quote . }}
 {{- end }}
-{{- if .Values.redash.schemasRefreshSchedule }}
+{{- with .Values.redash.schemasRefreshSchedule }}
 - name: REDASH_SCHEMAS_REFRESH_SCHEDULE
-  value: {{ default  .Values.redash.schemasRefreshSchedule | quote }}
+  value: {{ quote . }}
 {{- end }}
-{{- if .Values.redash.authType }}
+{{- with .Values.redash.authType }}
 - name: REDASH_AUTH_TYPE
-  value: {{ default  .Values.redash.authType | quote }}
+  value: {{ quote . }}
 {{- end }}
-{{- if .Values.redash.enforceHttps }}
+{{- with .Values.redash.enforceHttps }}
 - name: REDASH_ENFORCE_HTTPS
-  value: {{ default  .Values.redash.enforceHttps | quote }}
+  value: {{ quote . }}
 {{- end }}
-{{- if .Values.redash.invitationTokenMaxAge }}
+{{- with .Values.redash.invitationTokenMaxAge }}
 - name: REDASH_INVITATION_TOKEN_MAX_AGE
-  value: {{ default  .Values.redash.invitationTokenMaxAge | quote }}
+  value: {{ quote . }}
 {{- end }}
-{{- if .Values.redash.multiOrg }}
+{{- with .Values.redash.multiOrg }}
 - name: REDASH_MULTI_ORG
-  value: {{ default  .Values.redash.multiOrg | quote }}
+  value: {{ quote . }}
 {{- end }}
-{{- if .Values.redash.googleClientId }}
+{{- with .Values.redash.googleClientId }}
 - name: REDASH_GOOGLE_CLIENT_ID
-  value: {{ default  .Values.redash.googleClientId | quote }}
+  value: {{ quote . }}
 {{- end }}
 {{- if not .Values.redash.selfManagedSecrets }}
 {{- if or .Values.redash.googleClientSecret .Values.redash.existingSecret }}
@@ -218,25 +222,25 @@ Shared environment block used across each component.
       key: googleClientSecret
 {{- end }}
 {{- end }}
-{{- if .Values.redash.remoteUserLoginEnabled }}
+{{- with .Values.redash.remoteUserLoginEnabled }}
 - name: REDASH_REMOTE_USER_LOGIN_ENABLED
-  value: {{ default  .Values.redash.remoteUserLoginEnabled | quote }}
+  value: {{ quote . }}
 {{- end }}
-{{- if .Values.redash.remoteUserHeader }}
+{{- with .Values.redash.remoteUserHeader }}
 - name: REDASH_REMOTE_USER_HEADER
-  value: {{ default  .Values.redash.remoteUserHeader | quote }}
+  value: {{ quote . }}
 {{- end }}
-{{- if .Values.redash.ldapLoginEnabled }}
+{{- with .Values.redash.ldapLoginEnabled }}
 - name: REDASH_LDAP_LOGIN_ENABLED
-  value: {{ default  .Values.redash.ldapLoginEnabled | quote }}
+  value: {{ quote . }}
 {{- end }}
-{{- if .Values.redash.ldapUrl }}
+{{- with .Values.redash.ldapUrl }}
 - name: REDASH_LDAP_URL
-  value: {{ default  .Values.redash.ldapUrl | quote }}
+  value: {{ quote . }}
 {{- end }}
-{{- if .Values.redash.ldapBindDn }}
+{{- with .Values.redash.ldapBindDn }}
 - name: REDASH_LDAP_BIND_DN
-  value: {{ default  .Values.redash.ldapBindDn | quote }}
+  value: {{ quote . }}
 {{- end }}
 {{- if not .Values.redash.selfManagedSecrets }}
 {{- if or .Values.redash.ldapBindDnPassword .Values.redash.existingSecret }}
@@ -247,33 +251,33 @@ Shared environment block used across each component.
       key: ldapBindDnPassword
 {{- end }}
 {{- end }}
-{{- if .Values.redash.ldapDisplayNameKey }}
+{{- with .Values.redash.ldapDisplayNameKey }}
 - name: REDASH_LDAP_DISPLAY_NAME_KEY
-  value: {{ default  .Values.redash.ldapDisplayNameKey | quote }}
+  value: {{ quote . }}
 {{- end }}
-{{- if .Values.redash.ldapEmailKey }}
+{{- with .Values.redash.ldapEmailKey }}
 - name: REDASH_LDAP_EMAIL_KEY
-  value: {{ default  .Values.redash.ldapEmailKey | quote }}
+  value: {{ quote . }}
 {{- end }}
-{{- if .Values.redash.ldapCustomUsernamePrompt }}
+{{- with .Values.redash.ldapCustomUsernamePrompt }}
 - name: REDASH_LDAP_CUSTOM_USERNAME_PROMPT
-  value: {{ default  .Values.redash.ldapCustomUsernamePrompt | quote }}
+  value: {{ quote . }}
 {{- end }}
-{{- if .Values.redash.ldapSearchTemplate }}
+{{- with .Values.redash.ldapSearchTemplate }}
 - name: REDASH_LDAP_SEARCH_TEMPLATE
-  value: {{ default  .Values.redash.ldapSearchTemplate | quote }}
+  value: {{ quote . }}
 {{- end }}
-{{- if .Values.redash.ldapSearchDn }}
+{{- with .Values.redash.ldapSearchDn }}
 - name: REDASH_LDAP_SEARCH_DN
-  value: {{ default  .Values.redash.ldapSearchDn | quote }}
+  value: {{ quote . }}
 {{- end }}
-{{- if .Values.redash.staticAssetsPath }}
+{{- with .Values.redash.staticAssetsPath }}
 - name: REDASH_STATIC_ASSETS_PATH
-  value: {{ default  .Values.redash.staticAssetsPath | quote }}
+  value: {{ quote . }}
 {{- end }}
-{{- if .Values.redash.jobExpiryTime }}
+{{- with .Values.redash.jobExpiryTime }}
 - name: REDASH_JOB_EXPIRY_TIME
-  value: {{ default  .Values.redash.jobExpiryTime | quote }}
+  value: {{ quote . }}
 {{- end }}
 {{- if not .Values.redash.selfManagedSecrets }}
 {{- if or .Values.redash.cookieSecret .Values.redash.existingSecret }}
@@ -284,29 +288,29 @@ Shared environment block used across each component.
       key: cookieSecret
 {{- end }}
 {{- end }}
-{{- if .Values.redash.logLevel }}
+{{- with .Values.redash.logLevel }}
 - name: REDASH_LOG_LEVEL
-  value: {{ default  .Values.redash.logLevel | quote }}
+  value: {{ quote . }}
 {{- end }}
-{{- if .Values.redash.mailServer }}
+{{- with .Values.redash.mailServer }}
 - name: REDASH_MAIL_SERVER
-  value: {{ default  .Values.redash.mailServer | quote }}
+  value: {{ quote . }}
 {{- end }}
-{{- if .Values.redash.mailPort }}
+{{- with .Values.redash.mailPort }}
 - name: REDASH_MAIL_PORT
-  value: {{ default  .Values.redash.mailPort | quote }}
+  value: {{ quote . }}
 {{- end }}
-{{- if .Values.redash.mailUseTls }}
+{{- with .Values.redash.mailUseTls }}
 - name: REDASH_MAIL_USE_TLS
-  value: {{ default  .Values.redash.mailUseTls | quote }}
+  value: {{ quote . }}
 {{- end }}
-{{- if .Values.redash.mailUseSsl }}
+{{- with .Values.redash.mailUseSsl }}
 - name: REDASH_MAIL_USE_SSL
-  value: {{ default  .Values.redash.mailUseSsl | quote }}
+  value: {{ quote . }}
 {{- end }}
-{{- if .Values.redash.mailUsername }}
+{{- with .Values.redash.mailUsername }}
 - name: REDASH_MAIL_USERNAME
-  value: {{ default  .Values.redash.mailUsername | quote }}
+  value: {{ quote . }}
 {{- end }}
 {{- if not .Values.redash.selfManagedSecrets }}
 {{- if or .Values.redash.mailPassword .Values.redash.existingSecret }}
@@ -317,181 +321,181 @@ Shared environment block used across each component.
       key: mailPassword
 {{- end }}
 {{- end }}
-{{- if .Values.redash.mailDefaultSender }}
+{{- with .Values.redash.mailDefaultSender }}
 - name: REDASH_MAIL_DEFAULT_SENDER
-  value: {{ default  .Values.redash.mailDefaultSender | quote }}
+  value: {{ quote . }}
 {{- end }}
-{{- if .Values.redash.mailMaxEmails }}
+{{- with .Values.redash.mailMaxEmails }}
 - name: REDASH_MAIL_MAX_EMAILS
-  value: {{ default  .Values.redash.mailMaxEmails | quote }}
+  value: {{ quote . }}
 {{- end }}
-{{- if .Values.redash.mailAsciiAttachments }}
+{{- with .Values.redash.mailAsciiAttachments }}
 - name: REDASH_MAIL_ASCII_ATTACHMENTS
-  value: {{ default  .Values.redash.mailAsciiAttachments | quote }}
+  value: {{ quote . }}
 {{- end }}
-{{- if .Values.redash.host }}
+{{- with .Values.redash.host }}
 - name: REDASH_HOST
-  value: {{ default  .Values.redash.host | quote }}
+  value: {{ quote . }}
 {{- end }}
-{{- if .Values.redash.alertsDefaultMailSubjectTemplate }}
+{{- with .Values.redash.alertsDefaultMailSubjectTemplate }}
 - name: REDASH_ALERTS_DEFAULT_MAIL_SUBJECT_TEMPLATE
-  value: {{ default  .Values.redash.alertsDefaultMailSubjectTemplate | quote }}
+  value: {{ quote . }}
 {{- end }}
-{{- if .Values.redash.throttleLoginPattern }}
+{{- with .Values.redash.throttleLoginPattern }}
 - name: REDASH_THROTTLE_LOGIN_PATTERN
-  value: {{ default  .Values.redash.throttleLoginPattern | quote }}
+  value: {{ quote . }}
 {{- end }}
-{{- if .Values.redash.limiterStorage }}
+{{- with .Values.redash.limiterStorage }}
 - name: REDASH_LIMITER_STORAGE
-  value: {{ default  .Values.redash.limiterStorage | quote }}
+  value: {{ quote . }}
 {{- end }}
-{{- if .Values.redash.corsAccessControlAllowOrigin }}
+{{- with .Values.redash.corsAccessControlAllowOrigin }}
 - name: REDASH_CORS_ACCESS_CONTROL_ALLOW_ORIGIN
-  value: {{ default  .Values.redash.corsAccessControlAllowOrigin | quote }}
+  value: {{ quote . }}
 {{- end }}
-{{- if .Values.redash.corsAccessControlAllowCredentials }}
+{{- with .Values.redash.corsAccessControlAllowCredentials }}
 - name: REDASH_CORS_ACCESS_CONTROL_ALLOW_CREDENTIALS
-  value: {{ default  .Values.redash.corsAccessControlAllowCredentials | quote }}
+  value: {{ quote . }}
 {{- end }}
-{{- if .Values.redash.corsAccessControlRequestMethod }}
+{{- with .Values.redash.corsAccessControlRequestMethod }}
 - name: REDASH_CORS_ACCESS_CONTROL_REQUEST_METHOD
-  value: {{ default  .Values.redash.corsAccessControlRequestMethod | quote }}
+  value: {{ quote . }}
 {{- end }}
-{{- if .Values.redash.corsAccessControlAllowHeaders }}
+{{- with .Values.redash.corsAccessControlAllowHeaders }}
 - name: REDASH_CORS_ACCESS_CONTROL_ALLOW_HEADERS
-  value: {{ default  .Values.redash.corsAccessControlAllowHeaders | quote }}
+  value: {{ quote . }}
 {{- end }}
-{{- if .Values.redash.enabledQueryRunners }}
+{{- with .Values.redash.enabledQueryRunners }}
 - name: REDASH_ENABLED_QUERY_RUNNERS
-  value: {{ default  .Values.redash.enabledQueryRunners | quote }}
+  value: {{ quote . }}
 {{- end }}
-{{- if .Values.redash.additionalQueryRunners }}
+{{- with .Values.redash.additionalQueryRunners }}
 - name: REDASH_ADDITIONAL_QUERY_RUNNERS
-  value: {{ default  .Values.redash.additionalQueryRunners | quote }}
+  value: {{ quote . }}
 {{- end }}
-{{- if .Values.redash.disabledQueryRunners }}
+{{- with .Values.redash.disabledQueryRunners }}
 - name: REDASH_DISABLED_QUERY_RUNNERS
-  value: {{ default  .Values.redash.disabledQueryRunners | quote }}
+  value: {{ quote . }}
 {{- end }}
-{{- if .Values.redash.scheduledQueryTimeLimit }}
+{{- with .Values.redash.scheduledQueryTimeLimit }}
 - name: REDASH_SCHEDULED_QUERY_TIME_LIMIT
-  value: {{ default  .Values.redash.scheduledQueryTimeLimit | quote }}
+  value: {{ quote . }}
 {{- end }}
-{{- if .Values.redash.adhocQueryTimeLimit }}
+{{- with .Values.redash.adhocQueryTimeLimit }}
 - name: REDASH_ADHOC_QUERY_TIME_LIMIT
-  value: {{ default  .Values.redash.adhocQueryTimeLimit | quote }}
+  value: {{ quote . }}
 {{- end }}
-{{- if .Values.redash.enabledDestinations }}
+{{- with .Values.redash.enabledDestinations }}
 - name: REDASH_ENABLED_DESTINATIONS
-  value: {{ default  .Values.redash.enabledDestinations | quote }}
+  value: {{ quote . }}
 {{- end }}
-{{- if .Values.redash.additionalDestinations }}
+{{- with .Values.redash.additionalDestinations }}
 - name: REDASH_ADDITIONAL_DESTINATIONS
-  value: {{ default  .Values.redash.additionalDestinations | quote }}
+  value: {{ quote . }}
 {{- end }}
-{{- if .Values.redash.eventReportingWebhooks }}
+{{- with .Values.redash.eventReportingWebhooks }}
 - name: REDASH_EVENT_REPORTING_WEBHOOKS
-  value: {{ default  .Values.redash.eventReportingWebhooks | quote }}
+  value: {{ quote . }}
 {{- end }}
-{{- if .Values.redash.sentryDsn }}
+{{- with .Values.redash.sentryDsn }}
 - name: REDASH_SENTRY_DSN
-  value: {{ default  .Values.redash.sentryDsn | quote }}
+  value: {{ quote . }}
 {{- end }}
-{{- if .Values.redash.allowScriptsInUserInput }}
+{{- with .Values.redash.allowScriptsInUserInput }}
 - name: REDASH_ALLOW_SCRIPTS_IN_USER_INPUT
-  value: {{ default  .Values.redash.allowScriptsInUserInput | quote }}
+  value: {{ quote . }}
 {{- end }}
-{{- if .Values.redash.dashboardRefreshIntervals }}
+{{- with .Values.redash.dashboardRefreshIntervals }}
 - name: REDASH_DASHBOARD_REFRESH_INTERVALS
-  value: {{ default  .Values.redash.dashboardRefreshIntervals | quote }}
+  value: {{ quote . }}
 {{- end }}
-{{- if .Values.redash.queryRefreshIntervals }}
+{{- with .Values.redash.queryRefreshIntervals }}
 - name: REDASH_QUERY_REFRESH_INTERVALS
-  value: {{ default  .Values.redash.queryRefreshIntervals | quote }}
+  value: {{ quote . }}
 {{- end }}
-{{- if .Values.redash.passwordLoginEnabled }}
+{{- with .Values.redash.passwordLoginEnabled }}
 - name: REDASH_PASSWORD_LOGIN_ENABLED
-  value: {{ default  .Values.redash.passwordLoginEnabled | quote }}
+  value: {{ quote . }}
 {{- end }}
-{{- if .Values.redash.samlMetadataUrl }}
+{{- with .Values.redash.samlMetadataUrl }}
 - name: REDASH_SAML_METADATA_URL
-  value: {{ default  .Values.redash.samlMetadataUrl | quote }}
+  value: {{ quote . }}
 {{- end }}
-{{- if .Values.redash.samlEntityId }}
+{{- with .Values.redash.samlEntityId }}
 - name: REDASH_SAML_ENTITY_ID
-  value: {{ default  .Values.redash.samlEntityId | quote }}
+  value: {{ quote . }}
 {{- end }}
-{{- if .Values.redash.samlNameidFormat }}
+{{- with .Values.redash.samlNameidFormat }}
 - name: REDASH_SAML_NAMEID_FORMAT
-  value: {{ default  .Values.redash.samlNameidFormat | quote }}
+  value: {{ quote . }}
 {{- end }}
-{{- if .Values.redash.dateFormat }}
+{{- with .Values.redash.dateFormat }}
 - name: REDASH_DATE_FORMAT
-  value: {{ default  .Values.redash.dateFormat | quote }}
+  value: {{ quote . }}
 {{- end }}
-{{- if .Values.redash.jwtLoginEnabled }}
+{{- with .Values.redash.jwtLoginEnabled }}
 - name: REDASH_JWT_LOGIN_ENABLED
-  value: {{ default  .Values.redash.jwtLoginEnabled | quote }}
+  value: {{ quote . }}
 {{- end }}
-{{- if .Values.redash.jwtAuthIssuer }}
+{{- with .Values.redash.jwtAuthIssuer }}
 - name: REDASH_JWT_AUTH_ISSUER
-  value: {{ default  .Values.redash.jwtAuthIssuer | quote }}
+  value: {{ quote . }}
 {{- end }}
-{{- if .Values.redash.jwtAuthPublicCertsUrl }}
+{{- with .Values.redash.jwtAuthPublicCertsUrl }}
 - name: REDASH_JWT_AUTH_PUBLIC_CERTS_URL
-  value: {{ default  .Values.redash.jwtAuthPublicCertsUrl | quote }}
+  value: {{ quote . }}
 {{- end }}
-{{- if .Values.redash.jwtAuthAudience }}
+{{- with .Values.redash.jwtAuthAudience }}
 - name: REDASH_JWT_AUTH_AUDIENCE
-  value: {{ default  .Values.redash.jwtAuthAudience | quote }}
+  value: {{ quote . }}
 {{- end }}
-{{- if .Values.redash.jwtAuthAlgorithms }}
+{{- with .Values.redash.jwtAuthAlgorithms }}
 - name: REDASH_JWT_AUTH_ALGORITHMS
-  value: {{ default  .Values.redash.jwtAuthAlgorithms | quote }}
+  value: {{ quote . }}
 {{- end }}
-{{- if .Values.redash.jwtAuthCookieName }}
+{{- with .Values.redash.jwtAuthCookieName }}
 - name: REDASH_JWT_AUTH_COOKIE_NAME
-  value: {{ default  .Values.redash.jwtAuthCookieName | quote }}
+  value: {{ quote . }}
 {{- end }}
-{{- if .Values.redash.jwtAuthHeaderName }}
+{{- with .Values.redash.jwtAuthHeaderName }}
 - name: REDASH_JWT_AUTH_HEADER_NAME
-  value: {{ default  .Values.redash.jwtAuthHeaderName | quote }}
+  value: {{ .quote }}
 {{- end }}
-{{- if .Values.redash.featureShowQueryResultsCount }}
+{{- with .Values.redash.featureShowQueryResultsCount }}
 - name: REDASH_FEATURE_SHOW_QUERY_RESULTS_COUNT
-  value: {{ default  .Values.redash.featureShowQueryResultsCount | quote }}
+  value: {{ quote . }}
 {{- end }}
-{{- if .Values.redash.versionCheck }}
+{{- with .Values.redash.versionCheck }}
 - name: REDASH_VERSION_CHECK
-  value: {{ default  .Values.redash.versionCheck | quote }}
+  value: {{ quote . }}
 {{- end }}
-{{- if .Values.redash.featureDisableRefreshQueries }}
+{{- with .Values.redash.featureDisableRefreshQueries }}
 - name: REDASH_FEATURE_DISABLE_REFRESH_QUERIES
-  value: {{ default  .Values.redash.featureDisableRefreshQueries | quote }}
+  value: {{ quote . }}
 {{- end }}
-{{- if .Values.redash.featureShowPermissionsControl }}
+{{- with .Values.redash.featureShowPermissionsControl }}
 - name: REDASH_FEATURE_SHOW_PERMISSIONS_CONTROL
-  value: {{ default  .Values.redash.featureShowPermissionsControl | quote }}
+  value: {{ quote . }}
 {{- end }}
-{{- if .Values.redash.featureAllowCustomJsVisualizations }}
+{{- with .Values.redash.featureAllowCustomJsVisualizations }}
 - name: REDASH_FEATURE_ALLOW_CUSTOM_JS_VISUALIZATIONS
-  value: {{ default  .Values.redash.featureAllowCustomJsVisualizations | quote }}
+  value: {{ quote . }}
 {{- end }}
-{{- if .Values.redash.featureAutoPublishNamedQueries }}
+{{- with .Values.redash.featureAutoPublishNamedQueries }}
 - name: REDASH_FEATURE_AUTO_PUBLISH_NAMED_QUERIES
-  value: {{ default  .Values.redash.featureAutoPublishNamedQueries | quote }}
+  value: {{ quote . }}
 {{- end }}
-{{- if .Values.redash.bigqueryHttpTimeout }}
+{{- with .Values.redash.bigqueryHttpTimeout }}
 - name: REDASH_BIGQUERY_HTTP_TIMEOUT
-  value: {{ default  .Values.redash.bigqueryHttpTimeout | quote }}
+  value: {{ quote . }}
 {{- end }}
-{{- if .Values.redash.schemaRunTableSizeCalculations }}
+{{- with .Values.redash.schemaRunTableSizeCalculations }}
 - name: REDASH_SCHEMA_RUN_TABLE_SIZE_CALCULATIONS
-  value: {{ default  .Values.redash.schemaRunTableSizeCalculations | quote }}
+  value: {{ quote . }}
 {{- end }}
-{{- if .Values.redash.webWorkers }}
+{{- with .Values.redash.webWorkers }}
 - name: REDASH_WEB_WORKERS
-  value: {{ default  .Values.redash.webWorkers | quote }}
+  value: {{ quote . }}
 {{- end }}
 ## End primary Redash configuration
 {{- end -}}
@@ -500,9 +504,9 @@ Shared environment block used across each component.
 Environment variables initialized from secret used across each component.
 */}}
 {{- define "redash.envFrom" -}}
-{{- if .Values.envSecretName -}}
+{{- with .Values.envSecretName -}}
 - secretRef:
-    name: {{ .Values.envSecretName }}
+    name: {{ . }}
 {{- end -}}
 {{- end -}}
 
@@ -512,8 +516,8 @@ Common labels
 {{- define "redash.labels" -}}
 helm.sh/chart: {{ include "redash.chart" . }}
 {{ include "redash.selectorLabels" . }}
-{{- if .workerName }}
-app.kubernetes.io/component: {{ .workerName }}worker
+{{- with .workerName }}
+app.kubernetes.io/component: {{ . }}worker
 {{- end }}
 {{- if or .Chart.AppVersion .Values.image.tag }}
 app.kubernetes.io/version: {{ .Values.image.tag | default .Chart.AppVersion | quote }}
