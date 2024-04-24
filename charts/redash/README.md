@@ -8,7 +8,7 @@ This chart bootstraps a [Redash](https://github.com/getredash/redash) deployment
 
 This is a contributed project developed by volunteers and not officially supported by Redash.
 
-Current chart version is `3.1.0-alpha5`
+Current chart version is `3.1.0-alpha6`
 
 * <https://github.com/getredash/redash>
 
@@ -203,14 +203,16 @@ The following table lists the configurable parameters of the Redash chart and th
 | redis.database | int | `0` |  |
 | redis.enabled | bool | `true` | Whether to deploy a Redis server to satisfy the applications database requirements. To use an external Redis set this to false and configure the externalRedis parameter. |
 | redis.master.service.ports.redis | int | `6379` |  |
+| redis.replica.replicaCount | int | `0` |  |
 | scheduler.affinity | object | `{}` | Affinity for scheduler pod assignment [ref](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity) |
 | scheduler.env | object | `{}` | Redash scheduler specific environment variables. |
 | scheduler.initContainers | list | `[]` | Redash scheduler init containers configuration. |
-| scheduler.livenessProbe | object | `{}` | Liveness probe for scheduler to ensure workers are running fine |
+| scheduler.livenessProbe | object | `{"exec":{"command":["/bin/sh","-c","/app/bin/docker-entrypoint workers_healthcheck"]},"initialDelaySeconds":60,"periodSeconds":100,"timeoutSeconds":10}` | Liveness probe for scheduler to ensure workers are running fine |
 | scheduler.nodeSelector | object | `{}` | Node labels for scheduler pod assignment [ref](https://kubernetes.io/docs/user-guide/node-selection/) |
 | scheduler.podAnnotations | object | `{}` | Annotations for scheduler pod assignment [ref](https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/) |
 | scheduler.podLabels | object | `{}` | Labels for scheduler pod assignment [ref](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/) |
 | scheduler.podSecurityContext | object | `{}` | Security contexts for scheduler pod assignment [ref](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) |
+| scheduler.replicaCount | int | `1` | Number of scheduler pods to run |
 | scheduler.resources | string | `nil` | scheduler resource requests and limits [ref](http://kubernetes.io/docs/user-guide/compute-resources/) |
 | scheduler.securityContext | object | `{}` |  |
 | scheduler.tolerations | list | `[]` | Tolerations for scheduler pod assignment [ref](https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/) |
@@ -244,7 +246,7 @@ The following table lists the configurable parameters of the Redash chart and th
 | volumes | list | `[]` | Redash global volumes configuration - applied to all containers |
 | worker.affinity | object | `{}` | Default affinity for worker pod assignment [ref](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity) |
 | worker.initContainers | list | `[]` | Worker default init containers configuration |
-| worker.livenessProbe | object | `{}` | Default worker's liveness probe to ensure workers are running fine |
+| worker.livenessProbe | object | `{"exec":{"command":["/bin/sh","-c","/app/bin/docker-entrypoint workers_healthcheck"]},"initialDelaySeconds":60,"periodSeconds":100,"timeoutSeconds":10}` | Default worker's liveness probe to ensure workers are running fine |
 | worker.nodeSelector | object | `{}` | Default node labels for worker pod assignment [ref](https://kubernetes.io/docs/user-guide/node-selection/) |
 | worker.podAnnotations | object | `{}` | Default annotations for worker pod assignment [ref](https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/) |
 | worker.podLabels | object | `{}` | Default labels for worker pod assignment [ref](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/) |

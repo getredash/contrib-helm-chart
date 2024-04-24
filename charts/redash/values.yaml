@@ -454,6 +454,7 @@ worker:
         - /bin/sh
         - -c
         - /app/bin/docker-entrypoint workers_healthcheck
+    timeoutSeconds: 10
     initialDelaySeconds: 60
     periodSeconds: 100
 
@@ -461,6 +462,9 @@ worker:
 scheduler:
   # scheduler.env -- Redash scheduler specific environment variables.
   env: {}
+
+  # scheduler.replicaCount -- Number of scheduler pods to run
+  replicaCount: 1
 
   # scheduler.initContainers -- Redash scheduler init containers configuration.
   initContainers: []
@@ -485,6 +489,7 @@ scheduler:
         - /bin/sh
         - -c
         - /app/bin/docker-entrypoint workers_healthcheck
+    timeoutSeconds: 10
     initialDelaySeconds: 60
     periodSeconds: 100
 
