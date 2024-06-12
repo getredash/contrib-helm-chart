@@ -1,0 +1,66 @@
+{{- if .Values.config -}}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: "{{ .Release.Name }}-config"
+  labels:
+    {{- include "redash.labels" . | nindent 4 }}
+    app.kubernetes.io/component: config
+  annotations:
+    # This is what defines this resource as a hook.
+    "helm.sh/hook": post-install,post-upgrade,post-rollback
+    "helm.sh/hook-weight": "30"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  template:
+    metadata:
+      name: "{{ .Release.Name }}"
+      labels:
+        {{- include "redash.selectorLabels" . | nindent 8 }}
+        {{- if .Values.hookConfigJob.podLabels }}
+        {{- tpl (toYaml .Values.hookConfigJob.podLabels) $ | nindent 8 }}
+        {{- end }}
+      {{- with .Values.hookConfigJob.podAnnotations }}
+      annotations: {{ toYaml . | nindent 8 }}
+      {{- end }}
+    spec:
+      volumes:
+        - configMap:
+            name: {{ .Release.Name }}-datasources
+          name: {{ .Release.Name }}-datasources
+        - configMap:
+            name: {{ .Release.Name }}-groups
+          name: {{ .Release.Name }}-groups
+      serviceAccountName: {{ include "redash.serviceAccountName" . }}
+      restartPolicy: Never
+      securityContext: {{ toYaml .Values.hookConfigJob.podSecurityContext | nindent 8 }}
+      containers:
+      - name: {{ include "redash.name" . }}-config
+        securityContext: {{ toYaml .Values.hookConfigJob.securityContext | nindent 10 }}
+        image: "{{ .Values.hookConfigJob.image.repository }}:{{ .Values.hookConfigJob.image.tag }}"
+        imagePullPolicy: {{ .Values.hookConfigJob.image.pullPolicy }}
+        command: ["envoy-preflight", "python3", "redash-config-gitops.py"]
+        args:
+          - --host=http://{{ .Release.Name }}
+          - --apikey=$(APIKEY)
+        volumeMounts:
+        - name: {{ .Release.Name }}-datasources
+          mountPath: /config/datasources
+        - name: {{ .Release.Name }}-groups
+          mountPath: /config/groups
+        env:
+          - name: APIKEY
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Release.Name }}
+                key: apikey
+          # variables below are required by envoy-preflight (to shut down the Envoy proxy once the job completes)
+          - name: ENVOY_ADMIN_API
+            value: "http://127.0.0.1:15000/"
+          - name: ISTIO_QUIT_API
+            value: "http://127.0.0.1:15000/"
+        envFrom:
+        - secretRef:
+            name: {{ .Release.Name }}-datasources
+        resources: {{ toYaml .Values.hookConfigJob.resources | nindent 10 }}
+{{- end -}}

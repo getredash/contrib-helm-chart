@@ -354,6 +354,8 @@ server:
   podAnnotations:
     ad.datadoghq.com/redash-server.logs: '[{"source": "redash", "service": "{{ $.Release.Name }}"}]'
     ad.datadoghq.com/redash-server.init_configs: '[{}]'
+    checksum/configmap-datasources: '{{ include (print $.Template.BasePath "/configmap-datasources.yaml") $ | sha256sum }}'
+    checksum/configmap-groups: '{{ include (print $.Template.BasePath "/configmap-groups.yaml") $ | sha256sum }}'
 
   # server.podLabels -- Labels for server pod assignment [ref](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/)
   podLabels:
@@ -668,3 +670,62 @@ extraObjects: []
 #       secretsManagerSecretRef:
 #         secretId: redash-postgres-prod
 #         versionId: 00000000-1111-2222-3333-444444444444
+
+
+
+# Configuration for hook-config-job
+hookConfigJob:
+  image:
+    repository: eu.gcr.io/bbc-registry/redash-config
+    tag: 1.20240416100708.0-shaf2292497
+    pullPolicy: IfNotPresent
+  # hookConfigJob.podAnnotations -- Annotations for scheduled worker pod assignment [ref](https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/)
+  podAnnotations: {}
+  podLabels:
+    tags.datadoghq.com/service: "{{ .Release.Name | lower }}"
+    tags.datadoghq.com/version: "{{ .Values.image.tag }}"
+    team: dbre
+  podSecurityContext: {}  # TODO: set a USER in the image's Dockerfile & put runAsNonRoot: true here
+  securityContext: {}
+  resources:
+    limits:
+      memory: 300Mi
+    requests:
+      cpu: 100m
+      memory: 100Mi
+
+# "Infra-as-code" configuration of redash-internals (datasources, groups, permissions)
+#config:
+  #datasources:
+    ########### mariadb example ###########
+    #- name: preprod/dbre/mariadb-test
+      #type: mysql
+      #options:
+        #host: mariadb-test.dbre
+        #port: 3306
+        #user: redash_rd
+        #passwd: MARIADB_TEST_DBRE_PWD # name of key Ref in redash secret
+        #db: mysql
+    ########### postegresql example ###########
+    #- name: preprod/dbre/pg-test
+      #type: pg
+      #options:
+        #host: pg-test.dbre
+        #port: 5432
+        #user: redash_rd
+        #password: PG_TEST_DBRE_PWD # name of key Ref in redash secret
+        #dbname: test
+    ########### cassandra example ###########
+    #- name: preprod/dbre/cassandra-test
+      #type: Cassandra
+      #options:
+        #host: pg-test.dbre
+        #port: 9042
+        #username: redash_rd
+        #password: CASSANDRA_TEST_DBRE_PWD # name of key Ref in redash secret
+        #keyspace: test
+  #groups:
+    #- name: DBRE
+      #datasources:
+        #- preprod/dbre/mariadb-test
+        #- preprod/dbre/pg-test

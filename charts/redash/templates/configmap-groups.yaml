@@ -1,0 +1,9 @@
+{{- if .Values.config -}}
+apiVersion: v1
+data:
+  groups.yaml: |
+{{ toYaml .Values.config.groups | indent 4 }}
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-groups
+{{- end -}}
