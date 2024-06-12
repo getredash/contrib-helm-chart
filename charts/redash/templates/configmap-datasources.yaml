@@ -1,0 +1,9 @@
+{{- if .Values.config -}}
+apiVersion: v1
+data:
+  datasources.yaml: |
+{{ toYaml .Values.config.datasources | indent 4 }}
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-datasources
+{{- end -}}
