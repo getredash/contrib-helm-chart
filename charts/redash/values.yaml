@@ -331,7 +331,11 @@ server:
     failureThreshold: 3
 
   # server.podSecurityContext -- Security contexts for server pod assignment [ref](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
-  podSecurityContext: {}
+  podSecurityContext:
+    # 1000 is the uid of the default redash user in the image
+    runAsUser: 1000
+    fsGroup: 1000
+    runAsGroup: 1000
   securityContext: {}
 
   # server.nodeSelector -- Node labels for server pod assignment [ref](https://kubernetes.io/docs/user-guide/node-selection/)
@@ -426,7 +430,12 @@ worker:
     #  memory: 500Mi
 
   # worker.podSecurityContext -- Default worker's security context pod assignment [ref](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
-  podSecurityContext: {}
+  podSecurityContext:
+    # 1000 is the uid of the default redash user in the image
+    runAsUser: 1000
+    fsGroup: 1000
+    runAsGroup: 1000
+
   securityContext: {}
 
   # worker.nodeSelector -- Default node labels for worker pod assignment [ref](https://kubernetes.io/docs/user-guide/node-selection/)
@@ -540,7 +549,11 @@ migrations:
   #  memory: 500Mi
 
   # migrations.podSecurityContext -- Security contexts for scheduled worker pod assignment [ref](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
-  podSecurityContext: {}
+  podSecurityContext:
+    # 1000 is the uid of the default redash user in the image
+    runAsUser: 1000
+    fsGroup: 1000
+    runAsGroup: 1000
   securityContext: {}
 
   # migrations.nodeSelector -- Node labels for scheduled worker pod assignment [ref](https://kubernetes.io/docs/user-guide/node-selection/)
