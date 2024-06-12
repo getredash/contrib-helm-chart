@@ -208,7 +208,7 @@ redash:
   scheduledQueryTimeLimit: ""
   # -- `REDASH_ADHOC_QUERY_TIME_LIMIT` value. Time limit for adhoc queries (in seconds).
   # @default -- None
-  adhocQueryTimeLimit: ""
+  adhocQueryTimeLimit: 180
   # -- `REDASH_ENABLED_DESTINATIONS` value. Comma-separated list of alert destinations to be enabled (e.g. `redash.destinations.email,redash.destinations.slack` ).
   # @default -- ”,”.join(default_destinations)
   enabledDestinations: ""
