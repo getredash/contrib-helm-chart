@@ -1,0 +1,33 @@
+apiVersion: networking.istio.io/v1beta1
+kind: Sidecar
+metadata:
+  name: {{ .Release.Name }}
+spec:
+  workloadSelector:
+    labels: {{ include "redash.selectorLabels" . | nindent 6 }}
+  outboundTrafficPolicy:
+    mode: {{ .Values.istio.outboundTrafficPolicy }}
+  ingress:
+  - defaultEndpoint: 127.0.0.1:{{ .Values.server.httpPort }}
+    port:
+      name: http
+      number: {{ .Values.server.httpPort }}
+      protocol: HTTP
+  egress:
+  - hosts:
+    # GKE/K8S system:
+    - "istio-system/metadata.google.internal"
+    - "istio-system/metadata.google.internal."
+    # Redash "system":
+    - "./{{ include "redash.externalPostgresql.hostname" . }}.{{ .Release.Namespace }}.svc.cluster.local"
+    - "./{{ include "redash.externalRedis.hostname" . }}.{{ .Release.Namespace }}.svc.cluster.local"
+    - "./{{ include "redash.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local"    # this is the name of the HTTP service, useful for the config job to connect to the API
+    # SSO:
+    - "*/app-eu.onelogin.com"
+    - "*/blablacar.onelogin.com"
+    {{- if .Values.config }}
+    # The datasources (in the values, the host value should be a "short name", ex: mariadb-main.v3)
+    {{- range .Values.config.datasources }}
+    - "*/{{- .options.host }}.svc.cluster.local"
+    {{- end }}
+    {{- end }}

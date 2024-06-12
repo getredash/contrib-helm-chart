@@ -659,6 +659,9 @@ redis:
   replica:
     replicaCount: 0
 
+istio:
+  outboundTrafficPolicy: REGISTRY_ONLY
+
 # extraObjects -- Additional kubernetes manifests to deploy alongside the chart. Useful to include external secrets for dependencies.
 extraObjects: []
 # - apiVersion: mumoshu.github.io/v1alpha1
