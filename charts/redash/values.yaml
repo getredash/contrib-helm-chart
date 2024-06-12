@@ -30,7 +30,10 @@ volumes: []
 volumeMounts: []
 
 # commonLabels -- Redash global labels -- applied to all objects
-commonLabels: {}
+commonLabels:
+  tags.datadoghq.com/service: "{{ .Release.Name | lower }}"
+  tags.datadoghq.com/version: "{{ .Values.image.tag }}"
+  team: dbre
 
 ## Service account and security context configuration
 serviceAccount:
@@ -348,10 +351,15 @@ server:
   affinity: {}
 
   # server.podAnnotations -- Annotations for server pod assignment [ref](https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/)
-  podAnnotations: {}
+  podAnnotations:
+    ad.datadoghq.com/redash-server.logs: '[{"source": "redash", "service": "{{ $.Release.Name }}"}]'
+    ad.datadoghq.com/redash-server.init_configs: '[{}]'
 
   # server.podLabels -- Labels for server pod assignment [ref](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/)
-  podLabels: {}
+  podLabels:
+    tags.datadoghq.com/service: "{{ .Release.Name | lower }}"
+    tags.datadoghq.com/version: "{{ .Values.image.tag }}"
+    team: dbre
 
   # server.volumes -- Volumes for server pod assignment [ref](https://kubernetes.io/docs/concepts/storage/volumes/)
   volumes: []
@@ -401,16 +409,39 @@ workers:
     env:
       QUEUES: queries
       WORKERS_COUNT: 2
+    podAnnotations:
+      ad.datadoghq.com/redash-adhocworker.logs: >-
+        [{
+          "source": "redash",
+          "service": "{{ $.Release.Name }}",
+          "log_processing_rules": [{
+            "type": "exclude_at_match",
+            "name": "exclude_healthcheck",
+            "pattern" : "worker_healthcheck"
+          },
+          {
+            "type": "exclude_at_match",
+            "name": "exclude_info",
+            "pattern" : "info"
+          }]
+        }]
+      ad.datadoghq.com/redash-adhocworker.init_configs: '[{}]'
   scheduled:
     # workers.scheduled.env -- Redash scheduled worker specific environment variables.
     env:
       QUEUES: scheduled_queries,schemas
       WORKERS_COUNT: 1
+    podAnnotations:
+      ad.datadoghq.com/redash-scheduledworker.logs: '[{"source": "redash", "service": "{{ $.Release.Name }}"}]'
+      ad.datadoghq.com/redash-scheduledworker.init_configs: '[{}]'
   generic:
     # workers.generic.env -- Redash generic worker specific environment variables.
     env:
       QUEUES: periodic,emails,default
       WORKERS_COUNT: 1
+    podAnnotations:
+      ad.datadoghq.com/redash-genericworker.logs: '[{"source": "redash", "service": "{{ $.Release.Name }}"}]'
+      ad.datadoghq.com/redash-genericworker.init_configs: '[{}]'
 
 ## Common worker configuration, which can be overidden for each worker at workers.<workerName>
 worker:
@@ -451,7 +482,10 @@ worker:
   podAnnotations: {}
 
   # worker.podLabels -- Default labels for worker pod assignment [ref](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/)
-  podLabels: {}
+  podLabels:
+    tags.datadoghq.com/service: "{{ .Release.Name | lower }}"
+    tags.datadoghq.com/version: "{{ .Values.image.tag }}"
+    team: dbre
 
   # worker.volumes -- Default volumes for pod worker assignment [ref](https://kubernetes.io/docs/concepts/storage/volumes/)
   volumes: []
@@ -518,7 +552,10 @@ scheduler:
   podAnnotations: {}
 
   # scheduler.podLabels -- Labels for scheduler pod assignment [ref](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/)
-  podLabels: {}
+  podLabels:
+    tags.datadoghq.com/service: "{{ .Release.Name | lower }}"
+    tags.datadoghq.com/version: "{{ .Values.image.tag }}"
+    team: dbre
 
   # scheduler.volumes -- Volumes for scheduler pod  assignment [ref](https://kubernetes.io/docs/concepts/storage/volumes/)
   volumes: []
@@ -569,7 +606,9 @@ migrations:
   podAnnotations: {}
 
   # migrations.podLabels -- Labels for migration pod [ref](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/)
-  podLabels: {}
+  podLabels:
+    # Disable Istio side-car preventing job to finish properly
+    sidecar.istio.io/inject: "false"
 
 # externalPostgreSQL -- External PostgreSQL configuration. To use an external PostgreSQL instead of the automatically deployed postgresql chart: set postgresql.enabled to false then uncomment and configure the externalPostgreSQL connection URL (e.g. postgresql://user:pass@host:5432/database)
 externalPostgreSQL:

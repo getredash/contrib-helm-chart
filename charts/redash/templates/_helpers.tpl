@@ -534,6 +534,8 @@ Selector labels
 {{- define "redash.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "redash.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
+app: {{ .Release.Name }}
+component: database
 {{- end -}}
 
 {{/*
