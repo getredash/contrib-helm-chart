@@ -101,7 +101,7 @@ Shared environment block used across each component.
   value: {{ .Values.postgresql.auth.database | quote }}
 {{- end -}}
 {{- if not .Values.redis.enabled }}
-{{- if not .Values.redash.selfManagedSecrets -}}
+{{- if not .Values.redash.selfManagedSecrets }}
 - name: REDASH_REDIS_URL
   {{- with .Values.externalRedisSecret }}
   valueFrom:
@@ -126,11 +126,11 @@ Shared environment block used across each component.
   value: {{ .Values.redis.master.service.ports.redis | quote }}
 - name: REDASH_REDIS_NAME
   value: {{ .Values.redis.database | quote }}
-{{ end -}}
-{{ range $key, $value := .Values.env -}}
+{{- end }}
+{{ range $key, $value := .Values.env }}
 - name: {{ $key }}
   value: {{ $value | quote }}
-{{ end -}}
+{{- end -}}
 ## Start primary Redash configuration
 {{- if not .Values.redash.selfManagedSecrets }}
 {{- if or .Values.redash.secretKey .Values.redash.existingSecret }}
