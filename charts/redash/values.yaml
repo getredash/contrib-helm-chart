@@ -1,11 +1,11 @@
 ## Default values for Redash.
 
 image:
-  registry: docker.io
+  registry: eu.gcr.io/bbc-registry
   # image.repo -- Redash image name used for server and worker pods
-  repo: redash/preview
+  repo: redash
   # image.tag -- Redash image [tag](https://hub.docker.com/r/redash/redash/tags)
-  tag:
+  tag: 24.06.0-dev
   # image.pullPolicy - Image pull policy
   pullPolicy: IfNotPresent
 
