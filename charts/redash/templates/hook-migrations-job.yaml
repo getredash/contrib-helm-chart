@@ -21,7 +21,7 @@ spec:
         {{- tpl (toYaml .) $ | nindent 8 }}
         {{- end }}
       {{- with .Values.migrations.podAnnotations }}
-      annotations: {{ toYaml . | nindent 8 }}
+      annotations: {{ tpl (toYaml .) $ | nindent 8 }}
       {{- end }}
     spec:
       {{- with .Values.imagePullSecrets }}

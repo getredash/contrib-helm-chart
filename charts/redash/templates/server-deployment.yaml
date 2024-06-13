@@ -16,11 +16,11 @@ spec:
       labels:
         {{- include "redash.selectorLabels" . | nindent 8 }}
         app.kubernetes.io/component: server
-        {{- if .Values.server.podLabels }}
-        {{- tpl (toYaml .Values.server.podLabels) $ | nindent 8 }}
+        {{- with .Values.server.podLabels }}
+        {{- tpl (toYaml .) $ | nindent 8 }}
         {{- end }}
       {{- with .Values.server.podAnnotations }}
-      annotations: {{ toYaml . | nindent 8 }}
+      annotations: {{ tpl (toYaml .) $ | nindent 8 }}
       {{- end }}
     spec:
       {{ with .Values.imagePullSecrets -}}
