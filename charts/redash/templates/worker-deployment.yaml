@@ -17,8 +17,8 @@ spec:
       {{- if $workerConfig.podLabels }}
       {{ tpl (toYaml $workerConfig.podLabels) $ | nindent 8 }}
       {{- end }}
-      {{- with $workerConfig.podAnnotations -}}
-      annotations: {{ toYaml . | nindent 8 }}
+      {{- with $workerConfig.podAnnotations }}
+      annotations: {{ tpl (toYaml .) $ | nindent 8 }}
       {{- end }}
     spec:
       {{ with $.Values.imagePullSecrets -}}

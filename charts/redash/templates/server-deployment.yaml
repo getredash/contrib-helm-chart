@@ -20,7 +20,7 @@ spec:
         {{- tpl (toYaml .Values.server.podLabels) $ | nindent 8 }}
         {{- end }}
       {{- with .Values.server.podAnnotations }}
-      annotations: {{ toYaml . | nindent 8 }}
+      annotations: {{ tpl (toYaml .) $ | nindent 8 }}
       {{- end }}
     spec:
       {{ with .Values.imagePullSecrets -}}
