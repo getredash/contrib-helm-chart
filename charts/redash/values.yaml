@@ -29,6 +29,9 @@ volumes: []
 # volumeMounts -- Redash global volume mounts configuration - applied to all containers
 volumeMounts: []
 
+# commonLabels -- Redash global labels -- applied to all objects
+commonLabels: {}
+
 ## Service account and security context configuration
 serviceAccount:
   # serviceAccount.create -- Specifies whether a service account should be created

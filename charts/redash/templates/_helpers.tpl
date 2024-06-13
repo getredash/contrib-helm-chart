@@ -523,6 +523,9 @@ app.kubernetes.io/component: {{ . }}worker
 app.kubernetes.io/version: {{ .Values.image.tag | default .Chart.AppVersion | quote }}
 {{- end }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- if .Values.commonLabels }}
+{{ tpl (toYaml .Values.commonLabels) . }}
+{{- end }}
 {{- end -}}
 
 {{/*
