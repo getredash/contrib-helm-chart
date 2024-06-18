@@ -459,7 +459,7 @@ Shared environment block used across each component.
 {{- end }}
 {{- with .Values.redash.jwtAuthHeaderName }}
 - name: REDASH_JWT_AUTH_HEADER_NAME
-  value: {{ .quote }}
+  value: {{ quote . }}
 {{- end }}
 {{- with .Values.redash.featureShowQueryResultsCount }}
 - name: REDASH_FEATURE_SHOW_QUERY_RESULTS_COUNT
