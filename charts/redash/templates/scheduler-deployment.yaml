@@ -21,8 +21,8 @@ spec:
         {{- with .Values.scheduler.podLabels }}
         {{- tpl (toYaml .) $ | nindent 8 }}
         {{- end }}
-      {{- if .Values.scheduler.podAnnotations }}
-      annotations: {{ toYaml .Values.scheduler.podAnnotations | nindent 8 }}
+      {{- with .Values.scheduler.podAnnotations }}
+      annotations: {{ tpl (toYaml .) $ | nindent 8 }}
       {{- end }}
     spec:
       {{ with .Values.imagePullSecrets -}}

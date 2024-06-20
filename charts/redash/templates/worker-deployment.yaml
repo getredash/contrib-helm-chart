@@ -13,12 +13,13 @@ spec:
     matchLabels: {{ include "redash.selectorLabels" $context | nindent 6 }}
   template:
     metadata:
-      labels: {{ include "redash.selectorLabels" $context | nindent 8 }}
-      {{- if $workerConfig.podLabels }}
-      {{ tpl (toYaml $workerConfig.podLabels) $ | nindent 8 }}
-      {{- end }}
-      {{- with $workerConfig.podAnnotations -}}
-      annotations: {{ toYaml . | nindent 8 }}
+      labels:
+        {{- include "redash.selectorLabels" $context | nindent 8 }}
+        {{- with $workerConfig.podLabels }}
+        {{- tpl (toYaml .) $ | nindent 8 }}
+        {{- end }}
+      {{- with $workerConfig.podAnnotations }}
+      annotations: {{ tpl (toYaml .) $ | nindent 8 }}
       {{- end }}
     spec:
       {{ with $.Values.imagePullSecrets -}}

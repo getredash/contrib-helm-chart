@@ -15,9 +15,13 @@ spec:
   template:
     metadata:
       name: "{{ .Release.Name }}"
-      labels: {{ include "redash.selectorLabels" . | nindent 8 }}
+      labels:
+        {{- include "redash.selectorLabels" . | nindent 8 }}
+        {{- with .Values.migrations.podLabels }}
+        {{- tpl (toYaml .) $ | nindent 8 }}
+        {{- end }}
       {{- with .Values.migrations.podAnnotations }}
-      annotations: {{ toYaml . | nindent 8 }}
+      annotations: {{ tpl (toYaml .) $ | nindent 8 }}
       {{- end }}
     spec:
       {{- with .Values.imagePullSecrets }}
