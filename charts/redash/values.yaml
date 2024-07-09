@@ -661,6 +661,8 @@ redis:
 
 istio:
   outboundTrafficPolicy: REGISTRY_ONLY
+  resourceValidation:
+    enabled: true
 
 # extraObjects -- Additional kubernetes manifests to deploy alongside the chart. Useful to include external secrets for dependencies.
 extraObjects: []
