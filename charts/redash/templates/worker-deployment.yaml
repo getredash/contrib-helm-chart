@@ -69,4 +69,7 @@ spec:
       {{- with $workerConfig.tolerations }}
       tolerations: {{ toYaml . | nindent 8 }}
       {{- end }}
+      {{- with $workerConfig.priorityClassName }}
+      priorityClassName: {{ . }}
+      {{- end }}
 {{- end }}
