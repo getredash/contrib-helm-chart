@@ -355,6 +355,9 @@ server:
   # server.volumeMounts -- VolumeMounts for server pod assignment [ref](https://kubernetes.io/docs/concepts/storage/volumes/)
   volumeMounts: []
 
+  # priorityClassName -- Priority class name for server pod assignment [ref](https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/)
+  priorityClassName:
+
 service:
   # service.annotations -- Annotations to add to the service
   annotations: {}
@@ -450,6 +453,9 @@ worker:
   # worker.volumeMounts -- Default VolumeMounts for worker pod assignment [ref](https://kubernetes.io/docs/concepts/storage/volumes/)
   volumeMounts: []
 
+  # priorityClassName -- Default priority class name for worker pod assignment [ref](https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/)
+  priorityClassName:
+
   # worker.livenessProbe -- Default worker's liveness probe to ensure workers are running fine
   livenessProbe:
     exec:
@@ -517,6 +523,9 @@ scheduler:
   # scheduler.volumeMounts -- VolumeMounts for scheduler pod assignment [ref](https://kubernetes.io/docs/concepts/storage/volumes/)
   volumeMounts: []
 
+  # priorityClassName -- Default priority class name for scheduler pod assignment [ref](https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/)
+  priorityClassName:
+
 ## Configuration for migrations hook
 migrations:
   # migrations.volumes -- volumes that will be mounted to migrations pods only
@@ -557,6 +566,9 @@ migrations:
 
   # migrations.podLabels -- Labels for migration pod [ref](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/)
   podLabels: {}
+
+  # priorityClassName -- Default priority class name for migration pod [ref](https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/)
+  priorityClassName:
 
 # externalPostgreSQL -- External PostgreSQL configuration. To use an external PostgreSQL instead of the automatically deployed postgresql chart: set postgresql.enabled to false then uncomment and configure the externalPostgreSQL connection URL (e.g. postgresql://user:pass@host:5432/database)
 externalPostgreSQL:

@@ -68,3 +68,6 @@ spec:
       {{- with .Values.migrations.tolerations }}
       tolerations: {{ toYaml . | nindent 8 }}
       {{- end }}
+      {{- with .Values.migrations.priorityClassName }}
+      priorityClassName: {{ . }}
+      {{- end }}
