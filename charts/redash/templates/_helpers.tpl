@@ -83,7 +83,7 @@ Shared environment block used across each component.
     secretKeyRef: {{ toYaml . | nindent 6 }}
   {{- else }}
   value: {{ default "" .Values.externalPostgreSQL | quote }}
-  {{- end }}
+  {{ end }}
 {{- end }}
 {{- else -}}
 - name: REDASH_DATABASE_USER
@@ -108,7 +108,7 @@ Shared environment block used across each component.
     secretKeyRef: {{ toYaml . | nindent 6 }}
   {{- else }}
   value: {{ default "" .Values.externalRedis | quote }}
-  {{- end }}
+  {{ end }}
 {{- end }}
 {{- else }}
 - name: REDASH_REDIS_PASSWORD
