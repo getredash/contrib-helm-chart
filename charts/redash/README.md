@@ -135,6 +135,7 @@ The following table lists the configurable parameters of the Redash chart and th
 | redash.enabledQueryRunners | string | ”,”.join(default_query_runners) | `REDASH_ENABLED_QUERY_RUNNERS` value. Comma-separated list of query runners to be enabled (e.g. `redash.query_runner.pg,redash.query_runner.mysql`). |
 | redash.enforceHttps | string | false | `REDASH_ENFORCE_HTTPS` value. This is passed to [flask-talisman](https://github.com/googlecloudplatform/flask-talisman). |
 | redash.eventReportingWebhooks | string | `""` | `REDASH_EVENT_REPORTING_WEBHOOKS` value. Comma-separated list of webhook urls that to which events will be forwarded. |
+| redash.existingSecret | string | `""` | The existing secret name to be used. This option is paird with `redash.selfManagedSecrets`. |
 | redash.featureAllowCustomJsVisualizations | string | false | `REDASH_FEATURE_ALLOW_CUSTOM_JS_VISUALIZATIONS` value. Enable the custom visualization option. this appears as a sub-type of "chart" visualizations in the ui.. |
 | redash.featureAutoPublishNamedQueries | string | true | `REDASH_FEATURE_AUTO_PUBLISH_NAMED_QUERIES` value. Automatically publish a new query after its name is changed from "new query". |
 | redash.featureDisableRefreshQueries | string | false | `REDASH_FEATURE_DISABLE_REFRESH_QUERIES` value. Disable scheduled query execution. |
@@ -189,7 +190,7 @@ The following table lists the configurable parameters of the Redash chart and th
 | redash.schemaRunTableSizeCalculations | string | false | `REDASH_SCHEMA_RUN_TABLE_SIZE_CALCULATIONS` value. Enable showing the size of each table in the schema browser.. |
 | redash.schemasRefreshSchedule | string | 30 | `REDASH_SCHEMAS_REFRESH_SCHEDULE` value. How often to refresh the data source schemas (in minutes). |
 | redash.secretKey | string | `"test"` | REQUIRED `REDASH_SECRET_KEY` value. Secret key used for data encryption. Stored as a Secret value. |
-| redash.selfManagedSecrets | bool | `false` | disables all chart managed secrets providing an ability to set them using redash.envSecretName. Useful, while using together with external secrets |
+| redash.selfManagedSecrets | bool | `false` | disables all chart managed secrets providing an ability to set them using redash.existingSecret. Useful, while using together with external secrets |
 | redash.sentryDsn | string | `""` | `REDASH_SENTRY_DSN` value. |
 | redash.sqlAlchemyEnablePoolPrePing | string | true | `SQLALCHEMY_ENABLE_POOL_PRE_PING` value, controls whether the database connection that's in the pool will be checked by pinging before being used or not. See https://docs.sqlalchemy.org/en/13/core/pooling.html#sqlalchemy.pool.Pool.params.pre_ping |
 | redash.staticAssetsPath | string | ”../client/dist/” | `REDASH_STATIC_ASSETS_PATH` value. Directory that contains all front-end assets. relative to the ./redash directory. |
