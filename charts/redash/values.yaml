@@ -3,7 +3,7 @@
 image:
   registry: docker.io
   # image.repo -- Redash image name used for server and worker pods
-  repo: redash/preview
+  repo: redash/redash
   # image.tag -- Redash image [tag](https://hub.docker.com/r/redash/redash/tags)
   tag:
   # image.pullPolicy - Image pull policy

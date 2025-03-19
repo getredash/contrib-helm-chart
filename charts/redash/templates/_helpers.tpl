@@ -126,6 +126,8 @@ Shared environment block used across each component.
   value: {{ .Values.redis.master.service.ports.redis | quote }}
 - name: REDASH_REDIS_NAME
   value: {{ .Values.redis.database | quote }}
+- name: REDASH_REDIS_URL
+  value: "redis://:$(REDASH_REDIS_PASSWORD)@$(REDASH_REDIS_HOSTNAME):$(REDASH_REDIS_PORT)/$(REDASH_REDIS_NAME)"
 {{- end }}
 {{- range $key, $value := .Values.env }}
 - name: {{ $key }}
