@@ -108,6 +108,7 @@ The following table lists the configurable parameters of the Redash chart and th
 | migrations.ttlSecondsAfterFinished | int | `600` | ttl for install job [ref](https://kubernetes.io/docs/concepts/workloads/controllers/ttlafterfinished/) |
 | migrations.volumeMounts | list | `[]` | volume mounts for migrations pods |
 | migrations.volumes | list | `[]` | volumes that will be mounted to migrations pods only |
+| migrations.extraContainers | object | `{}` | Extra containers for migrations pod assignment |
 | nameOverride | string | `""` |  |
 | postgresql.auth.database | string | `"redash"` | PostgreSQL database name (when postgresql chart enabled) |
 | postgresql.auth.password | string | `nil` | REQUIRED: PostgreSQL password for redash user (when postgresql chart enabled) |
@@ -218,6 +219,7 @@ The following table lists the configurable parameters of the Redash chart and th
 | scheduler.tolerations | list | `[]` | Tolerations for scheduler pod assignment [ref](https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/) |
 | scheduler.volumeMounts | list | `[]` | VolumeMounts for scheduler pod assignment [ref](https://kubernetes.io/docs/concepts/storage/volumes/) |
 | scheduler.volumes | list | `[]` | Volumes for scheduler pod  assignment [ref](https://kubernetes.io/docs/concepts/storage/volumes/) |
+| scheduler.extraContainers | object | `{}` | Extra containers for scheduler pod assignment |
 | server.affinity | object | `{}` | Affinity for server pod assignment [ref](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity) |
 | server.env | object | `{}` | Redash server specific environment variables Don't use this for variables that are in the configuration above, however. |
 | server.httpPort | int | `5000` | Server container port (only useful if you are using a customized image) |
@@ -234,6 +236,7 @@ The following table lists the configurable parameters of the Redash chart and th
 | server.tolerations | list | `[]` | Tolerations for server pod assignment [ref](https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/) |
 | server.volumeMounts | list | `[]` | VolumeMounts for server pod assignment [ref](https://kubernetes.io/docs/concepts/storage/volumes/) |
 | server.volumes | list | `[]` | Volumes for server pod assignment [ref](https://kubernetes.io/docs/concepts/storage/volumes/) |
+| server.extraContainers | object | `{}` | Extra containers for server pod assignment |
 | service.annotations | object | `{}` | Annotations to add to the service |
 | service.externalTrafficPolicy | string | `""` |  |
 | service.loadBalancerIP | string | `nil` | Specific IP address to use for cloud providers such as Azure Kubernetes Service [ref](https://kubernetes.io/docs/concepts/services-networking/service/#loadbalancer) |
@@ -257,6 +260,7 @@ The following table lists the configurable parameters of the Redash chart and th
 | worker.tolerations | list | `[]` | Default tolerations for worker pod assignment [ref](https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/) |
 | worker.volumeMounts | list | `[]` | Default VolumeMounts for worker pod assignment [ref](https://kubernetes.io/docs/concepts/storage/volumes/) |
 | worker.volumes | list | `[]` | Default volumes for pod worker assignment [ref](https://kubernetes.io/docs/concepts/storage/volumes/) |
+| worker.extraContainers | object | `{}` | Extra containers for worker pod assignment |
 | workers.adhoc.env | object | `{"QUEUES":"queries","WORKERS_COUNT":2}` | Redash ad-hoc worker specific environment variables. |
 | workers.generic.env | object | `{"QUEUES":"periodic,emails,default","WORKERS_COUNT":1}` | Redash generic worker specific environment variables. |
 | workers.scheduled.env | object | `{"QUEUES":"scheduled_queries,schemas","WORKERS_COUNT":1}` | Redash scheduled worker specific environment variables. |

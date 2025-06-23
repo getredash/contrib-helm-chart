@@ -35,26 +35,29 @@ spec:
       initContainers: {{ toYaml . | nindent 8 }}
       {{- end }}
       containers:
-      - name: {{ include "redash.name" . }}-server
-        securityContext: {{ toYaml .Values.migrations.securityContext | nindent 10 }}
-        image: "{{ .Values.image.registry }}/{{ .Values.image.repo }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-        imagePullPolicy: {{ .Values.image.pullPolicy }}
-        args:
-          - create_db
-        env:
-        {{- $envCtx := mergeOverwrite (deepCopy .) (dict "Values" (dict "env" .Values.migrations.env)) -}}
-        {{- include "redash.env" $envCtx | nindent 10 }}
-        {{- if (include "redash.envFrom" .) }}
-        envFrom:
-        {{- include "redash.envFrom" . | nindent 10 }}
-        {{- end}}
-        {{- with .Values.migrations.resources }}
-        resources: {{ toYaml . | nindent 10 }}
+        {{- with .Values.migrations.extraContainers -}}
+        {{- toYaml . | nindent 8 }}
         {{- end }}
-        {{- $volumeMounts := concat .Values.volumeMounts .Values.migrations.volumeMounts }}
-        {{- with $volumeMounts }}
-        volumeMounts: {{ toYaml . | nindent 10 }}
-        {{- end }}
+        - name: {{ include "redash.name" . }}-server
+          securityContext: {{ toYaml .Values.migrations.securityContext | nindent 12 }}
+          image: "{{ .Values.image.registry }}/{{ .Values.image.repo }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args:
+            - create_db
+          env:
+          {{- $envCtx := mergeOverwrite (deepCopy .) (dict "Values" (dict "env" .Values.migrations.env)) -}}
+          {{- include "redash.env" $envCtx | nindent 12 }}
+          {{- if (include "redash.envFrom" .) }}
+          envFrom:
+          {{- include "redash.envFrom" . | nindent 12 }}
+          {{- end}}
+          {{- with .Values.migrations.resources }}
+          resources: {{ toYaml . | nindent 12 }}
+          {{- end }}
+          {{- $volumeMounts := concat .Values.volumeMounts .Values.migrations.volumeMounts }}
+          {{- with $volumeMounts }}
+          volumeMounts: {{ toYaml . | nindent 12 }}
+          {{- end }}
       {{- $volumes := concat .Values.volumes .Values.migrations.volumes -}}
       {{- with $volumes }}
       volumes: {{ toYaml . | nindent 8 }}
