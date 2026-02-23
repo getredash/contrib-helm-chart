@@ -18,7 +18,7 @@ jobs:
       - uses: medyagh/setup-minikube@v0.0.21
         with:
           kubernetes-version: ${{ matrix.k8s }}
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 1
       - uses: azure/setup-helm@v4
@@ -46,16 +46,16 @@ jobs:
               env:
                 WORKERS_COUNT: 1
           EOM
-          helm upgrade --install redash . --wait --timeout 10m -f test-values.yaml
+          helm upgrade --install redash . --wait --timeout 6m -f test-values.yaml
           sleep 10
           helm test redash
           helm delete redash
-          helm upgrade --install redashup . --wait --timeout 10m -f test-values.yaml
+          helm upgrade --install redashup . --wait --timeout 6m -f test-values.yaml
           kubectl get pod -l "app.kubernetes.io/instance=redashup,app.kubernetes.io/component=server" -o jsonpath="{..image}"
           sleep 10
           helm test redashup
           kubectl delete pod -l "app.kubernetes.io/instance=redashup,app.kubernetes.io/component=test-connection"
-          helm upgrade --install redashup . --wait --reset-values --timeout 10m -f test-values.yaml
+          helm upgrade --install redashup . --wait --reset-values --timeout 6m -f test-values.yaml
           kubectl get pod -l "app.kubernetes.io/instance=redashup,app.kubernetes.io/component=server" -o jsonpath="{..image}"
           sleep 10
           helm test redashup
@@ -78,13 +78,18 @@ jobs:
     runs-on: ubuntu-22.04
     if: github.ref == 'refs/heads/master'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - name: configure git
         run: |
           git config user.name "$GITHUB_ACTOR"
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+      - uses: azure/setup-helm@v4
+      - name: add helm repos
+        run: |
+          helm repo add bitnami https://charts.bitnami.com/bitnami
+          helm repo update
       - uses: helm/chart-releaser-action@v1.6.0
         env:
           CR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
