@@ -324,6 +324,23 @@ Shared environment block used across each component.
       name: {{ include "redash.secretName" . }}
       key: egpKBTables
 {{- end }}
+{{- if .Values.redash.existingSecret }}
+- name: REDASH_SNOWFLAKE_SERVICE_USER
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "redash.secretName" . }}
+      key: snowflakeServiceUser
+- name: REDASH_SNOWFLAKE_ACCOUNT
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "redash.secretName" . }}
+      key: snowflakeAccount
+- name: REDASH_SNOWFLAKE_WAREHOUSE
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "redash.secretName" . }}
+      key: snowflakeWarehouse
+{{- end }}
 {{- if .Values.redash.logLevel }}
 - name: REDASH_LOG_LEVEL
   value: {{ default  .Values.redash.logLevel | quote }}
