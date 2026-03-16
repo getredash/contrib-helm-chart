@@ -187,7 +187,7 @@ spec:
           valueFrom:
             secretKeyRef:
               name: {{ .Release.Name }}-postgresql
-              key: postgresql-password
+              key: password
         volumeMounts:
         - name: migration-storage
           mountPath: /tmp
@@ -318,7 +318,7 @@ spec:
           valueFrom:
             secretKeyRef:
               name: {{ .Release.Name }}-postgresql
-              key: postgresql-password
+              key: password
         volumeMounts:
         - name: migration-storage
           mountPath: /tmp

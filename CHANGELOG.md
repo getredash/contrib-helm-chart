@@ -3,13 +3,14 @@
 ## 3.2.2
 
 - Fix workers crash-looping after upgrade: add `wait-for-migrations` initContainer to all worker pods when `postgresql.enabled`. The initContainer polls PostgreSQL until the `alembic_version` table exists (created by the migrations hook), ensuring workers only start after the schema is fully applied. This also helps fresh installs where workers start before the post-install migrations job completes.
-- Fix migration and restore jobs reading the DB password from the wrong secret key: changed `secretKeyRef.key` to `postgresql-password` in both pre-upgrade (dump) and post-upgrade (restore) jobs. This aligns with the old Bitnami PG15 secret format (`postgresql-password`) and, when combined with `--set postgresql.auth.secretKeys.userPasswordKey=postgresql-password` in the upgrade command, eliminates the manual pre-upgrade secret patch entirely:
-  ```bash
-  helm upgrade ... \
-    --set postgresql.auth.secretKeys.userPasswordKey=postgresql-password \
-    ...
-  ```
-  With this flag Bitnami 18 validates the existing secret against `postgresql-password` (which already exists in 3.0.x installs) instead of `password`, making the upgrade from 3.0.x fully automatic with no manual `kubectl patch` step.
+- Fix migration and restore jobs using wrong secret key: changed `secretKeyRef.key` from `postgres-password` to `password` in both pre-upgrade and post-upgrade job pods.
+
+> **One-time manual step required before upgrading from 3.0.x**: Helm renders templates before running hooks, so Bitnami's secret validation happens before any hook can patch the secret. Run this once before `helm upgrade`:
+> ```bash
+> kubectl patch secret <release>-postgresql -n <namespace> --type='merge' \
+>   -p='{"data":{"password":"<base64-encoded-password>","postgres-password":"<base64-encoded-password>"}}'
+> ```
+> This is a one-time step — subsequent upgrades (3.2.x → 3.2.y) do not require it.
 
 ## 3.2.1
 
