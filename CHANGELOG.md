@@ -4,6 +4,10 @@
 
 - Fix workers crash-looping after upgrade: add `wait-for-migrations` initContainer to all worker pods when `postgresql.enabled`. The initContainer polls PostgreSQL until the `alembic_version` table exists (created by the migrations hook), ensuring workers only start after the schema is fully applied. This also helps fresh installs where workers start before the post-install migrations job completes.
 - Fix migration and restore jobs using wrong secret key: changed `secretKeyRef.key` from `postgres-password` to `password` in both pre-upgrade and post-upgrade job pods.
+- Fix pre-upgrade hook execution order: RBAC (Role + RoleBinding) is now deployed as a pre-upgrade hook at weight `-30`, before the migration job at weight `-10`. Previously the RBAC was a regular manifest applied after hooks, so the migration job had no permissions to delete StatefulSets, Deployments, or PVCs.
+- Fix Deployment deletion not running: removed the separate `postgres-secret-patch` job and moved Deployment deletion into the migration job, which runs with confirmed RBAC permissions after the pg_dump completes.
+- Fix Redis StatefulSet immutable field error: Redis 19.x → 24.x changes immutable StatefulSet spec fields. The migration job now deletes the Redis StatefulSet (`--cascade=orphan`) and its pod before Helm applies the new Redis 24.x spec.
+- Correct pre-upgrade ordering within the migration job: pg_dump runs first (requires old PostgreSQL pod to be alive), then Deployments, PostgreSQL StatefulSet, Redis StatefulSet, and PostgreSQL PVC are deleted — giving Helm a clean slate to apply new resources.
 
 > **One-time manual step required before upgrading from 3.0.x**: Helm renders templates before running hooks, so Bitnami's secret validation happens before any hook can patch the secret. Run this once before `helm upgrade`:
 > ```bash
