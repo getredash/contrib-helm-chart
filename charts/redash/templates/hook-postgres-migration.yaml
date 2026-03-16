@@ -3,6 +3,70 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
+  name: "{{ .Release.Name }}-postgres-secret-patch"
+  labels:
+    {{- include "redash.labels" . | nindent 4 }}
+    app.kubernetes.io/component: postgres-secret-patch
+  annotations:
+    "helm.sh/hook": pre-upgrade
+    "helm.sh/hook-weight": "-20"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  ttlSecondsAfterFinished: 3600
+  template:
+    metadata:
+      name: "{{ .Release.Name }}-postgres-secret-patch"
+      labels:
+        {{- include "redash.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: postgres-secret-patch
+    spec:
+      serviceAccountName: {{ include "redash.serviceAccountName" . }}
+      restartPolicy: Never
+      containers:
+      - name: secret-patch
+        image: bitnami/kubectl:latest
+        command:
+          - /bin/sh
+          - -c
+          - |
+            set -e
+            SECRET="{{ .Release.Name }}-postgresql"
+            NAMESPACE="{{ .Release.Namespace }}"
+
+            echo "=== Patching PostgreSQL secret to normalize key names ==="
+
+            # Read the existing password — old chart used 'postgresql-password', new chart uses 'password' and 'postgres-password'
+            PW=$(kubectl get secret "$SECRET" -n "$NAMESPACE" -o jsonpath='{.data.postgresql-password}' 2>/dev/null || echo "")
+
+            if [ -z "$PW" ]; then
+              # Already on new format, try 'password'
+              PW=$(kubectl get secret "$SECRET" -n "$NAMESPACE" -o jsonpath='{.data.password}' 2>/dev/null || echo "")
+            fi
+
+            if [ -z "$PW" ]; then
+              echo "ERROR: Could not find password in secret $SECRET (tried postgresql-password, password)"
+              exit 1
+            fi
+
+            echo "Found password in secret. Adding missing keys: password, postgres-password..."
+            kubectl patch secret "$SECRET" -n "$NAMESPACE" --type='json' -p="[
+              {\"op\": \"add\", \"path\": \"/data/password\", \"value\": \"$PW\"},
+              {\"op\": \"add\", \"path\": \"/data/postgres-password\", \"value\": \"$PW\"}
+            ]" || {
+              echo "Keys may already exist, trying merge patch..."
+              kubectl patch secret "$SECRET" -n "$NAMESPACE" --type='merge' -p="{\"data\":{\"password\":\"$PW\",\"postgres-password\":\"$PW\"}}"
+            }
+
+            echo "Secret patched successfully."
+            kubectl get secret "$SECRET" -n "$NAMESPACE" -o jsonpath='{.data}' | tr ',' '\n'
+
+            echo "=== Deleting Redash Deployments (label selectors changed between versions) ==="
+            kubectl delete deployments -n "$NAMESPACE" -l "app.kubernetes.io/instance={{ .Release.Name }}" --ignore-not-found
+            echo "Deployments deleted."
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
   name: "{{ .Release.Name }}-postgres-migration"
   labels:
     {{- include "redash.labels" . | nindent 4 }}
@@ -52,69 +116,60 @@ spec:
               sleep 2
             done
             
-            # Check PostgreSQL version
+            # Check PostgreSQL version (informational only)
             PG_VERSION=$(PGPASSWORD="$OLD_PG_PASSWORD" psql -h "$OLD_PG_HOST" -U "$OLD_PG_USER" -d "$OLD_PG_DB" -t -c "SELECT version();" | grep -oE '[0-9]+\.[0-9]+' | head -1)
             echo "Current PostgreSQL version: $PG_VERSION"
-            
-            # Only proceed if PostgreSQL version is 15.x (major version 15)
-            if echo "$PG_VERSION" | grep -qE '^15\.'; then
-              echo "PostgreSQL 15.x detected. Starting migration process..."
-              
-              # Step 1: Create database dump
-              echo "Step 1/4: Creating database dump..."
-              PGPASSWORD="$OLD_PG_PASSWORD" pg_dump -h "$OLD_PG_HOST" -U "$OLD_PG_USER" -d "$OLD_PG_DB" -F c -f /tmp/redash-backup.dump
-              
-              # Also create SQL dump as backup
-              PGPASSWORD="$OLD_PG_PASSWORD" pg_dump -h "$OLD_PG_HOST" -U "$OLD_PG_USER" -d "$OLD_PG_DB" -F p > /tmp/redash-backup.sql
-              
-              echo "Database dump created successfully"
-              ls -lh /tmp/redash-backup.*
-              
-              # Step 2: Scale down PostgreSQL StatefulSet to 0
-              echo "Step 2/4: Scaling down PostgreSQL StatefulSet..."
-              RELEASE_NAME="{{ .Release.Name }}"
-              NAMESPACE="{{ .Release.Namespace }}"
-              
-              # Try to find and scale down the PostgreSQL StatefulSet
-              # Bitnami PostgreSQL chart typically creates: <release-name>-postgresql or <release-name>-postgresql-primary
-              for STATEFULSET_NAME in "${RELEASE_NAME}-postgresql" "${RELEASE_NAME}-postgresql-primary"; do
-                if kubectl get statefulset "$STATEFULSET_NAME" -n "$NAMESPACE" > /dev/null 2>&1; then
-                  echo "Found StatefulSet: $STATEFULSET_NAME"
-                  kubectl scale statefulset "$STATEFULSET_NAME" --replicas=0 -n "$NAMESPACE" --timeout=120s || {
-                    echo "WARNING: Failed to scale down StatefulSet $STATEFULSET_NAME. Continuing anyway..."
-                  }
-                  echo "Waiting for PostgreSQL pods to terminate..."
-                  sleep 10
-                  break
-                fi
-              done
-              
-              # Step 3: Delete the PostgreSQL PVC so PostgreSQL 18 can start fresh
-              echo "Step 3/4: Deleting PostgreSQL PVC (data is safely backed up in dump files)..."
-              # Bitnami PostgreSQL typically creates PVCs like: <release-name>-postgresql-data-0 or <release-name>-postgresql
-              for PVC_NAME in "${RELEASE_NAME}-postgresql-data-0" "${RELEASE_NAME}-postgresql-data" "${RELEASE_NAME}-postgresql"; do
-                if kubectl get pvc "$PVC_NAME" -n "$NAMESPACE" > /dev/null 2>&1; then
-                  echo "Found PVC: $PVC_NAME"
-                  echo "Deleting PVC to allow PostgreSQL 18 to start with a fresh data directory..."
-                  echo "NOTE: All data has been backed up to /tmp/redash-backup.dump and /tmp/redash-backup.sql"
-                  kubectl delete pvc "$PVC_NAME" -n "$NAMESPACE" --timeout=120s || {
-                    echo "WARNING: Failed to delete PVC $PVC_NAME. PostgreSQL 18 may fail to start."
-                    echo "You may need to manually delete this PVC: kubectl delete pvc $PVC_NAME -n $NAMESPACE"
-                    echo "The data is safely backed up in the migration storage PVC."
-                  }
-                  break
-                fi
-              done
-              
-              echo "Step 4/4: Migration preparation complete!"
-              echo "Dump files are stored at: /tmp/redash-backup.dump and /tmp/redash-backup.sql"
-              echo "PostgreSQL 15 has been stopped and PVC handled."
-              echo "Helm upgrade will now start PostgreSQL 18 with a fresh data directory."
-              echo "The post-upgrade hook will restore the data automatically."
-            else
-              echo "PostgreSQL version is not 15.x (found: $PG_VERSION). Skipping migration."
-              echo "If you're upgrading from a different version, manual migration may be required."
-            fi
+            echo "Starting migration process..."
+
+            # Step 1: Create database dump
+            echo "Step 1/4: Creating database dump..."
+            PGPASSWORD="$OLD_PG_PASSWORD" pg_dump -h "$OLD_PG_HOST" -U "$OLD_PG_USER" -d "$OLD_PG_DB" -F c -f /tmp/redash-backup.dump
+
+            # Also create SQL dump as backup
+            PGPASSWORD="$OLD_PG_PASSWORD" pg_dump -h "$OLD_PG_HOST" -U "$OLD_PG_USER" -d "$OLD_PG_DB" -F p > /tmp/redash-backup.sql
+
+            echo "Database dump created successfully"
+            ls -lh /tmp/redash-backup.*
+
+            # Step 2: Delete PostgreSQL StatefulSet with --cascade=orphan then kill the pod
+            # --cascade=orphan removes the STS object (so helm can recreate with new immutable spec)
+            # without terminating the pod first — but we then delete the pod explicitly after dump is safe
+            echo "Step 2/4: Removing PostgreSQL StatefulSet and pod..."
+            RELEASE_NAME="{{ .Release.Name }}"
+            NAMESPACE="{{ .Release.Namespace }}"
+
+            for STATEFULSET_NAME in "${RELEASE_NAME}-postgresql" "${RELEASE_NAME}-postgresql-primary"; do
+              if kubectl get statefulset "$STATEFULSET_NAME" -n "$NAMESPACE" > /dev/null 2>&1; then
+                echo "Found StatefulSet: $STATEFULSET_NAME"
+                kubectl delete statefulset "$STATEFULSET_NAME" -n "$NAMESPACE" --cascade=orphan || {
+                  echo "WARNING: Failed to delete StatefulSet $STATEFULSET_NAME. Continuing anyway..."
+                }
+                break
+              fi
+            done
+
+            # Kill the orphaned postgres pod so new STS can claim the (soon-to-be-deleted) PVC slot
+            kubectl delete pod "${RELEASE_NAME}-postgresql-0" -n "$NAMESPACE" --ignore-not-found
+            echo "PostgreSQL pod terminated."
+
+            # Step 3: Delete the PostgreSQL PVC so new PostgreSQL can start fresh
+            # Bitnami chart creates PVCs as: data-<release>-postgresql-<index>
+            echo "Step 3/4: Deleting PostgreSQL PVC (data is safely backed up in dump files)..."
+            for PVC_NAME in "data-${RELEASE_NAME}-postgresql-0" "${RELEASE_NAME}-postgresql-data-0" "${RELEASE_NAME}-postgresql-data" "${RELEASE_NAME}-postgresql"; do
+              if kubectl get pvc "$PVC_NAME" -n "$NAMESPACE" > /dev/null 2>&1; then
+                echo "Found PVC: $PVC_NAME"
+                echo "NOTE: All data has been backed up to /tmp/redash-backup.dump and /tmp/redash-backup.sql"
+                kubectl delete pvc "$PVC_NAME" -n "$NAMESPACE" --timeout=120s || {
+                  echo "WARNING: Failed to delete PVC $PVC_NAME. New PostgreSQL may fail to start."
+                  echo "You may need to manually delete: kubectl delete pvc $PVC_NAME -n $NAMESPACE"
+                }
+                break
+              fi
+            done
+
+            echo "Step 4/4: Migration preparation complete!"
+            echo "Dump files stored at: /tmp/redash-backup.dump and /tmp/redash-backup.sql"
+            echo "The post-upgrade hook will restore the data automatically."
         env:
         - name: PGHOST
           value: {{ $postgresqlFullname }}
