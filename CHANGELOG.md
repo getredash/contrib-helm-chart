@@ -1,5 +1,19 @@
 # Changelog
 
+## 3.2.1
+
+- Fix PostgreSQL migration hooks to work automatically without manual intervention:
+  - **Remove PG version gate**: pre-upgrade dump now runs for any source PostgreSQL version, not only 15.x
+  - **Fix PVC name pattern**: correctly resolves bitnami PVC naming (`data-<release>-postgresql-0`)
+  - **Fix pod name derivation**: orphaned pod name is now derived from the matched StatefulSet name instead of being hardcoded, fixing cases where the STS is named `*-postgresql-primary`
+  - **Fix pod deletion safety**: pod is only deleted if the StatefulSet deletion succeeded, preventing pod recreation by an active controller
+  - **Add secret normalization hook** (pre-upgrade, weight -20): duplicates the password across all key names (`postgresql-password`, `password`, `postgres-password`) required by old and new bitnami chart versions
+  - **Add Deployment pre-deletion**: Deployments are deleted before upgrade to handle immutable label selector changes between chart versions
+  - **Fix secret log leak**: secret patch job now logs only key names, not base64-encoded values
+  - **Extend RBAC**: added `secrets` (get/patch), `deployments` (get/list/delete), `pods` (get/list/delete), `statefulsets` (delete) permissions
+- CI: tests now run on PRs only; publish runs on merge to master only (no redundant re-run of tests)
+- CI: helm install/upgrade timeout reduced from 6m to 5m
+
 ## 3.2.0
 
 - Upgrade Redash from v24.04.0-dev to v25.8.0 (latest stable)
