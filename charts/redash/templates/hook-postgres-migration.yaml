@@ -141,10 +141,11 @@ spec:
             for STATEFULSET_NAME in "${RELEASE_NAME}-postgresql" "${RELEASE_NAME}-postgresql-primary"; do
               if kubectl get statefulset "$STATEFULSET_NAME" -n "$NAMESPACE" > /dev/null 2>&1; then
                 echo "Found StatefulSet: $STATEFULSET_NAME"
-                kubectl delete statefulset "$STATEFULSET_NAME" -n "$NAMESPACE" --cascade=orphan || {
-                  echo "WARNING: Failed to delete StatefulSet $STATEFULSET_NAME. Continuing anyway..."
-                }
-                MATCHED_STS="$STATEFULSET_NAME"
+                if kubectl delete statefulset "$STATEFULSET_NAME" -n "$NAMESPACE" --cascade=orphan; then
+                  MATCHED_STS="$STATEFULSET_NAME"
+                else
+                  echo "WARNING: Failed to delete StatefulSet $STATEFULSET_NAME — skipping pod deletion to avoid recreation by active controller."
+                fi
                 break
               fi
             done
