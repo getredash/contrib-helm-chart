@@ -57,8 +57,7 @@ spec:
               kubectl patch secret "$SECRET" -n "$NAMESPACE" --type='merge' -p="{\"data\":{\"password\":\"$PW\",\"postgres-password\":\"$PW\"}}"
             }
 
-            echo "Secret patched successfully."
-            kubectl get secret "$SECRET" -n "$NAMESPACE" -o jsonpath='{.data}' | tr ',' '\n'
+            echo "Secret patched successfully. Keys present: $(kubectl get secret "$SECRET" -n "$NAMESPACE" -o jsonpath='{.data}' | python3 -c "import sys,json; print(list(json.load(sys.stdin).keys()))" 2>/dev/null || kubectl get secret "$SECRET" -n "$NAMESPACE" -o jsonpath='{.data}' | tr ',' '\n' | grep -o '"[^"]*":' | tr -d '":' )"
 
             echo "=== Deleting Redash Deployments (label selectors changed between versions) ==="
             kubectl delete deployments -n "$NAMESPACE" -l "app.kubernetes.io/instance={{ .Release.Name }}" --ignore-not-found
@@ -138,19 +137,23 @@ spec:
             RELEASE_NAME="{{ .Release.Name }}"
             NAMESPACE="{{ .Release.Namespace }}"
 
+            MATCHED_STS=""
             for STATEFULSET_NAME in "${RELEASE_NAME}-postgresql" "${RELEASE_NAME}-postgresql-primary"; do
               if kubectl get statefulset "$STATEFULSET_NAME" -n "$NAMESPACE" > /dev/null 2>&1; then
                 echo "Found StatefulSet: $STATEFULSET_NAME"
                 kubectl delete statefulset "$STATEFULSET_NAME" -n "$NAMESPACE" --cascade=orphan || {
                   echo "WARNING: Failed to delete StatefulSet $STATEFULSET_NAME. Continuing anyway..."
                 }
+                MATCHED_STS="$STATEFULSET_NAME"
                 break
               fi
             done
 
-            # Kill the orphaned postgres pod so new STS can claim the (soon-to-be-deleted) PVC slot
-            kubectl delete pod "${RELEASE_NAME}-postgresql-0" -n "$NAMESPACE" --ignore-not-found
-            echo "PostgreSQL pod terminated."
+            # Kill the orphaned postgres pod — derive name from the matched STS, not hardcoded
+            if [ -n "$MATCHED_STS" ]; then
+              kubectl delete pod "${MATCHED_STS}-0" -n "$NAMESPACE" --ignore-not-found
+              echo "PostgreSQL pod ${MATCHED_STS}-0 terminated."
+            fi
 
             # Step 3: Delete the PostgreSQL PVC so new PostgreSQL can start fresh
             # Bitnami chart creates PVCs as: data-<release>-postgresql-<index>
