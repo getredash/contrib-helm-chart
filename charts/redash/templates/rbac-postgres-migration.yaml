@@ -10,10 +10,19 @@ metadata:
 rules:
 - apiGroups: ["apps"]
   resources: ["statefulsets"]
-  verbs: ["get", "list", "patch", "update"]
+  verbs: ["get", "list", "patch", "update", "delete"]
 - apiGroups: [""]
   resources: ["persistentvolumeclaims"]
   verbs: ["get", "list", "patch", "update", "delete"]
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list", "delete"]
+- apiGroups: [""]
+  resources: ["secrets"]
+  verbs: ["get", "patch"]
+- apiGroups: ["apps"]
+  resources: ["deployments"]
+  verbs: ["get", "list", "delete"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding

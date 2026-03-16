@@ -5,10 +5,11 @@ on:
   pull_request:
 jobs:
   test-on-minikube:
+    if: github.event_name == 'pull_request'
     timeout-minutes: 45
     strategy:
       matrix:
-        k8s: 
+        k8s:
           - v1.31
           - v1.32
           - v1.33
@@ -46,16 +47,16 @@ jobs:
               env:
                 WORKERS_COUNT: 1
           EOM
-          helm upgrade --install redash . --wait --timeout 6m -f test-values.yaml
+          helm upgrade --install redash . --wait --timeout 5m -f test-values.yaml
           sleep 10
           helm test redash
           helm delete redash
-          helm upgrade --install redashup . --wait --timeout 6m -f test-values.yaml
+          helm upgrade --install redashup . --wait --timeout 5m -f test-values.yaml
           kubectl get pod -l "app.kubernetes.io/instance=redashup,app.kubernetes.io/component=server" -o jsonpath="{..image}"
           sleep 10
           helm test redashup
           kubectl delete pod -l "app.kubernetes.io/instance=redashup,app.kubernetes.io/component=test-connection"
-          helm upgrade --install redashup . --wait --reset-values --timeout 6m -f test-values.yaml
+          helm upgrade --install redashup . --wait --reset-values --timeout 5m -f test-values.yaml
           kubectl get pod -l "app.kubernetes.io/instance=redashup,app.kubernetes.io/component=server" -o jsonpath="{..image}"
           sleep 10
           helm test redashup
@@ -74,9 +75,8 @@ jobs:
           echo "MINIKUBE LOGS"
           minikube logs -n10 || true
   publish-chart:
-    needs: test-on-minikube
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     runs-on: ubuntu-22.04
-    if: github.ref == 'refs/heads/master'
     steps:
       - uses: actions/checkout@v6
         with:
