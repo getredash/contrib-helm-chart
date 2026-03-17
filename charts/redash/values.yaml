@@ -570,19 +570,6 @@ migrations:
   # priorityClassName -- Default priority class name for migration pod [ref](https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/)
   priorityClassName:
 
-## Configuration for PostgreSQL migration hooks (for major version upgrades)
-postgresqlMigration:
-  # postgresqlMigration.enabled -- Enable automatic PostgreSQL migration hooks for major version upgrades (e.g., 15→18). 
-  # WARNING: Requires a PVC to be created beforehand for storing the dump between pre-upgrade and post-upgrade hooks.
-  # See the upgrade section in README.md for PVC creation instructions.
-  # Then set postgresqlMigration.storage.pvcName to the PVC name.
-  enabled: false
-  # postgresqlMigration.storage -- Storage configuration for migration dumps
-  storage:
-    # postgresqlMigration.storage.pvcName -- REQUIRED: Name of existing PVC to use for storing migration dumps. 
-    # The PVC must exist before running the upgrade. Both pre-upgrade (dump) and post-upgrade (restore) hooks use this PVC.
-    # If not set, uses emptyDir which will NOT persist between hooks (migration will fail).
-    pvcName: ""
 
 # externalPostgreSQL -- External PostgreSQL configuration. To use an external PostgreSQL instead of the automatically deployed postgresql chart: set postgresql.enabled to false then uncomment and configure the externalPostgreSQL connection URL (e.g. postgresql://user:pass@host:5432/database)
 externalPostgreSQL:

@@ -1,34 +1,202 @@
 # Changelog
 
-## 3.2.2
+## 4.0.0
 
-- Fix workers crash-looping after upgrade: add `wait-for-migrations` initContainer to all worker pods when `postgresql.enabled`. The initContainer polls PostgreSQL until the `alembic_version` table exists (created by the migrations hook), ensuring workers only start after the schema is fully applied. This also helps fresh installs where workers start before the post-install migrations job completes.
-- Fix migration and restore jobs using wrong secret key: changed `secretKeyRef.key` from `postgres-password` to `password` in both pre-upgrade and post-upgrade job pods.
-- Fix pre-upgrade hook execution order: RBAC (Role + RoleBinding) is now deployed as a pre-upgrade hook at weight `-30`, before the migration job at weight `-10`. Previously the RBAC was a regular manifest applied after hooks, so the migration job had no permissions to delete StatefulSets, Deployments, or PVCs.
-- Fix Deployment deletion not running: removed the separate `postgres-secret-patch` job and moved Deployment deletion into the migration job, which runs with confirmed RBAC permissions after the pg_dump completes.
-- Fix Redis StatefulSet immutable field error: Redis 19.x → 24.x changes immutable StatefulSet spec fields. The migration job now deletes the Redis StatefulSet (`--cascade=orphan`) and its pod before Helm applies the new Redis 24.x spec.
-- Correct pre-upgrade ordering within the migration job: pg_dump runs first (requires old PostgreSQL pod to be alive), then Deployments, PostgreSQL StatefulSet, Redis StatefulSet, and PostgreSQL PVC are deleted — giving Helm a clean slate to apply new resources.
+**BREAKING CHANGE — PostgreSQL major version upgrade requires manual migration.**
 
-> **One-time manual step required before upgrading from 3.0.x**: Helm renders templates before running hooks, so Bitnami's secret validation happens before any hook can patch the secret. Run this once before `helm upgrade`:
-> ```bash
-> kubectl patch secret <release>-postgresql -n <namespace> --type='merge' \
->   -p='{"data":{"password":"<base64-encoded-password>","postgres-password":"<base64-encoded-password>"}}'
-> ```
-> This is a one-time step — subsequent upgrades (3.2.x → 3.2.y) do not require it.
+### What changed
 
-## 3.2.1
+- **Remove automatic PostgreSQL migration hooks** (`postgresqlMigration.enabled`): the pre-upgrade dump job and post-upgrade restore job have been removed entirely. These hooks proved too fragile in production due to OOM kills on large `query_results` tables, FK constraint violations during restore, and the requirement for superuser privileges for `--disable-triggers`. PostgreSQL major version migration must now be performed manually before running `helm upgrade`.
+- **Remove `rbac-postgres-migration` templates**: the Role and RoleBinding created for the migration hooks are no longer needed and have been removed.
+- **Remove `postgresqlMigration` values block**: the `postgresqlMigration.enabled` and `postgresqlMigration.storage.pvcName` values no longer exist. Remove them from your `values.yaml` or Helm `--set` flags before upgrading.
 
-- Fix PostgreSQL migration hooks to work automatically without manual intervention:
-  - **Remove PG version gate**: pre-upgrade dump now runs for any source PostgreSQL version, not only 15.x
-  - **Fix PVC name pattern**: correctly resolves bitnami PVC naming (`data-<release>-postgresql-0`)
-  - **Fix pod name derivation**: orphaned pod name is now derived from the matched StatefulSet name instead of being hardcoded, fixing cases where the STS is named `*-postgresql-primary`
-  - **Fix pod deletion safety**: pod is only deleted if the StatefulSet deletion succeeded, preventing pod recreation by an active controller
-  - **Add secret normalization hook** (pre-upgrade, weight -20): duplicates the password across all key names (`postgresql-password`, `password`, `postgres-password`) required by old and new bitnami chart versions
-  - **Add Deployment pre-deletion**: Deployments are deleted before upgrade to handle immutable label selector changes between chart versions
-  - **Fix secret log leak**: secret patch job now logs only key names, not base64-encoded values
-  - **Extend RBAC**: added `secrets` (get/patch), `deployments` (get/list/delete), `pods` (get/list/delete), `statefulsets` (delete) permissions
-- CI: tests now run on PRs only; publish runs on merge to master only (no redundant re-run of tests)
-- CI: helm install/upgrade timeout reduced from 6m to 5m
+### Deprecation notice
+
+Chart versions **3.1.x** and **3.2.x** are deprecated. Do not use them for new upgrades — the automatic migration hooks in those versions are unreliable. Upgrade directly to 4.0.0 and follow the manual migration steps below.
+
+### Manual PostgreSQL migration (required when upgrading from chart ≤ 3.0.x)
+
+If you are running chart 3.0.x (PostgreSQL 15) and upgrading to 4.0.0 (PostgreSQL 18), you **must** migrate your data manually. The steps below use a plain-SQL dump (`.sql`) rather than custom format — this gives you full control to strip problematic content before restoring.
+
+> Replace `<release>`, `<namespace>`, `<pg-user>`, `<pg-database>` with your actual values throughout.
+
+---
+
+**Step 1 — Collect credentials**
+
+```bash
+# PostgreSQL superuser password (needed to drop/create DB and restore as postgres)
+PG_ADMIN_PASS=$(kubectl get secret <release>-postgresql -n <namespace> \
+  -o jsonpath='{.data.postgres-password}' | base64 -d)
+
+# Redash app user password
+PG_REDASH_PASS=$(kubectl get secret <release>-postgresql -n <namespace> \
+  -o jsonpath='{.data.password}' | base64 -d)
+
+# Redis password
+REDIS_PASS=$(kubectl get secret <release>-redis -n <namespace> \
+  -o jsonpath='{.data.redis-password}' | base64 -d)
+```
+
+---
+
+**Step 2 — Dump from old PostgreSQL (PG 15, plain SQL format)**
+
+```bash
+# Dump the full schema + data as plain SQL, excluding query_results data.
+# query_results is a pure query cache — it's large, causes OOM on restore, and is regenerated automatically.
+kubectl exec -n <namespace> <release>-postgresql-0 -- \
+  env PGPASSWORD="$PG_REDASH_PASS" pg_dump \
+    -U <pg-user> -d <pg-database> \
+    --no-owner --no-acl \
+    --exclude-table-data=query_results \
+    -f /tmp/redash-dump.sql
+
+kubectl cp <namespace>/<release>-postgresql-0:/tmp/redash-dump.sql ./redash-dump.sql
+```
+
+---
+
+**Step 3 — Prepare the dump file (run locally, once)**
+
+```bash
+# PG 12+ removed SET default_with_oids — comment it out
+sed -i '' 's/^SET default_with_oids = false;/-- SET default_with_oids = false;/' redash-dump.sql
+
+# Comment out the FK constraint that references query_results.
+# Since query_results data is excluded, this constraint will fail on restore.
+# We add it back manually after NULLing the dangling references (Step 8).
+grep -n 'queries_latest_query_data_id_fkey' redash-dump.sql
+# Note the line number(s), then comment them out:
+sed -i '' '/queries_latest_query_data_id_fkey/s/^/-- /' redash-dump.sql
+```
+
+---
+
+**Step 4 — Scale down Redash app (keep PostgreSQL and Redis running)**
+
+```bash
+kubectl scale deploy -n <namespace> --replicas=0 --all
+
+# Wait until only the database pods remain
+kubectl get pods -n <namespace> -w
+```
+
+---
+
+**Step 5 — Drop and recreate the database**
+
+Connect as `postgres` to the `postgres` database (not `redash`) to avoid "database is being accessed by other users" errors.
+
+```bash
+kubectl exec -n <namespace> <release>-postgresql-0 -- \
+  env PGPASSWORD="$PG_ADMIN_PASS" psql -U postgres -d postgres \
+    -c "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname='<pg-database>' AND pid <> pg_backend_pid();" \
+    -c "DROP DATABASE <pg-database>;" \
+    -c "CREATE DATABASE <pg-database> OWNER <pg-user>;"
+```
+
+---
+
+**Step 6 — Copy dump into pod and restore**
+
+```bash
+kubectl cp redash-dump.sql <namespace>/<release>-postgresql-0:/tmp/dump.sql
+
+kubectl exec -n <namespace> <release>-postgresql-0 -- \
+  env PGPASSWORD="$PG_REDASH_PASS" psql -U <pg-user> -d <pg-database> -f /tmp/dump.sql
+```
+
+> `ERROR: must be owner of extension plpgsql` is harmless — safe to ignore.
+
+---
+
+**Step 7 — Upgrade the chart**
+
+```bash
+helm upgrade <release> <repo>/redash --version 4.0.0 \
+  --namespace <namespace> \
+  -f values.yaml \
+  --wait --timeout 15m
+```
+
+Scale back down immediately after upgrade so migrations can run cleanly:
+
+```bash
+kubectl scale deploy -n <namespace> --replicas=0 --all
+```
+
+---
+
+**Step 8 — Fix dangling FK references**
+
+`queries.latest_query_data_id` points to `query_results` rows that were not restored. NULL them out so the FK constraint can be added.
+
+```bash
+kubectl exec -n <namespace> <release>-postgresql-0 -- \
+  env PGPASSWORD="$PG_REDASH_PASS" psql -U <pg-user> -d <pg-database> \
+    -c "UPDATE queries SET latest_query_data_id = NULL
+        WHERE latest_query_data_id IS NOT NULL
+          AND latest_query_data_id NOT IN (SELECT id FROM query_results);"
+
+kubectl exec -n <namespace> <release>-postgresql-0 -- \
+  env PGPASSWORD="$PG_REDASH_PASS" psql -U <pg-user> -d <pg-database> \
+    -c "ALTER TABLE ONLY public.queries
+          ADD CONSTRAINT queries_latest_query_data_id_fkey
+          FOREIGN KEY (latest_query_data_id) REFERENCES public.query_results(id);" || true
+```
+
+---
+
+**Step 9 — Run Redash schema migrations**
+
+The new Redash version may have schema changes that Alembic needs to apply. Pass the connection URLs explicitly to avoid environment variable lookup issues.
+
+```bash
+kubectl exec -n <namespace> <release>-postgresql-0 -- \
+  env PGPASSWORD="$PG_REDASH_PASS" psql -U <pg-user> -d <pg-database> \
+    -c "SELECT version FROM alembic_version;"
+# Should show current migration head after upgrade
+
+# Find a running server pod and run migrations
+kubectl exec -n <namespace> <redash-server-pod> -- \
+  env REDASH_REDIS_URL="redis://:<redis-pass>@<release>-redis-master:6379/0" \
+      REDASH_DATABASE_URL="postgresql://<pg-user>:<pg-pass>@<release>-postgresql:5432/<pg-database>" \
+  /app/manage.py db upgrade
+```
+
+---
+
+**Step 10 — Scale up and verify**
+
+```bash
+kubectl scale deploy -n <namespace> --replicas=1 --all
+kubectl get pods -n <namespace> -w
+
+# Verify data survived
+kubectl exec -n <namespace> <release>-postgresql-0 -- \
+  env PGPASSWORD="$PG_REDASH_PASS" psql -U <pg-user> -d <pg-database> \
+    -c "SELECT count(*) FROM queries;"
+
+# Check server logs
+kubectl logs -n <namespace> deploy/<release>-redash-server --tail=50
+```
+
+`query_results` rows will be repopulated automatically as users re-run their queries.
+
+---
+
+**Known gotchas**
+
+| Issue | Fix |
+|---|---|
+| `SET default_with_oids` error | Comment it out in the dump (removed in PG 12+) |
+| OOM kill during `COPY query_results` | Use `--exclude-table-data=query_results` — it's just cache |
+| FK violation on `queries_latest_query_data_id_fkey` | Comment out in dump; re-add after NULLing dangling refs (Step 8) |
+| `cannot drop currently open database` | Connect to `postgres` DB as `postgres` superuser, not to `redash` |
+| `database being accessed by other users` | Scale down all Redash deploys first (Step 4) |
+| `manage.py` can't find Redis/Postgres | Pass `REDASH_REDIS_URL` and `REDASH_DATABASE_URL` explicitly (Step 9) |
+| `cryptography.fernet.InvalidToken` on data sources | `REDASH_SECRET_KEY` must match the key used by the old Redash to encrypt credentials — ensure it is set correctly in your Helm values |
 
 ## 3.2.0
 
