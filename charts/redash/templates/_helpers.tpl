@@ -497,6 +497,10 @@ Shared environment block used across each component.
 - name: REDASH_WEB_WORKERS
   value: {{ quote . }}
 {{- end }}
+{{- if .Values.redash.sqlAlchemyEnablePoolPrePing }}
+- name: SQLALCHEMY_ENABLE_POOL_PRE_PING
+  value: {{ default .Values.redash.sqlAlchemyEnablePoolPrePing | quote }}
+{{- end }}
 ## End primary Redash configuration
 {{- end -}}
 
