@@ -79,6 +79,9 @@ spec:
       {{- with .Values.migrations.nodeSelector }}
       nodeSelector: {{ toYaml . | nindent 8 }}
       {{- end }}
+      {{- if .Values.migrations.topologySpreadConstraints }}
+      topologySpreadConstraints: {{ toYaml .Values.migrations.topologySpreadConstraints | indent 8 }}
+      {{- end }}
       {{- with .Values.migrations.affinity }}
       affinity: {{ toYaml . | nindent 8 }}
       {{- end }}

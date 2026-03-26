@@ -80,6 +80,9 @@ spec:
       {{- with $workerConfig.nodeSelector }}
       nodeSelector: {{ toYaml . | nindent 8 }}
       {{- end }}
+      {{- if .Values.$workerConfig.topologySpreadConstraints }}
+      topologySpreadConstraints: {{ toYaml .Values.$workerConfig.topologySpreadConstraints | indent 8 }}
+      {{- end }}
       {{- with $workerConfig.affinity }}
       affinity: {{ toYaml . | nindent 8 }}
       {{- end }}
