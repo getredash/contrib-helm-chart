@@ -520,7 +520,7 @@ helm.sh/chart: {{ include "redash.chart" . }}
 app.kubernetes.io/component: {{ . }}worker
 {{- end }}
 {{- if or .Chart.AppVersion .Values.image.tag }}
-app.kubernetes.io/version: {{ .Values.image.tag | default .Chart.AppVersion | quote }}
+app.kubernetes.io/version: {{ tpl (.Values.image.tag | default .Chart.AppVersion) . | quote }}
 {{- end }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- if .Values.commonLabels }}

@@ -36,7 +36,7 @@ spec:
         {{- end }}
         - name: {{ include "redash.name" $context }}-{{ $workerName }}worker
           securityContext: {{ toYaml $workerConfig.securityContext | nindent 12 }}
-          image: {{ $.Values.image.registry }}/{{ $.Values.image.repo }}:{{ $.Values.image.tag | default $.Chart.AppVersion }}
+          image: {{ $.Values.image.registry }}/{{ $.Values.image.repo }}:{{ tpl ($.Values.image.tag | default $.Chart.AppVersion) $ }}
           imagePullPolicy: {{ $.Values.image.pullPolicy }}
           args:
           {{- if or $.Values.redis.enabled $.Values.postgresql.enabled }}
