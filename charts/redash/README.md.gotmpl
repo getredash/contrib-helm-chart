@@ -16,7 +16,7 @@ Current chart version is `{{ template "chart.version" . }}`
 
 - At least 3 GB of RAM available on your cluster
 - Kubernetes 1.19+ - chart is tested with latest 3 stable versions
-- Helm 3 (Helm 2 depreciated)
+- Helm 3 (Helm 2 deprecated)
 - PV provisioner support in the underlying infrastructure
 
 ## Installing the Chart
@@ -49,7 +49,7 @@ Install the chart:
 $ helm upgrade --install -f my-values.yaml my-release redash/redash
 ```
 
-The command deploys Redash on the Kubernetes cluster in the default configuration. The [configuration](#configuration) section and and default [values.yaml](values.yaml) lists the parameters that can be configured during installation.
+The command deploys Redash on the Kubernetes cluster in the default configuration. The [configuration](#configuration) section and default [values.yaml](values.yaml) lists the parameters that can be configured during installation.
 
 > **Tip**: List all releases using `helm list`
 
@@ -103,21 +103,21 @@ Below are notes on manual configuration changes or steps needed for major chart 
 - The Redash version is updated from v8 to v10 (v9 never had a stable release)
 - The upgrade should be automatic, but please test on a staging environment first!
 - There are now additional "genericworker" and "scheduler" deployments, with associated configuration in values.yaml
-- 3.x and higher will not run with Redash v8 - if you have overriden the image you will need to update that 
+- 3.x and higher will not run with Redash v8 - if you have overridden the image you will need to update that
 - This chart now requires Kubernetes 1.19+
-- Helm 2 is now depreciated and support will be removed in a future version
+- Helm 2 is now deprecated and support will be removed in a future version
 
 ### From 1.x to 2.x
 
 - There are 3 required secrets (see above) that must now be specified in your release
-- The server.env is now depreciated (except for non-standard variables such as PYTHON_*) to allow for better management of Redash configuration and secret values - any existing configuration should be migrated to the new values
+- The server.env is now deprecated (except for non-standard variables such as PYTHON_*) to allow for better management of Redash configuration and secret values - any existing configuration should be migrated to the new values
 
 ### From pre-release to 1.x
 
 - The values.yaml structure has several changes
 - The Redash, PostgreSQL and Redis versions have all been updated
 - Due to these changes you will likely need to dump the database and reload it into a fresh install
-- The chart now has it's own repo: https://getredash.github.io/contrib-helm-chart/
+- The chart now has its own repo: https://getredash.github.io/contrib-helm-chart/
 
 ## License
 
