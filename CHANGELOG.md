@@ -235,7 +235,7 @@ kubectl logs -n <namespace> deploy/<release>-redash-server --tail=50
 - Final release to support Redash v8.x
 - Redis password is now required
 - Kubernetes minimum version increased to v19.x
-- Helm 2 depreciated, will be removed in a future version
+- Helm 2 deprecated, will be removed in a future version
 - Supports stable Ingress API
 - Add support for SQL Alchemy pool pre-ping configuration
 - Add support for configurable worker pod labels
@@ -244,7 +244,7 @@ kubectl logs -n <namespace> deploy/<release>-redash-server --tail=50
 ## 2.3.0
 
 - Added externalPostgreSQLSecret / externalRedisSecret
-- Depreciated envSecretName (plan to remove in 3.0.0 chart)
+- Deprecated envSecretName (plan to remove in 3.0.0 chart)
 - Updated docs to make defaults clearer
 
 ## 2.2.0
@@ -278,7 +278,7 @@ kubectl logs -n <namespace> deploy/<release>-redash-server --tail=50
 ## 1.2.0
 
 - Upgrade Redash to 8.0.2.b37747
-- Upgrade PostgreSQL chart (the old version used depreciated APIs) and image tag
+- Upgrade PostgreSQL chart (the old version used deprecated APIs) and image tag
 - Upgrade Redis chart
 
 ## 1.1.0
