@@ -38,7 +38,7 @@ spec:
         {{- end }}
         - name: {{ include "redash.name" . }}-server
           securityContext: {{ toYaml .Values.server.securityContext | nindent 12 }}
-          image: {{ .Values.image.registry }}/{{ .Values.image.repo }}:{{ .Values.image.tag | default .Chart.AppVersion }}
+          image: {{ .Values.image.registry }}/{{ .Values.image.repo }}:{{ tpl (toString (.Values.image.tag | default .Chart.AppVersion)) . }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           {{- $volumeMounts := concat .Values.volumeMounts .Values.server.volumeMounts }}
           {{- with $volumeMounts }}
