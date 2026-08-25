@@ -10,10 +10,10 @@ jobs:
     strategy:
       matrix:
         k8s:
-          - v1.31
-          - v1.32
           - v1.33
           - v1.34
+          - v1.35
+          - v1.36
     runs-on: ubuntu-22.04
     steps:
       - uses: medyagh/setup-minikube@v0.0.21
