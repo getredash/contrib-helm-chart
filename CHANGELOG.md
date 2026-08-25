@@ -6,6 +6,7 @@
 
 - Add optional Knative Serving support for the Redash web server via `server.knative.enabled`: the server renders as a Knative Service instead of a Deployment, while worker, scheduler, migrations, PostgreSQL, and Redis stay on standard Kubernetes resources.
 - Skip the chart-managed `ingress` and `service` resources in Knative mode, relying on Knative routing instead. Configure the revision through `server.knative.annotations` and `server.knative.spec`.
+- Evaluate `image.tag` as a Helm template expression via `tpl`, so umbrella charts can pass a templated tag and have it resolve at render time. Plain string tags are unchanged.
 
 ### Fixed
 
@@ -14,7 +15,8 @@
 
 ### Changed
 
-- Test the chart against Kubernetes 1.33-1.36 (was 1.31-1.34) and update the documented prerequisite to 1.33+.
+- Test the chart against Kubernetes 1.31-1.36. 1.35 and 1.36 are added to the CI matrix while 1.31 and 1.32 stay covered, so the documented prerequisite remains 1.31+.
+- Fix typos across the documentation and values comments: `depreciated` -> `deprecated`, `overriden`/`overidden` -> `overridden`, `it's own` -> `its own`, `traffuc` -> `traffic`.
 
 ### Upgrade notes
 
