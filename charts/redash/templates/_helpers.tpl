@@ -516,9 +516,6 @@ Common labels
 {{- define "redash.labels" -}}
 helm.sh/chart: {{ include "redash.chart" . }}
 {{ include "redash.selectorLabels" . }}
-{{- with .workerName }}
-app.kubernetes.io/component: {{ . }}worker
-{{- end }}
 {{- if or .Chart.AppVersion .Values.image.tag }}
 app.kubernetes.io/version: {{ .Values.image.tag | default .Chart.AppVersion | quote }}
 {{- end }}
@@ -534,6 +531,9 @@ Selector labels
 {{- define "redash.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "redash.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
+{{- with .workerName }}
+app.kubernetes.io/component: {{ . }}worker
+{{- end }}
 {{- end -}}
 
 {{/*
