@@ -76,10 +76,10 @@ spec:
             - containerPort: {{ .Values.server.httpPort }}
           {{- $defaultProbe := dict "httpGet" (dict "path" "/ping" "port" .Values.server.httpPort) -}}
           {{- with .Values.server.livenessProbe }}
-          livenessProbe: {{ deepCopy . | mergeOverwrite $defaultProbe | toYaml | nindent 12 }}
+          livenessProbe: {{ include "redash.probe" (dict "probe" . "default" $defaultProbe) | nindent 12 }}
           {{- end }}
           {{- with .Values.server.readinessProbe }}
-          readinessProbe: {{ deepCopy . | mergeOverwrite $defaultProbe | toYaml | nindent 12 }}
+          readinessProbe: {{ include "redash.probe" (dict "probe" . "default" $defaultProbe) | nindent 12 }}
           {{- end }}
           {{- with .Values.server.resources }}
           resources: {{ toYaml . | nindent 12 }}

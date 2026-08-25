@@ -24,9 +24,11 @@ A Deployment's `spec.selector` is immutable, so the worker selector fix above ca
 
 ```bash
 kubectl delete deployment -n <namespace> \
-  <release>-adhocworker <release>-genericworker <release>-scheduledworker
+  <release>-redash-adhocworker <release>-redash-genericworker <release>-redash-scheduledworker
 helm upgrade <release> redash/redash
 ```
+
+The `-redash-` segment is the chart name; if you set `nameOverride` or `fullnameOverride`, use `kubectl get deploy -l app.kubernetes.io/instance=<release>` to get the actual names first.
 
 Deleting the Deployments removes their Pods, and the upgrade recreates both. Queries queued in Redis during the gap are picked up once the new workers start. The server, scheduler and databases are untouched.
 

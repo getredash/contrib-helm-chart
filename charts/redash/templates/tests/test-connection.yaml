@@ -1,7 +1,7 @@
 {{- $fullName := include "redash.fullname" . -}}
 {{- $testUrl := printf "http://%s:%v" $fullName .Values.service.port -}}
 {{- if .Values.server.knative.enabled -}}
-{{- $testUrl = printf "http://%s.%s.svc.cluster.local" $fullName .Release.Namespace -}}
+{{- $testUrl = printf "http://%s.%s.svc.%s" $fullName .Release.Namespace .Values.clusterDomain -}}
 {{- end -}}
 apiVersion: v1
 kind: Pod

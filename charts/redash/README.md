@@ -86,6 +86,7 @@ The following table lists the configurable parameters of the Redash chart and th
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
+| clusterDomain | string | `"cluster.local"` | Kubernetes cluster domain, used to build in-cluster hostnames |
 | commonLabels | object | `{}` |  |
 | env | object | `{"PYTHONUNBUFFERED":0,"REDASH_PRODUCTION":"true"}` | Redash global environment variables - applied to both server and worker containers. |
 | externalPostgreSQL | string | `nil` | External PostgreSQL configuration. To use an external PostgreSQL instead of the automatically deployed postgresql chart: set postgresql.enabled to false then uncomment and configure the externalPostgreSQL connection URL (e.g. postgresql://user:pass@host:5432/database) |

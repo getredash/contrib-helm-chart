@@ -511,6 +511,19 @@ Environment variables initialized from secret used across each component.
 {{- end -}}
 
 {{/*
+Render a probe. The chart's default handler is merged in only when the caller has
+not supplied one of its own, so a custom exec/tcpSocket probe does not end up
+alongside the default httpGet.
+*/}}
+{{- define "redash.probe" -}}
+{{- $probe := deepCopy .probe -}}
+{{- if not (or $probe.exec $probe.httpGet $probe.tcpSocket $probe.grpc) -}}
+{{- $probe = mergeOverwrite (deepCopy .default) $probe -}}
+{{- end -}}
+{{- toYaml $probe -}}
+{{- end -}}
+
+{{/*
 Common labels
 */}}
 {{- define "redash.labels" -}}

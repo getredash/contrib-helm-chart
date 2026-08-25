@@ -37,7 +37,7 @@ cd charts/redash && helm-docs --dry-run | prettier --parser markdown > README.md
 Two traps:
 
 - **The pre-commit hook is wrong for the current layout.** `.pre-commit-config.yaml` runs `helm-docs --dry-run > README.md` from the repo root, but the chart moved out of the top level, so that writes the *root* README rather than `charts/redash/README.md`. Run helm-docs from inside `charts/redash`.
-- **The checked-in chart README is stale.** It says version 3.2.0 (Chart.yaml is 4.0.1) and still documents the `postgresqlMigration` block that 4.0.0 removed.
+- **Regenerate from `charts/redash`, and check the diff.** The README had drifted from the template before (a stale version line, plus value rows for the `postgresqlMigration` block 4.0.0 removed), because the hook above was writing to the wrong file. Content hand-added to the generated README is silently lost on the next regeneration — the `### From 3.1 to 3.2` upgrade notes had to be moved into `README.md.gotmpl` to survive.
 
 The root `README.md` deliberately uses absolute GitHub URLs because it is synced to `gh-pages`. `templates/` is in `.prettierignore`.
 

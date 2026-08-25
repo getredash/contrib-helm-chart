@@ -32,6 +32,9 @@ volumeMounts: []
 # commonLabels -- Redash global labels -- applied to all objects
 commonLabels: {}
 
+# clusterDomain -- Kubernetes cluster domain, used to build in-cluster hostnames
+clusterDomain: cluster.local
+
 ## Service account and security context configuration
 serviceAccount:
   # serviceAccount.create -- Specifies whether a service account should be created
