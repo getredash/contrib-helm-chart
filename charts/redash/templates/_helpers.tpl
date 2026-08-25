@@ -511,13 +511,17 @@ Environment variables initialized from secret used across each component.
 {{- end -}}
 
 {{/*
-Render a probe. The chart's default handler is merged in only when the caller has
-not supplied one of its own, so a custom exec/tcpSocket probe does not end up
-alongside the default httpGet.
+Render a probe against the chart's default handler.
+
+The default is deep-merged in, so a partial override (e.g. httpGet.path alone)
+still inherits httpGet.port. It is suppressed only when the caller supplies a
+different kind of handler, which would otherwise leave the probe with two
+handlers -- rejected by the API server. Merging into a copy keeps the caller's
+default untouched for the next probe.
 */}}
 {{- define "redash.probe" -}}
 {{- $probe := deepCopy .probe -}}
-{{- if not (or $probe.exec $probe.httpGet $probe.tcpSocket $probe.grpc) -}}
+{{- if not (or $probe.exec $probe.tcpSocket $probe.grpc) -}}
 {{- $probe = mergeOverwrite (deepCopy .default) $probe -}}
 {{- end -}}
 {{- toYaml $probe -}}

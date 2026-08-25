@@ -3,11 +3,34 @@ on:
     branches:
       - master
   pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
+  lint:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+      - uses: azure/setup-helm@v4
+      - name: lint and render the chart
+        run: |
+          helm repo add bitnami https://charts.bitnami.com/bitnami
+          helm repo update
+          cd charts/redash
+          helm dependency build .
+          helm lint .
+          helm template test . > /dev/null
+          helm template test . --set server.knative.enabled=true > /dev/null
   test-on-minikube:
     if: github.event_name == 'pull_request'
     timeout-minutes: 45
     strategy:
+      fail-fast: false
       matrix:
         k8s:
           - v1.31
@@ -21,6 +44,8 @@ jobs:
       - uses: medyagh/setup-minikube@v0.0.21
         with:
           kubernetes-version: ${{ matrix.k8s }}
+          cpus: 4
+          memory: 8192
       - uses: actions/checkout@v6
         with:
           fetch-depth: 1
@@ -31,7 +56,6 @@ jobs:
           helm repo update
           cd charts/redash
           helm dependency build .
-          helm lint .
           cat > test-values.yaml <<- EOM
             redash:
               cookieSecret: $(openssl rand -base64 32)
@@ -49,16 +73,16 @@ jobs:
               env:
                 WORKERS_COUNT: 1
           EOM
-          helm upgrade --install redash . --wait --timeout 5m -f test-values.yaml
+          helm upgrade --install redash . --wait --timeout 10m -f test-values.yaml
           sleep 10
           helm test redash
           helm delete redash
-          helm upgrade --install redashup . --wait --timeout 5m -f test-values.yaml
+          helm upgrade --install redashup . --wait --timeout 10m -f test-values.yaml
           kubectl get pod -l "app.kubernetes.io/instance=redashup,app.kubernetes.io/component=server" -o jsonpath="{..image}"
           sleep 10
           helm test redashup
           kubectl delete pod -l "app.kubernetes.io/instance=redashup,app.kubernetes.io/component=test-connection"
-          helm upgrade --install redashup . --wait --reset-values --timeout 5m -f test-values.yaml
+          helm upgrade --install redashup . --wait --reset-values --timeout 10m -f test-values.yaml
           kubectl get pod -l "app.kubernetes.io/instance=redashup,app.kubernetes.io/component=server" -o jsonpath="{..image}"
           sleep 10
           helm test redashup

@@ -23,12 +23,12 @@
 A Deployment's `spec.selector` is immutable, so the worker selector fix above cannot be applied by `helm upgrade` alone - the upgrade fails with `field is immutable`. Delete the three worker Deployments first, then upgrade:
 
 ```bash
-kubectl delete deployment -n <namespace> \
-  <release>-redash-adhocworker <release>-redash-genericworker <release>-redash-scheduledworker
+kubectl get deploy -n <namespace> -l app.kubernetes.io/instance=<release> \
+  -o name | grep worker | xargs kubectl delete -n <namespace>
 helm upgrade <release> redash/redash
 ```
 
-The `-redash-` segment is the chart name; if you set `nameOverride` or `fullnameOverride`, use `kubectl get deploy -l app.kubernetes.io/instance=<release>` to get the actual names first.
+The worker Deployment names are not spelled out here because they vary: `redash.fullname` is `<release>-redash`, but collapses to just `<release>` when the release name already contains `redash`, and changes again under `nameOverride`/`fullnameOverride`. Selecting on the release label covers every case.
 
 Deleting the Deployments removes their Pods, and the upgrade recreates both. Queries queued in Redis during the gap are picked up once the new workers start. The server, scheduler and databases are untouched.
 
