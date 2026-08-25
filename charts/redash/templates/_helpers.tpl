@@ -511,16 +511,30 @@ Environment variables initialized from secret used across each component.
 {{- end -}}
 
 {{/*
+Render a probe against the chart's default handler.
+
+The default is deep-merged in, so a partial override (e.g. httpGet.path alone)
+still inherits httpGet.port. It is suppressed only when the caller supplies a
+different kind of handler, which would otherwise leave the probe with two
+handlers -- rejected by the API server. Merging into a copy keeps the caller's
+default untouched for the next probe.
+*/}}
+{{- define "redash.probe" -}}
+{{- $probe := deepCopy .probe -}}
+{{- if not (or $probe.exec $probe.tcpSocket $probe.grpc) -}}
+{{- $probe = mergeOverwrite (deepCopy .default) $probe -}}
+{{- end -}}
+{{- toYaml $probe -}}
+{{- end -}}
+
+{{/*
 Common labels
 */}}
 {{- define "redash.labels" -}}
 helm.sh/chart: {{ include "redash.chart" . }}
 {{ include "redash.selectorLabels" . }}
-{{- with .workerName }}
-app.kubernetes.io/component: {{ . }}worker
-{{- end }}
 {{- if or .Chart.AppVersion .Values.image.tag }}
-app.kubernetes.io/version: {{ .Values.image.tag | default .Chart.AppVersion | quote }}
+app.kubernetes.io/version: {{ tpl (toString (.Values.image.tag | default .Chart.AppVersion)) . | quote }}
 {{- end }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- if .Values.commonLabels }}
@@ -534,6 +548,9 @@ Selector labels
 {{- define "redash.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "redash.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
+{{- with .workerName }}
+app.kubernetes.io/component: {{ . }}worker
+{{- end }}
 {{- end -}}
 
 {{/*

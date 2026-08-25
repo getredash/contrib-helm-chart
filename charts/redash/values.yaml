@@ -32,6 +32,9 @@ volumeMounts: []
 # commonLabels -- Redash global labels -- applied to all objects
 commonLabels: {}
 
+# clusterDomain -- Kubernetes cluster domain, used to build in-cluster hostnames
+clusterDomain: cluster.local
+
 ## Service account and security context configuration
 serviceAccount:
   # serviceAccount.create -- Specifies whether a service account should be created
@@ -303,6 +306,14 @@ server:
   # server.replicaCount -- Number of server pods to run
   replicaCount: 1
 
+  knative:
+    # server.knative.enabled -- Render the server as a Knative Service instead of a Deployment
+    enabled: false
+    # server.knative.annotations -- Annotations for the Knative revision template, including `autoscaling.knative.dev/*` settings
+    annotations: {}
+    # server.knative.spec -- Additional fields for the Knative revision spec (e.g. `containerConcurrency`, `timeoutSeconds`)
+    spec: {}
+
   # server.resources -- Server resource requests and limits [ref](http://kubernetes.io/docs/user-guide/compute-resources/)
   resources:
     {}
@@ -365,7 +376,7 @@ service:
   loadBalancerIP:
   # service.type -- Kubernetes Service type
   type: ClusterIP
-  # service.externalTraffucPolicy -- external traffic policy for Load Balancer
+  # service.externalTrafficPolicy -- external traffic policy for Load Balancer
   externalTrafficPolicy: ""
   # service.port -- Service external port
   port: 80
@@ -411,7 +422,7 @@ workers:
       QUEUES: periodic,emails,default
       WORKERS_COUNT: 1
 
-## Common worker configuration, which can be overidden for each worker at workers.<workerName>
+## Common worker configuration, which can be overridden for each worker at workers.<workerName>
 worker:
   # worker.replicaCount -- Default number of worker pods to run
   replicaCount: 1
@@ -579,7 +590,7 @@ externalPostgreSQLSecret:
   # name: redash-postgres
   # key: connectionString
 
-# envSecretName -- DEPRECIATED, use externalPostgreSQLSecret/externalRedisSecret instead. Contents of this secret will be loaded as environment variables into the container. Useful e.g. to set to set PostgreSQL password in externalPostgreSQL parameter: postgresql://user:$(POSTGRESQL_PASSWORD)@host:5432/database [ref](https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/#using-environment-variables-inside-of-your-config)
+# envSecretName -- DEPRECATED, use externalPostgreSQLSecret/externalRedisSecret instead. Contents of this secret will be loaded as environment variables into the container. Useful e.g. to set to set PostgreSQL password in externalPostgreSQL parameter: postgresql://user:$(POSTGRESQL_PASSWORD)@host:5432/database [ref](https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/#using-environment-variables-inside-of-your-config)
 # envSecretName:
 
 ## Configuration values for the postgresql dependency. This PostgreSQL instance is used by default for all Redash state storage [ref](https://github.com/bitnami/charts/blob/main/bitnami/postgresql/README.md)

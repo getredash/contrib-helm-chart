@@ -1,5 +1,37 @@
 # Changelog
 
+## 4.1.0
+
+### Added
+
+- Add optional Knative Serving support for the Redash web server via `server.knative.enabled`: the server renders as a Knative Service instead of a Deployment, while worker, scheduler, migrations, PostgreSQL, and Redis stay on standard Kubernetes resources.
+- Skip the chart-managed `ingress` and `service` resources in Knative mode, relying on Knative routing instead. Configure the revision through `server.knative.annotations` and `server.knative.spec`.
+- Evaluate `image.tag` as a Helm template expression via `tpl`, so umbrella charts can pass a templated tag and have it resolve at render time. Plain string tags are unchanged.
+
+### Fixed
+
+- Fix `imagePullSecrets` rendering in the server, worker and scheduler pod specs. The whitespace chomping on the surrounding `with` block glued `serviceAccountName` onto the last pull secret entry, so any release that set `imagePullSecrets` failed to render with `mapping values are not allowed in this context`.
+- Give each worker Deployment a distinct `spec.selector`. `redash.selectorLabels` only emitted the chart name and release instance, so the `adhocworker`, `genericworker` and `scheduledworker` Deployments shared one selector and could adopt each other's Pods. The `app.kubernetes.io/component` label moved from `redash.labels` into `redash.selectorLabels`.
+
+### Changed
+
+- Test the chart against Kubernetes 1.31-1.36. 1.35 and 1.36 are added to the CI matrix while 1.31 and 1.32 stay covered, so the documented prerequisite remains 1.31+.
+- Fix typos across the documentation and values comments: `depreciated` -> `deprecated`, `overriden`/`overidden` -> `overridden`, `it's own` -> `its own`, `traffuc` -> `traffic`.
+
+### Upgrade notes
+
+A Deployment's `spec.selector` is immutable, so the worker selector fix above cannot be applied by `helm upgrade` alone - the upgrade fails with `field is immutable`. Delete the three worker Deployments first, then upgrade:
+
+```bash
+kubectl get deploy -n <namespace> -l app.kubernetes.io/instance=<release> \
+  -o name | grep worker | xargs kubectl delete -n <namespace>
+helm upgrade <release> redash/redash
+```
+
+The worker Deployment names are not spelled out here because they vary: `redash.fullname` is `<release>-redash`, but collapses to just `<release>` when the release name already contains `redash`, and changes again under `nameOverride`/`fullnameOverride`. Selecting on the release label covers every case.
+
+Deleting the Deployments removes their Pods, and the upgrade recreates both. Queries queued in Redis during the gap are picked up once the new workers start. The server, scheduler and databases are untouched.
+
 ## 4.0.0
 
 **BREAKING CHANGE — PostgreSQL major version upgrade requires manual migration.**
@@ -235,7 +267,7 @@ kubectl logs -n <namespace> deploy/<release>-redash-server --tail=50
 - Final release to support Redash v8.x
 - Redis password is now required
 - Kubernetes minimum version increased to v19.x
-- Helm 2 depreciated, will be removed in a future version
+- Helm 2 deprecated, will be removed in a future version
 - Supports stable Ingress API
 - Add support for SQL Alchemy pool pre-ping configuration
 - Add support for configurable worker pod labels
@@ -244,7 +276,7 @@ kubectl logs -n <namespace> deploy/<release>-redash-server --tail=50
 ## 2.3.0
 
 - Added externalPostgreSQLSecret / externalRedisSecret
-- Depreciated envSecretName (plan to remove in 3.0.0 chart)
+- Deprecated envSecretName (plan to remove in 3.0.0 chart)
 - Updated docs to make defaults clearer
 
 ## 2.2.0
@@ -278,7 +310,7 @@ kubectl logs -n <namespace> deploy/<release>-redash-server --tail=50
 ## 1.2.0
 
 - Upgrade Redash to 8.0.2.b37747
-- Upgrade PostgreSQL chart (the old version used depreciated APIs) and image tag
+- Upgrade PostgreSQL chart (the old version used deprecated APIs) and image tag
 - Upgrade Redis chart
 
 ## 1.1.0

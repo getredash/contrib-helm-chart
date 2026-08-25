@@ -1,3 +1,4 @@
+{{- if not .Values.server.knative.enabled -}}
 apiVersion: v1
 kind: Service
 metadata:
@@ -24,3 +25,4 @@ spec:
   selector:
     {{- include "redash.selectorLabels" . | nindent 4 }}
     app.kubernetes.io/component: server
+{{- end }}

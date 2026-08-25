@@ -1,3 +1,4 @@
+{{- if not .Values.server.knative.enabled -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -23,9 +24,9 @@ spec:
       annotations: {{ tpl (toYaml .) $ | nindent 8 }}
       {{- end }}
     spec:
-      {{ with .Values.imagePullSecrets -}}
+      {{- with .Values.imagePullSecrets }}
       imagePullSecrets: {{ toYaml . | nindent 8 }}
-      {{ end -}}
+      {{- end }}
       serviceAccountName: {{ include "redash.serviceAccountName" . }}
       securityContext: {{ toYaml .Values.server.podSecurityContext | nindent 8 }}
       {{- $initContainers := concat .Values.initContainers .Values.server.initContainers }}
@@ -38,7 +39,7 @@ spec:
         {{- end }}
         - name: {{ include "redash.name" . }}-server
           securityContext: {{ toYaml .Values.server.securityContext | nindent 12 }}
-          image: {{ .Values.image.registry }}/{{ .Values.image.repo }}:{{ .Values.image.tag | default .Chart.AppVersion }}
+          image: {{ .Values.image.registry }}/{{ .Values.image.repo }}:{{ tpl (toString (.Values.image.tag | default .Chart.AppVersion)) . }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           {{- $volumeMounts := concat .Values.volumeMounts .Values.server.volumeMounts }}
           {{- with $volumeMounts }}
@@ -73,10 +74,10 @@ spec:
             - containerPort: {{ .Values.server.httpPort }}
           {{- $defaultProbe := dict "httpGet" (dict "path" "/ping" "port" .Values.server.httpPort) -}}
           {{- with .Values.server.livenessProbe }}
-          livenessProbe: {{ deepCopy . | mergeOverwrite $defaultProbe | toYaml | nindent 12 }}
+          livenessProbe: {{ include "redash.probe" (dict "probe" . "default" $defaultProbe) | nindent 12 }}
           {{- end }}
           {{- with .Values.server.readinessProbe }}
-          readinessProbe: {{ deepCopy . | mergeOverwrite $defaultProbe | toYaml | nindent 12 }}
+          readinessProbe: {{ include "redash.probe" (dict "probe" . "default" $defaultProbe) | nindent 12 }}
           {{- end }}
           {{- with .Values.server.resources }}
           resources: {{ toYaml . | nindent 12 }}
@@ -97,3 +98,4 @@ spec:
       {{- with .Values.server.priorityClassName }}
       priorityClassName: {{ . }}
       {{- end }}
+{{- end }}

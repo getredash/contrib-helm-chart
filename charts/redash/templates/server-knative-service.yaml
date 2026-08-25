@@ -1,27 +1,21 @@
-apiVersion: apps/v1
-kind: Deployment
+{{- if .Values.server.knative.enabled -}}
+apiVersion: serving.knative.dev/v1
+kind: Service
 metadata:
-  name: {{ include "redash.scheduler.fullname" . }}
+  name: {{ include "redash.fullname" . }}
   labels:
     {{- include "redash.labels" . | nindent 4 }}
-    app.kubernetes.io/component: scheduler
+    app.kubernetes.io/component: server
 spec:
-  replicas: {{ .Values.scheduler.replicaCount }}
-  strategy:
-    type: Recreate
-  selector:
-    matchLabels:
-      {{- include "redash.selectorLabels" . | nindent 6 }}
-      app.kubernetes.io/component: scheduler
   template:
     metadata:
       labels:
         {{- include "redash.selectorLabels" . | nindent 8 }}
-        app.kubernetes.io/component: scheduler
-        {{- with .Values.scheduler.podLabels }}
+        app.kubernetes.io/component: server
+        {{- with .Values.server.podLabels }}
         {{- tpl (toYaml .) $ | nindent 8 }}
         {{- end }}
-      {{- with .Values.scheduler.podAnnotations }}
+      {{- with mergeOverwrite (deepCopy .Values.server.podAnnotations) .Values.server.knative.annotations }}
       annotations: {{ tpl (toYaml .) $ | nindent 8 }}
       {{- end }}
     spec:
@@ -29,20 +23,27 @@ spec:
       imagePullSecrets: {{ toYaml . | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ include "redash.serviceAccountName" . }}
-      securityContext: {{ toYaml .Values.scheduler.podSecurityContext | nindent 8 }}
-      {{- $initContainers := concat .Values.initContainers .Values.scheduler.initContainers }}
+      {{- with .Values.server.podSecurityContext }}
+      securityContext: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.server.knative.spec }}
+      {{- toYaml . | nindent 6 }}
+      {{- end }}
+      {{- $initContainers := concat .Values.initContainers .Values.server.initContainers }}
       {{- with $initContainers }}
       initContainers: {{ toYaml . | nindent 8 }}
       {{- end }}
       containers:
-        {{- with .Values.scheduler.extraContainers -}}
-        {{ toYaml . | nindent 8 }}
+        {{- with .Values.server.extraContainers -}}
+        {{- toYaml . | nindent 8 }}
         {{- end }}
-        - name: {{ include "redash.name" . }}-scheduler
-          securityContext: {{ toYaml .Values.scheduler.securityContext | nindent 12 }}
+        - name: {{ include "redash.name" . }}-server
+          {{- with .Values.server.securityContext }}
+          securityContext: {{ toYaml . | nindent 12 }}
+          {{- end }}
           image: {{ .Values.image.registry }}/{{ .Values.image.repo }}:{{ tpl (toString (.Values.image.tag | default .Chart.AppVersion)) . }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          {{- $volumeMounts := concat .Values.volumeMounts .Values.scheduler.volumeMounts }}
+          {{- $volumeMounts := concat .Values.volumeMounts .Values.server.volumeMounts }}
           {{- with $volumeMounts }}
           volumeMounts: {{ toYaml . | nindent 12 }}
           {{- end }}
@@ -61,36 +62,42 @@ spec:
               {{- if .Values.postgresql.enabled }}
               export REDASH_DATABASE_URL="postgresql://${REDASH_DATABASE_USER}:${REDASH_DATABASE_PASSWORD}@${REDASH_DATABASE_HOSTNAME}:${REDASH_DATABASE_PORT}/${REDASH_DATABASE_NAME}"
               {{- end }}
-              exec /app/bin/docker-entrypoint scheduler
+              exec /app/bin/docker-entrypoint server
           {{- else }}
-            - scheduler
+            - server
           {{- end }}
           env:
-          {{- $envCtx := mergeOverwrite (deepCopy .) (dict "Values" (dict "env" .Values.scheduler.env)) -}}
+          {{- $envCtx := mergeOverwrite (deepCopy .) (dict "Values" (dict "env" .Values.server.env)) -}}
           {{- include "redash.env" $envCtx | nindent 12 }}
           {{- with (include "redash.envFrom" .) }}
           envFrom: {{ . | nindent 12 }}
           {{- end }}
-          {{- with .Values.scheduler.resources }}
+          ports:
+            - containerPort: {{ .Values.server.httpPort }}
+          {{- $defaultProbe := dict "httpGet" (dict "path" "/ping" "port" .Values.server.httpPort) -}}
+          {{- with .Values.server.livenessProbe }}
+          livenessProbe: {{ include "redash.probe" (dict "probe" . "default" $defaultProbe) | nindent 12 }}
+          {{- end }}
+          {{- with .Values.server.readinessProbe }}
+          readinessProbe: {{ include "redash.probe" (dict "probe" . "default" $defaultProbe) | nindent 12 }}
+          {{- end }}
+          {{- with .Values.server.resources }}
           resources: {{ toYaml . | nindent 12 }}
           {{- end }}
-          {{- with .Values.scheduler.livenessProbe }}
-          livenessProbe: {{ toYaml . | nindent 12 }}
-          {{- end }}
-      {{- $volumes := concat .Values.volumes .Values.scheduler.volumes }}
+      {{- $volumes := concat .Values.volumes .Values.server.volumes -}}
       {{- with $volumes }}
       volumes: {{ toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.scheduler.nodeSelector }}
+      {{- with .Values.server.nodeSelector }}
       nodeSelector: {{ toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.scheduler.affinity }}
+      {{- with .Values.server.affinity }}
       affinity: {{ toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.scheduler.tolerations }}
-      tolerations:
-      {{ toYaml . | nindent 8 }}
+      {{- with .Values.server.tolerations }}
+      tolerations: {{ toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.scheduler.priorityClassName }}
+      {{- with .Values.server.priorityClassName }}
       priorityClassName: {{ . }}
       {{- end }}
+{{- end }}
