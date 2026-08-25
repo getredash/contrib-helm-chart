@@ -498,6 +498,10 @@ Shared environment block used across each component.
   value: {{ quote . }}
 {{- end }}
 ## End primary Redash configuration
+{{- with .Values.redash.sqlAlchemyEnablePoolPrePing }}
+- name: SQLALCHEMY_ENABLE_POOL_PRE_PING
+  value: {{ quote . }}
+{{- end }}
 {{- end -}}
 
 {{/*
