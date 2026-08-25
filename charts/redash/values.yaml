@@ -606,6 +606,11 @@ postgresql:
     username: redash
     # postgresql.auth.password -- REQUIRED: PostgreSQL password for redash user (when postgresql chart enabled)
     password:
+    # postgresql.auth.existingSecret -- Name of an existing secret holding the PostgreSQL password. Takes precedence over postgresql.auth.password, and is read by both the postgresql subchart and Redash.
+    existingSecret: ""
+    secretKeys:
+      # postgresql.auth.secretKeys.userPasswordKey -- Key inside postgresql.auth.existingSecret holding the redash user password
+      userPasswordKey: password
   # postgresql.auth.database -- PostgreSQL database name (when postgresql chart enabled)
     database: redash
 
