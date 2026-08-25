@@ -8,14 +8,14 @@ This chart bootstraps a [Redash](https://github.com/getredash/redash) deployment
 
 This is a contributed project developed by volunteers and not officially supported by Redash.
 
-Current chart version is `3.2.0`
+Current chart version is `4.1.0`
 
 * <https://github.com/getredash/redash>
 
 ## Prerequisites
 
 - At least 3 GB of RAM available on your cluster
-- Kubernetes 1.31+ - chart is tested with latest 4 stable versions (1.31-1.34)
+- Kubernetes 1.33+ - chart is tested with latest 4 stable versions (1.33-1.36)
 - Helm 3 (Helm 2 depreciated)
 - PV provisioner support in the underlying infrastructure
 
@@ -52,6 +52,14 @@ $ helm upgrade --install -f my-values.yaml my-release redash/redash
 The command deploys Redash on the Kubernetes cluster in the default configuration. The [configuration](#configuration) section and and default [values.yaml](values.yaml) lists the parameters that can be configured during installation.
 
 > **Tip**: List all releases using `helm list`
+
+## Knative Serving
+
+Set `server.knative.enabled=true` to render the Redash web server as a Knative Service instead of a Kubernetes Deployment. Workers, scheduler, migrations, PostgreSQL, and Redis still render as standard Kubernetes resources.
+
+When Knative mode is enabled, the chart-managed `ingress` and `service` resources are skipped and Knative handles routing instead. Configure autoscaling through `server.knative.annotations`, including `autoscaling.knative.dev/*` keys such as `min-scale` and `max-scale`, and set revision fields such as `containerConcurrency` or `timeoutSeconds` through `server.knative.spec`.
+
+Knative mode requires Knative Serving to be available on the target cluster. Some server pod settings use Knative feature-gated PodSpec fields, such as `server.initContainers`, `server.nodeSelector`, `server.affinity`, `server.tolerations`, `server.priorityClassName`, `server.podSecurityContext`, and some `server.volumes` values. Enable the corresponding Knative `config-features` flags before setting those values; otherwise Knative admission rejects the Service and `helm install/upgrade` fails.
 
 ## Uninstalling the Chart
 
@@ -117,9 +125,6 @@ The following table lists the configurable parameters of the Redash chart and th
 | postgresql.auth.username | string | `"redash"` | PostgreSQL username for redash user (when postgresql chart enabled) |
 | postgresql.enabled | bool | `true` | Whether to deploy a PostgreSQL server to satisfy the applications database requirements. To use an external PostgreSQL set this to false and configure the externalPostgreSQL parameter. |
 | postgresql.primary.service.ports.postgresql | int | `5432` |  |
-| postgresqlMigration.enabled | bool | `false` | Enable automatic PostgreSQL migration hooks for major version upgrades (e.g., 15→18).  WARNING: Requires a PVC to be created beforehand for storing the dump between pre-upgrade and post-upgrade hooks. Create a PVC: kubectl create -f - <<EOF apiVersion: v1 kind: PersistentVolumeClaim metadata:   name: <release-name>-postgres-migration spec:   accessModes: [ReadWriteOnce]   resources:     requests:       storage: 10Gi EOF Then set postgresqlMigration.storage.pvcName to the PVC name. |
-| postgresqlMigration.storage | object | `{"pvcName":""}` | Storage configuration for migration dumps |
-| postgresqlMigration.storage.pvcName | string | `""` | REQUIRED: Name of existing PVC to use for storing migration dumps.  The PVC must exist before running the upgrade. Both pre-upgrade (dump) and post-upgrade (restore) hooks use this PVC. If not set, uses emptyDir which will NOT persist between hooks (migration will fail). |
 | redash.additionalDestinations | string | `""` | `REDASH_ADDITIONAL_DESTINATIONS` value. Comma-separated list of non-default alert destinations to be enabled. |
 | redash.additionalQueryRunners | string | `""` | `REDASH_ADDITIONAL_QUERY_RUNNERS` value. Comma-separated list of non-default query runners to be enabled. |
 | redash.adhocQueryTimeLimit | string | None | `REDASH_ADHOC_QUERY_TIME_LIMIT` value. Time limit for adhoc queries (in seconds). |
@@ -229,6 +234,9 @@ The following table lists the configurable parameters of the Redash chart and th
 | server.env | object | `{}` | Redash server specific environment variables Don't use this for variables that are in the configuration above, however. |
 | server.httpPort | int | `5000` | Server container port (only useful if you are using a customized image) |
 | server.initContainers | list | `[]` | Server init containers configuration |
+| server.knative.annotations | object | `{}` | Annotations for the Knative revision template, including `autoscaling.knative.dev/*` settings |
+| server.knative.enabled | bool | `false` | Render the server as a Knative Service instead of a Deployment |
+| server.knative.spec | object | `{}` | Additional fields for the Knative revision spec (e.g. `containerConcurrency`, `timeoutSeconds`) |
 | server.livenessProbe | object | `{"failureThreshold":10,"initialDelaySeconds":90,"periodSeconds":10,"successThreshold":1,"timeoutSeconds":1}` | Server liveness probe configuration |
 | server.nodeSelector | object | `{}` | Node labels for server pod assignment [ref](https://kubernetes.io/docs/user-guide/node-selection/) |
 | server.podAnnotations | object | `{}` | Annotations for server pod assignment [ref](https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/) |

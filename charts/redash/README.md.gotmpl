@@ -15,7 +15,7 @@ Current chart version is `{{ template "chart.version" . }}`
 ## Prerequisites
 
 - At least 3 GB of RAM available on your cluster
-- Kubernetes 1.31+ - chart is tested with latest 4 stable versions (1.31-1.34)
+- Kubernetes 1.33+ - chart is tested with latest 4 stable versions (1.33-1.36)
 - Helm 3 (Helm 2 depreciated)
 - PV provisioner support in the underlying infrastructure
 
@@ -105,6 +105,91 @@ Below are notes on manual configuration changes or steps needed for major chart 
   - default config for all workers is at `worker` section
 - replaced `hookInstallJob` and `hookUpgradeJob` with `migrations`
 - Moved custom entrypoint scripts to [Redash repo](https://github.com/getredash/redash/pull/6674)
+
+### From 3.1 to 3.2
+
+**CRITICAL: PostgreSQL Major Version Upgrade (15→18)**
+
+This upgrade includes a PostgreSQL major version upgrade from 15 to 18. **PostgreSQL major versions are NOT data-directory compatible** - PostgreSQL 18 cannot read PostgreSQL 15 data directly.
+
+**Two upgrade options:**
+
+#### Option 1: Automatic Migration (Recommended)
+
+Enable automatic migration hooks:
+
+1. **Create a PVC for migration storage** (required):
+   ```bash
+   kubectl create -f - <<EOF
+   apiVersion: v1
+   kind: PersistentVolumeClaim
+   metadata:
+     name: <release-name>-postgres-migration
+   spec:
+     accessModes: [ReadWriteOnce]
+     resources:
+       requests:
+         storage: 10Gi
+   EOF
+   ```
+
+2. **Enable migration hooks** in your values:
+   ```yaml
+   postgresqlMigration:
+     enabled: true
+     storage:
+       pvcName: <release-name>-postgres-migration
+   ```
+
+3. **Upgrade**:
+   ```bash
+   helm upgrade --reuse-values <release-name> redash/redash
+   ```
+
+**What happens automatically:**
+- Pre-upgrade hook: Dumps PostgreSQL 15 data to the migration PVC
+- Pre-upgrade hook: Scales down PostgreSQL 15 StatefulSet
+- Pre-upgrade hook: Deletes the old PostgreSQL 15 PVC (data is safely backed up)
+- Helm upgrade: Starts PostgreSQL 18 with a fresh data directory
+- Post-upgrade hook: Restores data from dump files to PostgreSQL 18
+
+**Important Notes:**
+- The service account needs RBAC permissions (automatically created when `postgresqlMigration.enabled: true`)
+- Ensure the migration PVC has sufficient storage (at least 2x your database size)
+- The old PostgreSQL 15 PVC will be **deleted** - all data must be in the dump files
+- Test in a staging environment first!
+
+#### Option 2: Manual Migration
+
+If you prefer manual control:
+
+1. **Dump the database**:
+   ```bash
+   kubectl exec -it <release-name>-postgresql-0 -- pg_dump -U redash -d redash -F c -f /tmp/redash-backup.dump
+   kubectl cp <release-name>-postgresql-0:/tmp/redash-backup.dump ./redash-backup.dump
+   ```
+
+2. **Delete the PostgreSQL StatefulSet and PVC**:
+   ```bash
+   kubectl scale statefulset <release-name>-postgresql --replicas=0
+   kubectl delete pvc <release-name>-postgresql-data-0  # or appropriate PVC name
+   ```
+
+3. **Upgrade the chart** (PostgreSQL 18 will start fresh):
+   ```bash
+   helm upgrade --reuse-values <release-name> redash/redash
+   ```
+
+4. **Wait for PostgreSQL 18 to be ready**, then restore:
+   ```bash
+   kubectl cp ./redash-backup.dump <release-name>-postgresql-0:/tmp/redash-backup.dump
+   kubectl exec -it <release-name>-postgresql-0 -- pg_restore -U redash -d redash -v --no-owner --no-privileges /tmp/redash-backup.dump
+   ```
+
+**Other changes:**
+- Redash upgraded from v24.04.0-dev to v25.8.0 (latest stable)
+- Redis dependency upgraded from ^19.1.0 to ^24.1.0
+- Kubernetes compatibility: 1.31+ (removed support for 1.26-1.30)
 
 ### From 2.x to 3.x
 

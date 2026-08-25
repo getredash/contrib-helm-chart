@@ -2,8 +2,31 @@
 
 ## 4.1.0
 
+### Added
+
 - Add optional Knative Serving support for the Redash web server via `server.knative.enabled`: the server renders as a Knative Service instead of a Deployment, while worker, scheduler, migrations, PostgreSQL, and Redis stay on standard Kubernetes resources.
 - Skip the chart-managed `ingress` and `service` resources in Knative mode, relying on Knative routing instead. Configure the revision through `server.knative.annotations` and `server.knative.spec`.
+
+### Fixed
+
+- Fix `imagePullSecrets` rendering in the server, worker and scheduler pod specs. The whitespace chomping on the surrounding `with` block glued `serviceAccountName` onto the last pull secret entry, so any release that set `imagePullSecrets` failed to render with `mapping values are not allowed in this context`.
+- Give each worker Deployment a distinct `spec.selector`. `redash.selectorLabels` only emitted the chart name and release instance, so the `adhocworker`, `genericworker` and `scheduledworker` Deployments shared one selector and could adopt each other's Pods. The `app.kubernetes.io/component` label moved from `redash.labels` into `redash.selectorLabels`.
+
+### Changed
+
+- Test the chart against Kubernetes 1.33-1.36 (was 1.31-1.34) and update the documented prerequisite to 1.33+.
+
+### Upgrade notes
+
+A Deployment's `spec.selector` is immutable, so the worker selector fix above cannot be applied by `helm upgrade` alone - the upgrade fails with `field is immutable`. Delete the three worker Deployments first, then upgrade:
+
+```bash
+kubectl delete deployment -n <namespace> \
+  <release>-adhocworker <release>-genericworker <release>-scheduledworker
+helm upgrade <release> redash/redash
+```
+
+Deleting the Deployments removes their Pods, and the upgrade recreates both. Queries queued in Redis during the gap are picked up once the new workers start. The server, scheduler and databases are untouched.
 
 ## 4.0.0
 
