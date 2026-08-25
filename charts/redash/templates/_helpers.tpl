@@ -517,7 +517,7 @@ Common labels
 helm.sh/chart: {{ include "redash.chart" . }}
 {{ include "redash.selectorLabels" . }}
 {{- if or .Chart.AppVersion .Values.image.tag }}
-app.kubernetes.io/version: {{ .Values.image.tag | default .Chart.AppVersion | quote }}
+app.kubernetes.io/version: {{ tpl (toString (.Values.image.tag | default .Chart.AppVersion)) . | quote }}
 {{- end }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- if .Values.commonLabels }}

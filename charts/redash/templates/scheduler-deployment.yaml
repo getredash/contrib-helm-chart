@@ -40,7 +40,7 @@ spec:
         {{- end }}
         - name: {{ include "redash.name" . }}-scheduler
           securityContext: {{ toYaml .Values.scheduler.securityContext | nindent 12 }}
-          image: {{ .Values.image.registry }}/{{ .Values.image.repo }}:{{ .Values.image.tag | default .Chart.AppVersion }}
+          image: {{ .Values.image.registry }}/{{ .Values.image.repo }}:{{ tpl (toString (.Values.image.tag | default .Chart.AppVersion)) . }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           {{- $volumeMounts := concat .Values.volumeMounts .Values.scheduler.volumeMounts }}
           {{- with $volumeMounts }}
