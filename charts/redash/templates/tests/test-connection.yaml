@@ -1,7 +1,12 @@
+{{- $fullName := include "redash.fullname" . -}}
+{{- $testUrl := printf "http://%s:%v" $fullName .Values.service.port -}}
+{{- if .Values.server.knative.enabled -}}
+{{- $testUrl = printf "http://%s.%s.svc.cluster.local" $fullName .Release.Namespace -}}
+{{- end -}}
 apiVersion: v1
 kind: Pod
 metadata:
-  name: "{{ include "redash.fullname" . }}-test-connection"
+  name: "{{ $fullName }}-test-connection"
   labels:
     {{- include "redash.labels" . | nindent 4 }}
     app.kubernetes.io/component: test-connection
@@ -12,5 +17,5 @@ spec:
     - name: curl
       image: curlimages/curl:8.8.0
       command: ['sh']
-      args: ['-c', 'curl --silent --show-error -L --max-redirs 3 --retry 3 --retry-connrefused --retry-delay 10 --max-time 30 "http://{{ include "redash.fullname" . }}:{{ .Values.service.port }}" | fgrep "Welcome to Redash"']
+      args: ['-c', 'curl --silent --show-error -L --max-redirs 3 --retry 3 --retry-connrefused --retry-delay 10 --max-time 30 "{{ $testUrl }}" | fgrep "Welcome to Redash"']
   restartPolicy: Never

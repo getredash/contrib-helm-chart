@@ -303,6 +303,14 @@ server:
   # server.replicaCount -- Number of server pods to run
   replicaCount: 1
 
+  knative:
+    # server.knative.enabled -- Render the server as a Knative Service instead of a Deployment
+    enabled: false
+    # server.knative.annotations -- Annotations for the Knative revision template, including `autoscaling.knative.dev/*` settings
+    annotations: {}
+    # server.knative.spec -- Additional fields for the Knative revision spec (e.g. `containerConcurrency`, `timeoutSeconds`)
+    spec: {}
+
   # server.resources -- Server resource requests and limits [ref](http://kubernetes.io/docs/user-guide/compute-resources/)
   resources:
     {}

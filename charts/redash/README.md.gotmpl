@@ -15,7 +15,7 @@ Current chart version is `{{ template "chart.version" . }}`
 ## Prerequisites
 
 - At least 3 GB of RAM available on your cluster
-- Kubernetes 1.19+ - chart is tested with latest 3 stable versions
+- Kubernetes 1.31+ - chart is tested with latest 4 stable versions (1.31-1.34)
 - Helm 3 (Helm 2 depreciated)
 - PV provisioner support in the underlying infrastructure
 
@@ -52,6 +52,14 @@ $ helm upgrade --install -f my-values.yaml my-release redash/redash
 The command deploys Redash on the Kubernetes cluster in the default configuration. The [configuration](#configuration) section and and default [values.yaml](values.yaml) lists the parameters that can be configured during installation.
 
 > **Tip**: List all releases using `helm list`
+
+## Knative Serving
+
+Set `server.knative.enabled=true` to render the Redash web server as a Knative Service instead of a Kubernetes Deployment. Workers, scheduler, migrations, PostgreSQL, and Redis still render as standard Kubernetes resources.
+
+When Knative mode is enabled, the chart-managed `ingress` and `service` resources are skipped and Knative handles routing instead. Configure autoscaling through `server.knative.annotations`, including `autoscaling.knative.dev/*` keys such as `min-scale` and `max-scale`, and set revision fields such as `containerConcurrency` or `timeoutSeconds` through `server.knative.spec`.
+
+Knative mode requires Knative Serving to be available on the target cluster. Some server pod settings use Knative feature-gated PodSpec fields, such as `server.initContainers`, `server.nodeSelector`, `server.affinity`, `server.tolerations`, `server.priorityClassName`, `server.podSecurityContext`, and some `server.volumes` values. Enable the corresponding Knative `config-features` flags before setting those values; otherwise Knative admission rejects the Service and `helm install/upgrade` fails.
 
 ## Uninstalling the Chart
 

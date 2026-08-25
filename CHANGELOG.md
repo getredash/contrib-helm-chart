@@ -1,5 +1,10 @@
 # Changelog
 
+## 4.1.0
+
+- Add optional Knative Serving support for the Redash web server via `server.knative.enabled`: the server renders as a Knative Service instead of a Deployment, while worker, scheduler, migrations, PostgreSQL, and Redis stay on standard Kubernetes resources.
+- Skip the chart-managed `ingress` and `service` resources in Knative mode, relying on Knative routing instead. Configure the revision through `server.knative.annotations` and `server.knative.spec`.
+
 ## 4.0.0
 
 **BREAKING CHANGE — PostgreSQL major version upgrade requires manual migration.**
