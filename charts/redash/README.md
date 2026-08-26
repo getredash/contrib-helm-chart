@@ -8,7 +8,7 @@ This chart bootstraps a [Redash](https://github.com/getredash/redash) deployment
 
 This is a contributed project developed by volunteers and not officially supported by Redash.
 
-Current chart version is `4.1.0`
+Current chart version is `4.2.0`
 
 * <https://github.com/getredash/redash>
 
@@ -59,7 +59,7 @@ Set `server.knative.enabled=true` to render the Redash web server as a Knative S
 
 When Knative mode is enabled, the chart-managed `ingress` and `service` resources are skipped and Knative handles routing instead. Configure autoscaling through `server.knative.annotations`, including `autoscaling.knative.dev/*` keys such as `min-scale` and `max-scale`, and set revision fields such as `containerConcurrency` or `timeoutSeconds` through `server.knative.spec`.
 
-Knative mode requires Knative Serving to be available on the target cluster. Some server pod settings use Knative feature-gated PodSpec fields, such as `server.initContainers`, `server.nodeSelector`, `server.affinity`, `server.tolerations`, `server.priorityClassName`, `server.podSecurityContext`, and some `server.volumes` values. Enable the corresponding Knative `config-features` flags before setting those values; otherwise Knative admission rejects the Service and `helm install/upgrade` fails.
+Knative mode requires Knative Serving to be available on the target cluster. Some server pod settings use Knative feature-gated PodSpec fields, such as `server.initContainers`, `server.nodeSelector`, `server.affinity`, `server.tolerations`, `server.priorityClassName`, `server.podSecurityContext`, `server.topologySpreadConstraints`, and some `server.volumes` values. Enable the corresponding Knative `config-features` flags before setting those values; otherwise Knative admission rejects the Service and `helm install/upgrade` fails.
 
 ## Uninstalling the Chart
 
@@ -117,12 +117,15 @@ The following table lists the configurable parameters of the Redash chart and th
 | migrations.resources | string | `nil` | Scheduled worker resource requests and limits [ref](http://kubernetes.io/docs/user-guide/compute-resources/) |
 | migrations.securityContext | object | `{}` |  |
 | migrations.tolerations | list | `[]` | Tolerations for server pod assignment [ref](https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/) |
+| migrations.topologySpreadConstraints | list | `[]` | Topology spread constraints for migrations pod assignment [ref](https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/) |
 | migrations.ttlSecondsAfterFinished | int | `600` | ttl for install job [ref](https://kubernetes.io/docs/concepts/workloads/controllers/ttlafterfinished/) |
 | migrations.volumeMounts | list | `[]` | volume mounts for migrations pods |
 | migrations.volumes | list | `[]` | volumes that will be mounted to migrations pods only |
 | nameOverride | string | `""` |  |
 | postgresql.auth.database | string | `"redash"` | PostgreSQL database name (when postgresql chart enabled) |
+| postgresql.auth.existingSecret | string | `""` | Name of an existing secret holding the PostgreSQL password. Takes precedence over postgresql.auth.password, and is read by both the postgresql subchart and Redash. |
 | postgresql.auth.password | string | `nil` | REQUIRED: PostgreSQL password for redash user (when postgresql chart enabled) |
+| postgresql.auth.secretKeys.userPasswordKey | string | `"password"` | Key inside postgresql.auth.existingSecret holding the redash user password |
 | postgresql.auth.username | string | `"redash"` | PostgreSQL username for redash user (when postgresql chart enabled) |
 | postgresql.enabled | bool | `true` | Whether to deploy a PostgreSQL server to satisfy the applications database requirements. To use an external PostgreSQL set this to false and configure the externalPostgreSQL parameter. |
 | postgresql.primary.service.ports.postgresql | int | `5432` |  |
@@ -229,6 +232,7 @@ The following table lists the configurable parameters of the Redash chart and th
 | scheduler.resources | string | `nil` | scheduler resource requests and limits [ref](http://kubernetes.io/docs/user-guide/compute-resources/) |
 | scheduler.securityContext | object | `{}` |  |
 | scheduler.tolerations | list | `[]` | Tolerations for scheduler pod assignment [ref](https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/) |
+| scheduler.topologySpreadConstraints | list | `[]` | Topology spread constraints for scheduler pod assignment [ref](https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/) |
 | scheduler.volumeMounts | list | `[]` | VolumeMounts for scheduler pod assignment [ref](https://kubernetes.io/docs/concepts/storage/volumes/) |
 | scheduler.volumes | list | `[]` | Volumes for scheduler pod  assignment [ref](https://kubernetes.io/docs/concepts/storage/volumes/) |
 | server.affinity | object | `{}` | Affinity for server pod assignment [ref](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity) |
@@ -249,6 +253,7 @@ The following table lists the configurable parameters of the Redash chart and th
 | server.resources | object | `{}` | Server resource requests and limits [ref](http://kubernetes.io/docs/user-guide/compute-resources/) |
 | server.securityContext | object | `{}` |  |
 | server.tolerations | list | `[]` | Tolerations for server pod assignment [ref](https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/) |
+| server.topologySpreadConstraints | list | `[]` | Topology spread constraints for server pod assignment [ref](https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/) |
 | server.volumeMounts | list | `[]` | VolumeMounts for server pod assignment [ref](https://kubernetes.io/docs/concepts/storage/volumes/) |
 | server.volumes | list | `[]` | Volumes for server pod assignment [ref](https://kubernetes.io/docs/concepts/storage/volumes/) |
 | service.annotations | object | `{}` | Annotations to add to the service |
@@ -273,6 +278,7 @@ The following table lists the configurable parameters of the Redash chart and th
 | worker.resources | string | `nil` | Worker default resource requests and limits [ref](http://kubernetes.io/docs/user-guide/compute-resources/) |
 | worker.securityContext | object | `{}` |  |
 | worker.tolerations | list | `[]` | Default tolerations for worker pod assignment [ref](https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/) |
+| worker.topologySpreadConstraints | list | `[]` | Default topology spread constraints for worker pod assignment [ref](https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/) |
 | worker.volumeMounts | list | `[]` | Default VolumeMounts for worker pod assignment [ref](https://kubernetes.io/docs/concepts/storage/volumes/) |
 | worker.volumes | list | `[]` | Default volumes for pod worker assignment [ref](https://kubernetes.io/docs/concepts/storage/volumes/) |
 | workers.adhoc.env | object | `{"QUEUES":"queries","WORKERS_COUNT":2}` | Redash ad-hoc worker specific environment variables. |

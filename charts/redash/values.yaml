@@ -348,6 +348,9 @@ server:
   # server.nodeSelector -- Node labels for server pod assignment [ref](https://kubernetes.io/docs/user-guide/node-selection/)
   nodeSelector: {}
 
+  # server.topologySpreadConstraints -- Topology spread constraints for server pod assignment [ref](https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/)
+  topologySpreadConstraints: []
+
   # server.tolerations -- Tolerations for server pod assignment [ref](https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/)
   tolerations: []
 
@@ -446,6 +449,9 @@ worker:
   # worker.nodeSelector -- Default node labels for worker pod assignment [ref](https://kubernetes.io/docs/user-guide/node-selection/)
   nodeSelector: {}
 
+  # worker.topologySpreadConstraints -- Default topology spread constraints for worker pod assignment [ref](https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/)
+  topologySpreadConstraints: []
+
   # worker.tolerations -- Default tolerations for worker pod assignment [ref](https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/)
   tolerations: []
 
@@ -516,6 +522,9 @@ scheduler:
   # scheduler.nodeSelector -- Node labels for scheduler pod assignment [ref](https://kubernetes.io/docs/user-guide/node-selection/)
   nodeSelector: {}
 
+  # scheduler.topologySpreadConstraints -- Topology spread constraints for scheduler pod assignment [ref](https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/)
+  topologySpreadConstraints: []
+
   # scheduler.tolerations -- Tolerations for scheduler pod assignment [ref](https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/)
   tolerations: []
 
@@ -566,6 +575,9 @@ migrations:
   # migrations.nodeSelector -- Node labels for scheduled worker pod assignment [ref](https://kubernetes.io/docs/user-guide/node-selection/)
   nodeSelector: {}
 
+  # migrations.topologySpreadConstraints -- Topology spread constraints for migrations pod assignment [ref](https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/)
+  topologySpreadConstraints: []
+
   # migrations.tolerations -- Tolerations for server pod assignment [ref](https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/)
   tolerations: []
 
@@ -606,6 +618,11 @@ postgresql:
     username: redash
     # postgresql.auth.password -- REQUIRED: PostgreSQL password for redash user (when postgresql chart enabled)
     password:
+    # postgresql.auth.existingSecret -- Name of an existing secret holding the PostgreSQL password. Takes precedence over postgresql.auth.password, and is read by both the postgresql subchart and Redash.
+    existingSecret: ""
+    secretKeys:
+      # postgresql.auth.secretKeys.userPasswordKey -- Key inside postgresql.auth.existingSecret holding the redash user password
+      userPasswordKey: password
   # postgresql.auth.database -- PostgreSQL database name (when postgresql chart enabled)
     database: redash
 

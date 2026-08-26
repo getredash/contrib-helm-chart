@@ -91,8 +91,8 @@ Shared environment block used across each component.
 - name: REDASH_DATABASE_PASSWORD
   valueFrom:
     secretKeyRef:
-      name: {{ .Release.Name }}-postgresql
-      key: password
+      name: {{ .Values.postgresql.auth.existingSecret | default (printf "%s-postgresql" .Release.Name) | quote }}
+      key: {{ ternary .Values.postgresql.auth.secretKeys.userPasswordKey "password" (ne .Values.postgresql.auth.existingSecret "") | quote }}
 - name: REDASH_DATABASE_HOSTNAME
   value: {{ include "redash.postgresql.fullname" . }}
 - name: REDASH_DATABASE_PORT
@@ -115,9 +115,9 @@ Shared environment block used across each component.
   valueFrom:
     secretKeyRef:
     {{- with .Values.redis.existingSecret }}
-      name: {{ . }}
+      name: {{ . | quote }}
     {{- else }}
-      name: {{ .Release.Name }}-redis
+      name: {{ printf "%s-redis" .Release.Name | quote }}
     {{- end }}
       key: redis-password
 - name: REDASH_REDIS_HOSTNAME
@@ -498,6 +498,10 @@ Shared environment block used across each component.
   value: {{ quote . }}
 {{- end }}
 ## End primary Redash configuration
+{{- with .Values.redash.sqlAlchemyEnablePoolPrePing }}
+- name: SQLALCHEMY_ENABLE_POOL_PRE_PING
+  value: {{ quote . }}
+{{- end }}
 {{- end -}}
 
 {{/*

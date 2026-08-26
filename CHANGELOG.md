@@ -1,5 +1,17 @@
 # Changelog
 
+## 4.2.0
+
+### Added
+
+- Add `topologySpreadConstraints` for the server, workers, scheduler and migrations job, alongside the existing `nodeSelector`/`affinity`/`tolerations` settings. Workers read the merged per-worker config, so `workers.<name>.topologySpreadConstraints` overrides the shared `worker.topologySpreadConstraints` default.
+- Add `postgresql.auth.existingSecret` and `postgresql.auth.secretKeys.userPasswordKey`, so a release can point the bundled PostgreSQL at an existing secret.
+
+### Fixed
+
+- Emit `SQLALCHEMY_ENABLE_POOL_PRE_PING`. `redash.sqlAlchemyEnablePoolPrePing` was documented and defaulted to `"true"`, but the shared env helper never rendered the variable, so setting it had no effect.
+- Read the database password from `postgresql.auth.existingSecret` when it is set. `REDASH_DATABASE_PASSWORD` was hardcoded to the `password` key of the chart-managed `<release>-postgresql` secret, so a release using an existing secret referenced a secret that does not exist. Default renders are unchanged.
+
 ## 4.1.0
 
 ### Added
