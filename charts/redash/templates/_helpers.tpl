@@ -243,7 +243,7 @@ Shared environment block used across each component.
   value: {{ quote . }}
 {{- end }}
 {{- if not .Values.redash.selfManagedSecrets }}
-{{- if or .Values.redash.ldapBindDnPassword .Values.redash.existingSecret }}
+{{- if .Values.redash.ldapBindDn }}
 - name: REDASH_LDAP_BIND_DN_PASSWORD
   valueFrom:
     secretKeyRef:
@@ -313,7 +313,7 @@ Shared environment block used across each component.
   value: {{ quote . }}
 {{- end }}
 {{- if not .Values.redash.selfManagedSecrets }}
-{{- if or .Values.redash.mailPassword .Values.redash.existingSecret }}
+{{- if .Values.redash.mailUsername }}
 - name: REDASH_MAIL_PASSWORD
   valueFrom:
     secretKeyRef:
