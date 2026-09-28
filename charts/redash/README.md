@@ -253,7 +253,7 @@ The following table lists the configurable parameters of the Redash chart and th
 | server.replicaCount | int | `1` | Number of server pods to run. Set to `null` to omit `spec.replicas`, so an external HorizontalPodAutoscaler or KEDA ScaledObject can own the replica count |
 | server.resources | object | `{}` | Server resource requests and limits [ref](http://kubernetes.io/docs/user-guide/compute-resources/) |
 | server.securityContext | object | `{}` |  |
-| server.terminationGracePeriodSeconds | int | `nil` | Seconds Kubernetes waits after SIGTERM before killing server pods. Unset uses the Kubernetes default of 30 |
+| server.terminationGracePeriodSeconds | int | `nil` | Seconds Kubernetes waits after SIGTERM before killing server pods. Unset uses the Kubernetes default of 30. Ignored when `server.knative.enabled` is true: Knative does not allow this field and derives the grace period from the revision's `timeoutSeconds` (`server.knative.spec.timeoutSeconds`) |
 | server.tolerations | list | `[]` | Tolerations for server pod assignment [ref](https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/) |
 | server.topologySpreadConstraints | list | `[]` | Topology spread constraints for server pod assignment [ref](https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/) |
 | server.volumeMounts | list | `[]` | VolumeMounts for server pod assignment [ref](https://kubernetes.io/docs/concepts/storage/volumes/) |

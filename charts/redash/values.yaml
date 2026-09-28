@@ -306,7 +306,7 @@ server:
   # server.replicaCount -- Number of server pods to run. Set to `null` to omit `spec.replicas`, so an external HorizontalPodAutoscaler or KEDA ScaledObject can own the replica count
   replicaCount: 1
 
-  # server.terminationGracePeriodSeconds -- (int) Seconds Kubernetes waits after SIGTERM before killing server pods. Unset uses the Kubernetes default of 30
+  # server.terminationGracePeriodSeconds -- (int) Seconds Kubernetes waits after SIGTERM before killing server pods. Unset uses the Kubernetes default of 30. Ignored when `server.knative.enabled` is true: Knative does not allow this field and derives the grace period from the revision's `timeoutSeconds` (`server.knative.spec.timeoutSeconds`)
   terminationGracePeriodSeconds:
 
   knative:
