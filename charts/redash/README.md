@@ -8,7 +8,7 @@ This chart bootstraps a [Redash](https://github.com/getredash/redash) deployment
 
 This is a contributed project developed by volunteers and not officially supported by Redash.
 
-Current chart version is `4.2.0`
+Current chart version is `4.3.0`
 
 * <https://github.com/getredash/redash>
 
@@ -231,6 +231,7 @@ The following table lists the configurable parameters of the Redash chart and th
 | scheduler.replicaCount | int | `1` | Number of scheduler pods to run |
 | scheduler.resources | string | `nil` | scheduler resource requests and limits [ref](http://kubernetes.io/docs/user-guide/compute-resources/) |
 | scheduler.securityContext | object | `{}` |  |
+| scheduler.terminationGracePeriodSeconds | int | `nil` | Seconds Kubernetes waits after SIGTERM before killing the scheduler pod. Unset uses the Kubernetes default of 30 |
 | scheduler.tolerations | list | `[]` | Tolerations for scheduler pod assignment [ref](https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/) |
 | scheduler.topologySpreadConstraints | list | `[]` | Topology spread constraints for scheduler pod assignment [ref](https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/) |
 | scheduler.volumeMounts | list | `[]` | VolumeMounts for scheduler pod assignment [ref](https://kubernetes.io/docs/concepts/storage/volumes/) |
@@ -249,9 +250,10 @@ The following table lists the configurable parameters of the Redash chart and th
 | server.podSecurityContext | object | `{}` | Security contexts for server pod assignment [ref](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) |
 | server.priorityClassName | string | `nil` |  |
 | server.readinessProbe | object | `{"failureThreshold":3,"initialDelaySeconds":10,"periodSeconds":10,"successThreshold":1,"timeoutSeconds":1}` | Server readiness probe configuration  |
-| server.replicaCount | int | `1` | Number of server pods to run |
+| server.replicaCount | int | `1` | Number of server pods to run. Set to `null` to omit `spec.replicas`, so an external HorizontalPodAutoscaler or KEDA ScaledObject can own the replica count |
 | server.resources | object | `{}` | Server resource requests and limits [ref](http://kubernetes.io/docs/user-guide/compute-resources/) |
 | server.securityContext | object | `{}` |  |
+| server.terminationGracePeriodSeconds | int | `nil` | Seconds Kubernetes waits after SIGTERM before killing server pods. Unset uses the Kubernetes default of 30 |
 | server.tolerations | list | `[]` | Tolerations for server pod assignment [ref](https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/) |
 | server.topologySpreadConstraints | list | `[]` | Topology spread constraints for server pod assignment [ref](https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/) |
 | server.volumeMounts | list | `[]` | VolumeMounts for server pod assignment [ref](https://kubernetes.io/docs/concepts/storage/volumes/) |
@@ -274,9 +276,10 @@ The following table lists the configurable parameters of the Redash chart and th
 | worker.podLabels | object | `{}` | Default labels for worker pod assignment [ref](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/) |
 | worker.podSecurityContext | object | `{}` | Default worker's security context pod assignment [ref](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) |
 | worker.priorityClassName | string | `nil` |  |
-| worker.replicaCount | int | `1` | Default number of worker pods to run |
+| worker.replicaCount | int | `1` | Default number of worker pods to run. Set to `null` (here or under `workers.<name>`) to omit `spec.replicas`, so an external HorizontalPodAutoscaler or KEDA ScaledObject can own the replica count |
 | worker.resources | string | `nil` | Worker default resource requests and limits [ref](http://kubernetes.io/docs/user-guide/compute-resources/) |
 | worker.securityContext | object | `{}` |  |
+| worker.terminationGracePeriodSeconds | int | `nil` | Default seconds Kubernetes waits after SIGTERM before killing worker pods. Unset uses the Kubernetes default of 30. Raise it when workers should finish in-flight jobs before exiting |
 | worker.tolerations | list | `[]` | Default tolerations for worker pod assignment [ref](https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/) |
 | worker.topologySpreadConstraints | list | `[]` | Default topology spread constraints for worker pod assignment [ref](https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/) |
 | worker.volumeMounts | list | `[]` | Default VolumeMounts for worker pod assignment [ref](https://kubernetes.io/docs/concepts/storage/volumes/) |

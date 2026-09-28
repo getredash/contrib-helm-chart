@@ -29,6 +29,9 @@ spec:
       imagePullSecrets: {{ toYaml . | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ include "redash.serviceAccountName" . }}
+      {{- if not (kindIs "invalid" .Values.scheduler.terminationGracePeriodSeconds) }}
+      terminationGracePeriodSeconds: {{ .Values.scheduler.terminationGracePeriodSeconds }}
+      {{- end }}
       securityContext: {{ toYaml .Values.scheduler.podSecurityContext | nindent 8 }}
       {{- $initContainers := concat .Values.initContainers .Values.scheduler.initContainers }}
       {{- with $initContainers }}

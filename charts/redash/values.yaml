@@ -303,8 +303,11 @@ server:
   # Don't use this for variables that are in the configuration above, however.
   env: {}
 
-  # server.replicaCount -- Number of server pods to run
+  # server.replicaCount -- Number of server pods to run. Set to `null` to omit `spec.replicas`, so an external HorizontalPodAutoscaler or KEDA ScaledObject can own the replica count
   replicaCount: 1
+
+  # server.terminationGracePeriodSeconds -- (int) Seconds Kubernetes waits after SIGTERM before killing server pods. Unset uses the Kubernetes default of 30
+  terminationGracePeriodSeconds:
 
   knative:
     # server.knative.enabled -- Render the server as a Knative Service instead of a Deployment
@@ -427,8 +430,11 @@ workers:
 
 ## Common worker configuration, which can be overridden for each worker at workers.<workerName>
 worker:
-  # worker.replicaCount -- Default number of worker pods to run
+  # worker.replicaCount -- Default number of worker pods to run. Set to `null` (here or under `workers.<name>`) to omit `spec.replicas`, so an external HorizontalPodAutoscaler or KEDA ScaledObject can own the replica count
   replicaCount: 1
+
+  # worker.terminationGracePeriodSeconds -- (int) Default seconds Kubernetes waits after SIGTERM before killing worker pods. Unset uses the Kubernetes default of 30. Raise it when workers should finish in-flight jobs before exiting
+  terminationGracePeriodSeconds:
 
   # worker.initContainers -- Worker default init containers configuration
   initContainers: []
@@ -491,6 +497,9 @@ scheduler:
 
   # scheduler.replicaCount -- Number of scheduler pods to run
   replicaCount: 1
+
+  # scheduler.terminationGracePeriodSeconds -- (int) Seconds Kubernetes waits after SIGTERM before killing the scheduler pod. Unset uses the Kubernetes default of 30
+  terminationGracePeriodSeconds:
 
   # scheduler.initContainers -- Redash scheduler init containers configuration.
   initContainers: []

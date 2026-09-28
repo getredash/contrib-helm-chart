@@ -1,5 +1,12 @@
 # Changelog
 
+## 4.3.0
+
+### Added
+
+- Add `terminationGracePeriodSeconds` for the server, workers and scheduler. Workers read the merged per-worker config, so `workers.<name>.terminationGracePeriodSeconds` overrides the shared `worker.terminationGracePeriodSeconds` default. Unset keeps the Kubernetes default of 30 seconds, which is shorter than many queries, so a rollout or node drain can stop a worker mid-query.
+- Allow `server.replicaCount`, `worker.replicaCount` and `workers.<name>.replicaCount` to be `null`, which omits `spec.replicas` from the Deployment. This lets an external HorizontalPodAutoscaler or KEDA ScaledObject own the replica count without `helm upgrade` resetting it. Default renders are unchanged.
+
 ## 4.2.0
 
 ### Added
