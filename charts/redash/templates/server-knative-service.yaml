@@ -74,6 +74,7 @@ spec:
           {{- end }}
           ports:
             - containerPort: {{ .Values.server.httpPort }}
+              protocol: TCP
           {{- $defaultProbe := dict "httpGet" (dict "path" "/ping" "port" .Values.server.httpPort) -}}
           {{- with .Values.server.livenessProbe }}
           livenessProbe: {{ include "redash.probe" (dict "probe" . "default" $defaultProbe) | nindent 12 }}
