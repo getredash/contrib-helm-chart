@@ -1,6 +1,28 @@
 apiVersion: v1
 entries:
   redash:
+  - apiVersion: v2
+    appVersion: 26.9.0
+    created: "2026-10-25T21:29:07.663005589Z"
+    description: Redash is an open source tool built for teams to query, visualize
+      and collaborate.
+    digest: 9a02aa8cb28d6313cf65083a0dbfffeec35bbe67a1fc0d1858aec7aecf6f21f5
+    home: https://redash.io/
+    icon: https://redash.io/assets/images/elements/redash-logo.svg
+    keywords:
+    - redash
+    - analytics
+    - visualization
+    maintainers:
+    - email: owen.barton@civicactions.com
+      name: Owen Barton
+    name: redash
+    sources:
+    - https://github.com/getredash/redash
+    type: application
+    urls:
+    - https://github.com/getredash/contrib-helm-chart/releases/download/redash-5.0.0/redash-5.0.0.tgz
+    version: 5.0.0
   - apiVersion: v1
     appVersion: 25.8.0
     created: "2026-10-25T20:52:36.260158067Z"
@@ -1081,4 +1103,4 @@ entries:
     urls:
     - redash-1.1.0.tgz
     version: 1.1.0
-generated: "2026-10-25T20:52:36.260560571Z"
+generated: "2026-10-25T21:29:07.663396108Z"
