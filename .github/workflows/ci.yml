@@ -11,12 +11,12 @@ concurrency:
 jobs:
   lint:
     if: github.event_name == 'pull_request'
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 1
-      - uses: azure/setup-helm@v4
+      - uses: azure/setup-helm@v5
       - name: lint and render the chart
         run: |
           cd charts/redash
@@ -36,17 +36,17 @@ jobs:
           - v1.34
           - v1.35
           - v1.36
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: medyagh/setup-minikube@v0.0.21
         with:
           kubernetes-version: ${{ matrix.k8s }}
           cpus: 4
           memory: 8192
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 1
-      - uses: azure/setup-helm@v4
+      - uses: azure/setup-helm@v5
       - name: testing helm chart
         run: |
           cd charts/redash
@@ -95,16 +95,16 @@ jobs:
           minikube logs -n10 || true
   publish-chart:
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - name: configure git
         run: |
           git config user.name "$GITHUB_ACTOR"
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
-      - uses: azure/setup-helm@v4
-      - uses: helm/chart-releaser-action@v1.6.0
+      - uses: azure/setup-helm@v5
+      - uses: helm/chart-releaser-action@v1.7.0
         env:
           CR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
