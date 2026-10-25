@@ -394,7 +394,7 @@ kubectl exec -i -n <namespace> <fullname>-postgres-0 -- \
 
 **6. Start Redash**
 
-Run the same upgrade again. It restores the replica counts, and the migrations job applies any pending Redash schema migrations to the restored database. If you set `server.replicaCount`, `worker.replicaCount` or `workers.<name>.replicaCount` to `null` so that an autoscaler owns them, the chart does not set replicas: scale those Deployments back to at least 1 yourself (`kubectl scale deploy ... --replicas=1`), because an HPA does not scale up from 0.
+Run the same upgrade again. It restores the replica counts, and the migrations job applies any pending Redash schema migrations to the restored database. If an HPA or KEDA owns the Deployment replicas (`server.replicaCount`, `worker.replicaCount` or `workers.<name>.replicaCount` set to `null`), the chart does not set replicas, so this step does not bring them back. Pause KEDA before step 2 (`autoscaling.keda.sh/paused: "true"` on each ScaledObject) so it does not scale Redash up mid-migration, then after this step scale the Deployments to at least 1 (`kubectl scale deploy ... --replicas=1`, since an HPA does not scale up from 0) and remove the pause annotation.
 
 ```bash
 helm upgrade <release> redash/redash --version 5.0.0 -n <namespace> -f my-values.yaml --wait
