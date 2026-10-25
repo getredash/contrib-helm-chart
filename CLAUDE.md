@@ -60,9 +60,9 @@ An ~80-entry block mapping `redash.*` values to `REDASH_*` env vars, shared by e
 - Secret-valued settings are additionally gated on `redash.selfManagedSecrets` and `redash.existingSecret`; follow the existing `{{- if not .Values.redash.selfManagedSecrets }}` pattern rather than inventing a new one.
 - Per-component env reaches the shared helper via `$envCtx := mergeOverwrite (deepCopy .) (dict "Values" (dict "env" .Values.<component>.env))` — the helper always reads `.Values.env`, and each template swaps in its own component env before including it.
 
-### The connection-string snippet is duplicated 5×
+### Connection URLs: `redash.connectionUrls`
 
-When the bundled PostgreSQL / Redis are enabled, `REDASH_DATABASE_URL` and `REDASH_REDIS_URL` are assembled from their component parts by an inline `/bin/sh -c` block in the container `args`. That identical snippet appears in the **server, Knative server, worker, scheduler, and migrations** templates. Any change to connection handling must be applied to all five.
+When the bundled PostgreSQL / Redis are enabled, `REDASH_DATABASE_URL` and `REDASH_REDIS_URL` are assembled from their component parts by shell lines in the container `args` (`/bin/sh -c`). Those lines come from the `redash.connectionUrls` helper in `_helpers.tpl`, included by the **server, Knative server, worker, scheduler, and migrations** templates. The helper percent-encodes the user and password with the image's `python3`: raw interpolation broke whenever a password contained `/` (about half of `openssl rand -base64` outputs), which was the cause of the old intermittent minikube CI failures.
 
 ## Conventions and gotchas
 

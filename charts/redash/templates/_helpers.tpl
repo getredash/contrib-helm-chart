@@ -587,5 +587,22 @@ Create the name of the service account to use
 {{- end -}}
 {{- end -}}
 
-# This ensures a random value is provided for postgresql.auth.password:
-required "A secure random value for .postgresql.auth.password is required" .Values.postgresql.auth.password
+{{/*
+Shell lines that build REDASH_REDIS_URL / REDASH_DATABASE_URL from their parts when the bundled Redis / PostgreSQL are enabled.
+Credentials are percent-encoded, so passwords containing "/", "@", ":" or "%" (e.g. from `openssl rand -base64`) still give a valid URL.
+*/}}
+{{- define "redash.connectionUrls" -}}
+{{- if or .Values.redis.enabled .Values.postgresql.enabled -}}
+urlencode_env() { python3 -c 'import os, sys, urllib.parse; print(urllib.parse.quote(os.environ[sys.argv[1]], safe=""))' "$1"; }
+{{- end }}
+{{- if .Values.redis.enabled }}
+if [ -n "${REDASH_REDIS_PASSWORD}" ]; then
+  export REDASH_REDIS_URL="redis://:$(urlencode_env REDASH_REDIS_PASSWORD)@${REDASH_REDIS_HOSTNAME}:${REDASH_REDIS_PORT}/${REDASH_REDIS_NAME}"
+else
+  export REDASH_REDIS_URL="redis://${REDASH_REDIS_HOSTNAME}:${REDASH_REDIS_PORT}/${REDASH_REDIS_NAME}"
+fi
+{{- end }}
+{{- if .Values.postgresql.enabled }}
+export REDASH_DATABASE_URL="postgresql://$(urlencode_env REDASH_DATABASE_USER):$(urlencode_env REDASH_DATABASE_PASSWORD)@${REDASH_DATABASE_HOSTNAME}:${REDASH_DATABASE_PORT}/${REDASH_DATABASE_NAME}"
+{{- end }}
+{{- end -}}

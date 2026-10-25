@@ -18,7 +18,8 @@
 
 - Run `manage db upgrade` in the migrations job after `create_db`. `create_db` only builds the schema on an empty database, so until now `helm upgrade` never applied Redash schema migrations to existing installs, although the README said it did.
 - The `NOTES.txt` port-forward command could select a database pod instead of the Redash server; it now filters on `app.kubernetes.io/component=server`.
-- The external PostgreSQL check in `NOTES.txt` referenced values that no longer existed (`postgresql.postgresqlPassword`, `postgresql.existingSecret`), and with default values its `required` always passed, because the `or` chain fell through to the empty `externalPostgreSQLSecret: {}`. It now fails when `postgresql.enabled` is false and neither `externalPostgreSQL` nor `externalPostgreSQLSecret` is set, unless `redash.selfManagedSecrets` is enabled.
+- Percent-encode the user and password when building `REDASH_REDIS_URL` / `REDASH_DATABASE_URL` for the bundled Redis and PostgreSQL. A password containing `/`, `@`, `:` or `%` (about half of `openssl rand -base64 32` outputs contain `/`, as the README suggests) produced an invalid URL, so Redash could not reach Redis and never became ready. This was also the cause of the intermittent `test-on-minikube` CI failures. The snippet that was duplicated in the server, Knative server, worker, scheduler and migrations templates is now one helper, `redash.connectionUrls`.
+- Remove the external PostgreSQL check from `NOTES.txt`. It referenced values that no longer existed (`postgresql.postgresqlPassword`, `postgresql.existingSecret`) and, with default values, its `required` always passed because the `or` chain fell through to the empty `externalPostgreSQLSecret: {}`. A working replacement would reject valid setups that pass the URL through `env`, a component `env` or `envSecretName`.
 
 ## 4.3.0
 

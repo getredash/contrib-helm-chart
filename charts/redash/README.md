@@ -356,6 +356,8 @@ Plan a maintenance window: Redash is stopped from step 2 until step 6. Replace `
 kubectl scale deploy -n <namespace> -l app.kubernetes.io/instance=<release> --replicas=0
 ```
 
+With `server.knative.enabled`, this only stops the workers and scheduler: the Knative web server keeps running. That does not affect the dump, but keep users away from Redash until step 6 (for example by removing its route), because between steps 4 and 5 it serves an empty database.
+
 **3. Dump the database from the Bitnami PostgreSQL**
 
 Set `PG_USER`/`PG_DB` to your `postgresql.auth.username`/`postgresql.auth.database`; steps 3 and 5 use them.
@@ -392,7 +394,7 @@ kubectl exec -i -n <namespace> <fullname>-postgres-0 -- \
 
 **6. Start Redash**
 
-Run the same upgrade again. It restores the replica counts, and the migrations job applies any pending Redash schema migrations to the restored database.
+Run the same upgrade again. It restores the replica counts, and the migrations job applies any pending Redash schema migrations to the restored database. If you set `server.replicaCount`, `worker.replicaCount` or `workers.<name>.replicaCount` to `null` so that an autoscaler owns them, the chart does not set replicas: scale those Deployments back to at least 1 yourself (`kubectl scale deploy ... --replicas=1`), because an HPA does not scale up from 0.
 
 ```bash
 helm upgrade <release> redash/redash --version 5.0.0 -n <namespace> -f my-values.yaml --wait
