@@ -22,10 +22,8 @@ Full functional test = the minikube flow in `.github/workflows/ci.yml` (install 
 Regenerating the chart README (see the trap below):
 
 ```bash
-cd charts/redash && helm-docs --dry-run > README.md
+cd charts/redash && helm-docs --dry-run | prettier --parser markdown > README.md
 ```
-
-The committed README is raw helm-docs output; piping it through prettier re-pads every table and buries the real diff.
 
 ## Docs are generated — do not hand-edit
 
@@ -44,7 +42,7 @@ The root `README.md` deliberately uses absolute GitHub URLs because it is synced
 
 ## Architecture
 
-Five Redash workloads render from one shared env helper, next to two optional databases:
+The server (Deployment or Knative Service), workers, scheduler and migrations job render from one shared env helper. The `helm test` pod and the two optional databases below do not use it:
 
 - `server-deployment.yaml` — the web server, fronted by `service.yaml` / optional `ingress.yaml`.
 - `worker-deployment.yaml` — **one Deployment per key under `workers.*`** (`adhoc`, `scheduled`, `generic`), produced by a single `range`. Each worker's config is `mergeOverwrite (deepCopy .Values.worker) $config`, so `worker.*` holds shared defaults and `workers.<name>.*` overrides them. Adding a worker means adding a values key, not a template.
@@ -62,9 +60,9 @@ An ~80-entry block mapping `redash.*` values to `REDASH_*` env vars, shared by e
 - Secret-valued settings are additionally gated on `redash.selfManagedSecrets` and `redash.existingSecret`; follow the existing `{{- if not .Values.redash.selfManagedSecrets }}` pattern rather than inventing a new one.
 - Per-component env reaches the shared helper via `$envCtx := mergeOverwrite (deepCopy .) (dict "Values" (dict "env" .Values.<component>.env))` — the helper always reads `.Values.env`, and each template swaps in its own component env before including it.
 
-### The connection-string snippet is duplicated 4×
+### The connection-string snippet is duplicated 5×
 
-When the bundled PostgreSQL / Redis are enabled, `REDASH_DATABASE_URL` and `REDASH_REDIS_URL` are assembled from their component parts by an inline `/bin/sh -c` block in the container `args`. That identical snippet appears in **server, worker, scheduler, and migrations** templates. Any change to connection handling must be applied to all four.
+When the bundled PostgreSQL / Redis are enabled, `REDASH_DATABASE_URL` and `REDASH_REDIS_URL` are assembled from their component parts by an inline `/bin/sh -c` block in the container `args`. That identical snippet appears in the **server, Knative server, worker, scheduler, and migrations** templates. Any change to connection handling must be applied to all five.
 
 ## Conventions and gotchas
 

@@ -632,7 +632,7 @@ postgresql:
   auth:
     # postgresql.auth.username -- PostgreSQL username for redash user (when postgresql is enabled). The official image makes this user the database superuser.
     username: redash
-    # postgresql.auth.password -- REQUIRED: PostgreSQL password for redash user (when postgresql is enabled)
+    # postgresql.auth.password -- REQUIRED: PostgreSQL password for redash user (when postgresql is enabled). PostgreSQL only applies it when it initialises an empty data directory; to change it later, run `ALTER USER <username> PASSWORD '<new>'` in the database first, then update this value.
     password:
     # postgresql.auth.existingSecret -- Name of an existing secret holding the PostgreSQL password. Takes precedence over postgresql.auth.password, and is read by both PostgreSQL and Redash.
     existingSecret: ""

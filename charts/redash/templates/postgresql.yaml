@@ -47,11 +47,11 @@ spec:
   template:
     metadata:
       labels:
-        {{- include "redash.selectorLabels" . | nindent 8 }}
-        app.kubernetes.io/component: postgresql
         {{- with .Values.postgresql.podLabels }}
         {{- tpl (toYaml .) $ | nindent 8 }}
         {{- end }}
+        {{- include "redash.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: postgresql
       {{- with .Values.postgresql.podAnnotations }}
       annotations: {{ tpl (toYaml .) $ | nindent 8 }}
       {{- end }}

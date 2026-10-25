@@ -57,11 +57,11 @@ spec:
   template:
     metadata:
       labels:
-        {{- include "redash.selectorLabels" . | nindent 8 }}
-        app.kubernetes.io/component: redis
         {{- with .Values.redis.podLabels }}
         {{- tpl (toYaml .) $ | nindent 8 }}
         {{- end }}
+        {{- include "redash.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: redis
       {{- with .Values.redis.podAnnotations }}
       annotations: {{ tpl (toYaml .) $ | nindent 8 }}
       {{- end }}

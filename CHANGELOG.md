@@ -18,7 +18,7 @@
 
 - Run `manage db upgrade` in the migrations job after `create_db`. `create_db` only builds the schema on an empty database, so until now `helm upgrade` never applied Redash schema migrations to existing installs, although the README said it did.
 - The `NOTES.txt` port-forward command could select a database pod instead of the Redash server; it now filters on `app.kubernetes.io/component=server`.
-- The external PostgreSQL check in `NOTES.txt` referenced values that no longer existed (`postgresql.postgresqlPassword`, `postgresql.existingSecret`) and never failed. It now fails when `postgresql.enabled` is false and neither `externalPostgreSQL` nor `externalPostgreSQLSecret` is set.
+- The external PostgreSQL check in `NOTES.txt` referenced values that no longer existed (`postgresql.postgresqlPassword`, `postgresql.existingSecret`), and with default values its `required` always passed, because the `or` chain fell through to the empty `externalPostgreSQLSecret: {}`. It now fails when `postgresql.enabled` is false and neither `externalPostgreSQL` nor `externalPostgreSQLSecret` is set, unless `redash.selfManagedSecrets` is enabled.
 
 ## 4.3.0
 
