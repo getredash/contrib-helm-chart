@@ -19,13 +19,10 @@ jobs:
       - uses: azure/setup-helm@v4
       - name: lint and render the chart
         run: |
-          helm repo add bitnami https://charts.bitnami.com/bitnami
-          helm repo update
           cd charts/redash
-          helm dependency build .
-          helm lint .
-          helm template test . > /dev/null
-          helm template test . --set server.knative.enabled=true > /dev/null
+          helm lint . --set postgresql.auth.password=test
+          helm template test . --set postgresql.auth.password=test > /dev/null
+          helm template test . --set postgresql.auth.password=test --set server.knative.enabled=true > /dev/null
   test-on-minikube:
     if: github.event_name == 'pull_request'
     timeout-minutes: 45
@@ -52,10 +49,7 @@ jobs:
       - uses: azure/setup-helm@v4
       - name: testing helm chart
         run: |
-          helm repo add bitnami https://charts.bitnami.com/bitnami
-          helm repo update
           cd charts/redash
-          helm dependency build .
           cat > test-values.yaml <<- EOM
             redash:
               cookieSecret: $(openssl rand -base64 32)
@@ -67,7 +61,6 @@ jobs:
                 password: $(openssl rand -base64 32)
             redis:
               auth:
-                enabled: true
                 password: $(openssl rand -base64 32)
             worker:
               env:
@@ -112,10 +105,6 @@ jobs:
           git config user.name "$GITHUB_ACTOR"
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
       - uses: azure/setup-helm@v4
-      - name: add helm repos
-        run: |
-          helm repo add bitnami https://charts.bitnami.com/bitnami
-          helm repo update
       - uses: helm/chart-releaser-action@v1.6.0
         env:
           CR_TOKEN: ${{ secrets.GITHUB_TOKEN }}

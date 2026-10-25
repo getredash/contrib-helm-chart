@@ -8,7 +8,7 @@ This chart bootstraps a [Redash](https://github.com/getredash/redash) deployment
 
 This is a contributed project developed by volunteers and not officially supported by Redash.
 
-Current chart version is `4.3.0`
+Current chart version is `5.0.0`
 
 * <https://github.com/getredash/redash>
 
@@ -16,7 +16,7 @@ Current chart version is `4.3.0`
 
 - At least 3 GB of RAM available on your cluster
 - Kubernetes 1.31+ - chart is tested with latest 6 stable versions (1.31-1.36)
-- Helm 3 (Helm 2 deprecated)
+- Helm 3.14+ (for `helm upgrade --reset-then-reuse-values`; Helm 2 is not supported)
 - PV provisioner support in the underlying infrastructure
 
 ## Installing the Chart
@@ -71,13 +71,6 @@ $ helm delete my-release
 
 The command removes all the Kubernetes components associated with the chart and deletes the release.
 
-## Requirements
-
-| Repository | Name | Version |
-|------------|------|---------|
-| https://charts.bitnami.com/bitnami | postgresql | ^18.2.0 |
-| https://charts.bitnami.com/bitnami | redis | ^24.1.0 |
-
 ## Configuration
 
 The following table lists the configurable parameters of the Redash chart and their default values.
@@ -89,9 +82,9 @@ The following table lists the configurable parameters of the Redash chart and th
 | clusterDomain | string | `"cluster.local"` | Kubernetes cluster domain, used to build in-cluster hostnames |
 | commonLabels | object | `{}` |  |
 | env | object | `{"PYTHONUNBUFFERED":0,"REDASH_PRODUCTION":"true"}` | Redash global environment variables - applied to both server and worker containers. |
-| externalPostgreSQL | string | `nil` | External PostgreSQL configuration. To use an external PostgreSQL instead of the automatically deployed postgresql chart: set postgresql.enabled to false then uncomment and configure the externalPostgreSQL connection URL (e.g. postgresql://user:pass@host:5432/database) |
+| externalPostgreSQL | string | `nil` | External PostgreSQL configuration. To use an external PostgreSQL instead of the bundled PostgreSQL server: set postgresql.enabled to false then uncomment and configure the externalPostgreSQL connection URL (e.g. postgresql://user:pass@host:5432/database) |
 | externalPostgreSQLSecret | object | `{}` | Read external PostgreSQL configuration from a secret. This should point at a secret file with a single key which specifies the connection string. |
-| externalRedis | string | `nil` | External Redis configuration. To use an external Redis instead of the automatically deployed redis chart: set redis.enabled to false then uncomment and configure the externalRedis connection URL (e.g. redis://user:pass@host:6379/database). |
+| externalRedis | string | `nil` | External Redis configuration. To use an external Redis instead of the bundled Redis server: set redis.enabled to false then uncomment and configure the externalRedis connection URL (e.g. redis://user:pass@host:6379/database). |
 | externalRedisSecret | object | `{}` | Read external Redis configuration from a secret. This should point at a secret file with a single key which specifies the connection string. |
 | extraObjects | list | `[]` | Additional kubernetes manifests to deploy alongside the chart. Useful to include external secrets for dependencies. |
 | fullnameOverride | string | `""` |  |
@@ -122,13 +115,31 @@ The following table lists the configurable parameters of the Redash chart and th
 | migrations.volumeMounts | list | `[]` | volume mounts for migrations pods |
 | migrations.volumes | list | `[]` | volumes that will be mounted to migrations pods only |
 | nameOverride | string | `""` |  |
-| postgresql.auth.database | string | `"redash"` | PostgreSQL database name (when postgresql chart enabled) |
-| postgresql.auth.existingSecret | string | `""` | Name of an existing secret holding the PostgreSQL password. Takes precedence over postgresql.auth.password, and is read by both the postgresql subchart and Redash. |
-| postgresql.auth.password | string | `nil` | REQUIRED: PostgreSQL password for redash user (when postgresql chart enabled) |
+| postgresql.affinity | object | `{}` | Affinity for PostgreSQL pod assignment |
+| postgresql.auth.database | string | `"redash"` | PostgreSQL database name (when postgresql is enabled) |
+| postgresql.auth.existingSecret | string | `""` | Name of an existing secret holding the PostgreSQL password. Takes precedence over postgresql.auth.password, and is read by both PostgreSQL and Redash. |
+| postgresql.auth.password | string | `nil` | REQUIRED: PostgreSQL password for redash user (when postgresql is enabled) |
 | postgresql.auth.secretKeys.userPasswordKey | string | `"password"` | Key inside postgresql.auth.existingSecret holding the redash user password |
-| postgresql.auth.username | string | `"redash"` | PostgreSQL username for redash user (when postgresql chart enabled) |
+| postgresql.auth.username | string | `"redash"` | PostgreSQL username for redash user (when postgresql is enabled). The official image makes this user the database superuser. |
 | postgresql.enabled | bool | `true` | Whether to deploy a PostgreSQL server to satisfy the applications database requirements. To use an external PostgreSQL set this to false and configure the externalPostgreSQL parameter. |
-| postgresql.primary.service.ports.postgresql | int | `5432` |  |
+| postgresql.image.pullPolicy | string | `"IfNotPresent"` | PostgreSQL image pull policy |
+| postgresql.image.registry | string | `"docker.io"` |  |
+| postgresql.image.repo | string | `"library/postgres"` | PostgreSQL image name [ref](https://hub.docker.com/_/postgres) |
+| postgresql.image.tag | string | `"18.6"` | PostgreSQL image tag. Keep the major version unless you migrate the data yourself. |
+| postgresql.nodeSelector | object | `{}` | Node labels for PostgreSQL pod assignment |
+| postgresql.persistence.accessModes | list | `["ReadWriteOnce"]` | Access modes of the created PersistentVolumeClaim |
+| postgresql.persistence.enabled | bool | `true` | Store PostgreSQL data on a PersistentVolumeClaim. When false, data lives in an emptyDir and is lost with the pod. |
+| postgresql.persistence.existingClaim | string | `""` | Use an existing PersistentVolumeClaim instead of creating one |
+| postgresql.persistence.size | string | `"8Gi"` | Size of the created PersistentVolumeClaim |
+| postgresql.persistence.storageClass | string | `nil` | Storage class of the created PersistentVolumeClaim. Unset uses the cluster default; "-" sets an empty storageClassName. |
+| postgresql.podAnnotations | object | `{}` | Annotations for the PostgreSQL pod |
+| postgresql.podLabels | object | `{}` | Labels for the PostgreSQL pod |
+| postgresql.podSecurityContext | object | `{"fsGroup":999,"runAsGroup":999,"runAsNonRoot":true,"runAsUser":999,"seccompProfile":{"type":"RuntimeDefault"}}` | Security context for the PostgreSQL pod. 999 is the postgres user of the official image. |
+| postgresql.priorityClassName | string | `nil` | Priority class name for the PostgreSQL pod |
+| postgresql.resources | object | `{}` | PostgreSQL resource requests and limits [ref](http://kubernetes.io/docs/user-guide/compute-resources/) |
+| postgresql.securityContext | object | `{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]}}` | Security context for the PostgreSQL container |
+| postgresql.service.port | int | `5432` | PostgreSQL service port |
+| postgresql.tolerations | list | `[]` | Tolerations for PostgreSQL pod assignment |
 | redash.additionalDestinations | string | `""` | `REDASH_ADDITIONAL_DESTINATIONS` value. Comma-separated list of non-default alert destinations to be enabled. |
 | redash.additionalQueryRunners | string | `""` | `REDASH_ADDITIONAL_QUERY_RUNNERS` value. Comma-separated list of non-default query runners to be enabled. |
 | redash.adhocQueryTimeLimit | string | None | `REDASH_ADHOC_QUERY_TIME_LIMIT` value. Time limit for adhoc queries (in seconds). |
@@ -215,10 +226,30 @@ The following table lists the configurable parameters of the Redash chart and th
 | redash.throttleLoginPattern | string | 50/hour | `REDASH_THROTTLE_LOGIN_PATTERN` value. The [flask-limiter](https://flask-limiter.readthedocs.io/en/stable/) string pattern used to rate limit requests to the /login route.. |
 | redash.versionCheck | string | true | `REDASH_VERSION_CHECK` value. Toggle whether to periodically check if a newer version of redash is available.. |
 | redash.webWorkers | string | 4 | `REDASH_WEB_WORKERS` value. How many processes will gunicorn spawn to handle web requests. |
-| redis.database | int | `0` |  |
+| redis.affinity | object | `{}` | Affinity for Redis pod assignment |
+| redis.auth.existingSecret | string | `""` | Name of an existing secret holding the Redis password. Takes precedence over redis.auth.password. |
+| redis.auth.existingSecretPasswordKey | string | `"redis-password"` | Key inside redis.auth.existingSecret holding the Redis password |
+| redis.auth.password | string | `""` | Redis password. When empty, the chart generates one and keeps it across upgrades. Set it explicitly when rendering with `helm template` (e.g. Argo CD, Flux), which cannot look up the existing one. |
+| redis.database | int | `0` | Redis database number used by Redash |
 | redis.enabled | bool | `true` | Whether to deploy a Redis server to satisfy the applications database requirements. To use an external Redis set this to false and configure the externalRedis parameter. |
-| redis.master.service.ports.redis | int | `6379` |  |
-| redis.replica.replicaCount | int | `0` |  |
+| redis.image.pullPolicy | string | `"IfNotPresent"` | Redis image pull policy |
+| redis.image.registry | string | `"docker.io"` |  |
+| redis.image.repo | string | `"library/redis"` | Redis image name [ref](https://hub.docker.com/_/redis) |
+| redis.image.tag | string | `"7.4.11-alpine"` | Redis image tag |
+| redis.nodeSelector | object | `{}` | Node labels for Redis pod assignment |
+| redis.persistence.accessModes | list | `["ReadWriteOnce"]` | Access modes of the created PersistentVolumeClaim |
+| redis.persistence.enabled | bool | `false` | Store Redis data on a PersistentVolumeClaim. Redash only keeps job queues and caches in Redis, so the default emptyDir is usually enough. |
+| redis.persistence.existingClaim | string | `""` | Use an existing PersistentVolumeClaim instead of creating one |
+| redis.persistence.size | string | `"8Gi"` | Size of the created PersistentVolumeClaim |
+| redis.persistence.storageClass | string | `nil` | Storage class of the created PersistentVolumeClaim. Unset uses the cluster default; "-" sets an empty storageClassName. |
+| redis.podAnnotations | object | `{}` | Annotations for the Redis pod |
+| redis.podLabels | object | `{}` | Labels for the Redis pod |
+| redis.podSecurityContext | object | `{"fsGroup":1000,"runAsGroup":1000,"runAsNonRoot":true,"runAsUser":999,"seccompProfile":{"type":"RuntimeDefault"}}` | Security context for the Redis pod. 999/1000 are the redis user and group of the official image. |
+| redis.priorityClassName | string | `nil` | Priority class name for the Redis pod |
+| redis.resources | object | `{}` | Redis resource requests and limits [ref](http://kubernetes.io/docs/user-guide/compute-resources/) |
+| redis.securityContext | object | `{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]}}` | Security context for the Redis container |
+| redis.service.port | int | `6379` | Redis service port |
+| redis.tolerations | list | `[]` | Tolerations for Redis pod assignment |
 | scheduler.affinity | object | `{}` | Affinity for scheduler pod assignment [ref](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity) |
 | scheduler.env | object | `{}` | Redash scheduler specific environment variables. |
 | scheduler.initContainers | list | `[]` | Redash scheduler init containers configuration. |
@@ -293,16 +324,80 @@ The following table lists the configurable parameters of the Redash chart and th
 - See [the changelog](CHANGELOG.md) for major changes in each release
 - The project will use the [semver specification](http://semver.org) for chart version numbers (chart versions will not match Redash versions, since we may need to update the chart more than once for the same Redash release)
 - Always back up your database before upgrading!
-- Schema migrations will be run automatically after each upgrade
+- Schema migrations will be run automatically after each upgrade (from 5.0.0; earlier chart versions only created the schema on a fresh install)
 
 To upgrade a release named `my-release`:
 
 ```bash
 helm repo update
-helm upgrade --reuse-values my-release redash/redash
+helm upgrade --reset-then-reuse-values my-release redash/redash
 ```
 
 Below are notes on manual configuration changes or steps needed for major chart version updates.
+
+### From 4.x to 5.0
+
+5.0.0 replaces the Bitnami PostgreSQL and Redis subcharts with chart-owned StatefulSets on the official `postgres` and `redis` images, and upgrades Redash from v25.8.0 to v26.9.0. The new PostgreSQL starts with an empty data directory, so a release that uses the bundled PostgreSQL (`postgresql.enabled: true`, the default) has to dump its data before upgrading and restore it afterwards. Both sides run PostgreSQL 18, so a plain-SQL `pg_dump` restores as-is.
+
+Releases that use an external PostgreSQL (`postgresql.enabled: false`) only need the values changes in step 1. Redis holds no data that needs moving.
+
+Plan a maintenance window: Redash is stopped from step 2 until step 6. Replace `<release>` and `<namespace>` below. `<fullname>` is `<release>-redash`, or just `<release>` when the release name already contains `redash` (it also follows `nameOverride`/`fullnameOverride`).
+
+**1. Update your values file**
+
+- Make sure it sets `postgresql.auth.password`, which 5.0.0 requires. If you relied on the Bitnami chart generating it, copy the current one: `kubectl get secret <release>-postgresql -n <namespace> -o jsonpath='{.data.password}' | base64 -d`
+- Rename `postgresql.primary.service.ports.postgresql` → `postgresql.service.port`, `redis.master.service.ports.redis` → `redis.service.port`, and `redis.existingSecret` → `redis.auth.existingSecret`.
+- Remove other Bitnami subchart settings (`postgresql.primary.*`, `redis.master.*`, `redis.replica.*`, `redis.architecture`, and any `postgresql.image`/`redis.image` overrides such as `bitnamilegacy/*`). Set the equivalent `postgresql.*`/`redis.*` values from [values.yaml](values.yaml) instead, e.g. `postgresql.persistence.size`.
+- If you use custom JavaScript charts, set `REDASH_FEATURE_ALLOW_CUSTOM_JS_VISUALIZATIONS: "true"` in `env` — Redash v26.9.0 disables them by default. Read the rest of its [upgrade notes](https://github.com/getredash/redash/blob/master/CHANGELOG.md#2690) too.
+
+**2. Stop Redash, keeping the databases running**
+
+```bash
+kubectl scale deploy -n <namespace> -l app.kubernetes.io/instance=<release> --replicas=0
+```
+
+**3. Dump the database from the Bitnami PostgreSQL**
+
+```bash
+PG_PASS=$(kubectl get secret <release>-postgresql -n <namespace> -o jsonpath='{.data.password}' | base64 -d)
+kubectl exec -n <namespace> <release>-postgresql-0 -- \
+  env PGPASSWORD="$PG_PASS" pg_dump -U redash -d redash --no-owner --no-acl > redash.sql
+```
+
+Use your `postgresql.auth.username`/`postgresql.auth.database` if they are not `redash`. Check that `redash.sql` is not empty before continuing. If `query_results` is very large, it is only a cache and can be left out with `--exclude-table-data=query_results`, but then the `queries_latest_query_data_id_fkey` constraint fails on restore — handle it as in the [4.0.0 notes](https://github.com/getredash/contrib-helm-chart/blob/master/CHANGELOG.md#400).
+
+**4. Upgrade the chart**
+
+Pass your values file explicitly, or use `--reset-then-reuse-values`. Plain `--reuse-values` does not pick up the new chart defaults and fails to render.
+
+```bash
+helm upgrade <release> redash/redash --version 5.0.0 -n <namespace> -f my-values.yaml --wait
+```
+
+Helm removes the Bitnami StatefulSets and starts `<fullname>-postgres` with a fresh database. The old PersistentVolumeClaims (`data-<release>-postgresql-0`, `redis-data-<release>-redis-master-0`) are kept.
+
+**5. Stop Redash again and restore the dump into the new PostgreSQL**
+
+```bash
+kubectl scale deploy -n <namespace> -l app.kubernetes.io/instance=<release> --replicas=0
+kubectl exec -n <namespace> <fullname>-postgres-0 -- \
+  psql -U redash -d postgres -c 'DROP DATABASE redash WITH (FORCE)' -c 'CREATE DATABASE redash'
+kubectl exec -i -n <namespace> <fullname>-postgres-0 -- \
+  psql -U redash -d redash -v ON_ERROR_STOP=1 -q < redash.sql > /dev/null
+```
+
+**6. Start Redash**
+
+Run the same upgrade again. It restores the replica counts, and the migrations job applies any pending Redash schema migrations to the restored database.
+
+```bash
+helm upgrade <release> redash/redash --version 5.0.0 -n <namespace> -f my-values.yaml --wait
+```
+
+**7. Clean up**
+
+- If a Redash data source points at the bundled database by its old hostname (`<release>-postgresql`), change it to `<fullname>-postgres`.
+- Once Redash works, delete the old volumes: `kubectl delete pvc -n <namespace> data-<release>-postgresql-0 redis-data-<release>-redis-master-0`
 
 ### From 3.0 to 3.1
 

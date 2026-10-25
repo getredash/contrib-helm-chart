@@ -40,10 +40,10 @@ spec:
         image: "{{ .Values.image.registry }}/{{ .Values.image.repo }}:{{ tpl (toString (.Values.image.tag | default .Chart.AppVersion)) . }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         args:
-        {{- if or .Values.redis.enabled .Values.postgresql.enabled }}
           - /bin/sh
           - -c
           - |
+            set -e
             {{- if .Values.redis.enabled }}
             if [ -n "${REDASH_REDIS_PASSWORD}" ]; then
               export REDASH_REDIS_URL="redis://:${REDASH_REDIS_PASSWORD}@${REDASH_REDIS_HOSTNAME}:${REDASH_REDIS_PORT}/${REDASH_REDIS_NAME}"
@@ -54,10 +54,9 @@ spec:
             {{- if .Values.postgresql.enabled }}
             export REDASH_DATABASE_URL="postgresql://${REDASH_DATABASE_USER}:${REDASH_DATABASE_PASSWORD}@${REDASH_DATABASE_HOSTNAME}:${REDASH_DATABASE_PORT}/${REDASH_DATABASE_NAME}"
             {{- end }}
-            exec /app/bin/docker-entrypoint create_db
-        {{- else }}
-          - create_db
-        {{- end }}
+            # create_db only builds the schema on an empty database; db upgrade applies pending migrations to existing ones.
+            /app/bin/docker-entrypoint create_db
+            exec /app/bin/docker-entrypoint manage db upgrade
         env:
         {{- $envCtx := mergeOverwrite (deepCopy .) (dict "Values" (dict "env" .Values.migrations.env)) -}}
         {{- include "redash.env" $envCtx | nindent 10 }}

@@ -48,16 +48,39 @@ Create a default fully qualified scheduler name.
 
 {{/*
 Create a default fully qualified postgresql name.
+The "-postgres" suffix keeps it distinct from the "<release>-postgresql" objects of the Bitnami subchart used before 5.0.0.
 */}}
 {{- define "redash.postgresql.fullname" -}}
-{{- printf "%s-%s" .Release.Name "postgresql" | trunc 63 | trimSuffix "-" -}}
+{{- template "redash.fullname" . -}}-postgres
+{{- end -}}
+
+{{/*
+Name and key of the secret holding the bundled PostgreSQL password.
+*/}}
+{{- define "redash.postgresql.secretName" -}}
+{{- .Values.postgresql.auth.existingSecret | default (include "redash.postgresql.fullname" .) -}}
+{{- end -}}
+
+{{- define "redash.postgresql.secretKey" -}}
+{{- ternary .Values.postgresql.auth.secretKeys.userPasswordKey "password" (ne .Values.postgresql.auth.existingSecret "") -}}
 {{- end -}}
 
 {{/*
 Create a default fully qualified redis name.
 */}}
 {{- define "redash.redis.fullname" -}}
-{{- printf "%s-%s" .Release.Name "redis-master" | trunc 63 | trimSuffix "-" -}}
+{{- template "redash.fullname" . -}}-redis
+{{- end -}}
+
+{{/*
+Name and key of the secret holding the bundled Redis password.
+*/}}
+{{- define "redash.redis.secretName" -}}
+{{- .Values.redis.auth.existingSecret | default (include "redash.redis.fullname" .) -}}
+{{- end -}}
+
+{{- define "redash.redis.secretKey" -}}
+{{- ternary .Values.redis.auth.existingSecretPasswordKey "redis-password" (ne .Values.redis.auth.existingSecret "") -}}
 {{- end -}}
 
 {{/*
@@ -91,12 +114,12 @@ Shared environment block used across each component.
 - name: REDASH_DATABASE_PASSWORD
   valueFrom:
     secretKeyRef:
-      name: {{ .Values.postgresql.auth.existingSecret | default (printf "%s-postgresql" .Release.Name) | quote }}
-      key: {{ ternary .Values.postgresql.auth.secretKeys.userPasswordKey "password" (ne .Values.postgresql.auth.existingSecret "") | quote }}
+      name: {{ include "redash.postgresql.secretName" . | quote }}
+      key: {{ include "redash.postgresql.secretKey" . | quote }}
 - name: REDASH_DATABASE_HOSTNAME
   value: {{ include "redash.postgresql.fullname" . }}
 - name: REDASH_DATABASE_PORT
-  value: {{ .Values.postgresql.primary.service.ports.postgresql | quote }}
+  value: {{ .Values.postgresql.service.port | quote }}
 - name: REDASH_DATABASE_NAME
   value: {{ .Values.postgresql.auth.database | quote }}
 {{- end -}}
@@ -114,16 +137,12 @@ Shared environment block used across each component.
 - name: REDASH_REDIS_PASSWORD
   valueFrom:
     secretKeyRef:
-    {{- with .Values.redis.existingSecret }}
-      name: {{ . | quote }}
-    {{- else }}
-      name: {{ printf "%s-redis" .Release.Name | quote }}
-    {{- end }}
-      key: redis-password
+      name: {{ include "redash.redis.secretName" . | quote }}
+      key: {{ include "redash.redis.secretKey" . | quote }}
 - name: REDASH_REDIS_HOSTNAME
   value: {{ include "redash.redis.fullname" . }}
 - name: REDASH_REDIS_PORT
-  value: {{ .Values.redis.master.service.ports.redis | quote }}
+  value: {{ .Values.redis.service.port | quote }}
 - name: REDASH_REDIS_NAME
   value: {{ .Values.redis.database | quote }}
 {{- end }}

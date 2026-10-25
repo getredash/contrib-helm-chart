@@ -1,5 +1,25 @@
 # Changelog
 
+## 5.0.0
+
+**BREAKING CHANGE — the bundled PostgreSQL and Redis no longer come from the Bitnami subcharts. Releases that use the bundled PostgreSQL must move their data with a dump and restore.** See [From 4.x to 5.0](charts/redash/README.md#from-4x-to-50) for the steps.
+
+### Changed
+
+- Upgrade Redash from v25.8.0 to [v26.9.0](https://github.com/getredash/redash/blob/master/CHANGELOG.md#2690). There are no schema changes between the two versions, but v26.9.0 changes some defaults (custom JavaScript visualizations are disabled by default, query permissions are stricter) — read its "Upgrading and compatibility" notes before upgrading.
+- Replace the Bitnami `postgresql` and `redis` subcharts with chart-owned single-instance StatefulSets on the official [`postgres`](https://hub.docker.com/_/postgres) (18.6) and [`redis`](https://hub.docker.com/_/redis) (7.4.11-alpine) images, the same images Redash's own `compose.yaml` uses. Bitnami stopped publishing free versioned images, so the subcharts were pulling `bitnami/postgresql:latest`.
+- Move `Chart.yaml` to `apiVersion: v2` and drop `requirements.yaml`/`requirements.lock`, since the chart no longer has dependencies. `helm dependency build` is no longer needed.
+- Rename the bundled database objects: PostgreSQL is now `<fullname>-postgres` (was `<release>-postgresql`) and Redis is `<fullname>-redis` (was `<release>-redis-master`). The new names keep the 5.0.0 objects from colliding with the old Bitnami StatefulSets during the upgrade.
+- Rename values: `postgresql.primary.service.ports.postgresql` → `postgresql.service.port`, `redis.master.service.ports.redis` → `redis.service.port`, `redis.existingSecret` → `redis.auth.existingSecret`. Other Bitnami subchart values (`postgresql.primary.*`, `redis.master.*`, `redis.replica.*`, `redis.architecture`, Bitnami `image` overrides, …) are no longer read; see `postgresql.*` and `redis.*` in [values.yaml](charts/redash/values.yaml) for the new settings.
+- `postgresql.auth.password` (or `postgresql.auth.existingSecret`) is now enforced when `postgresql.enabled` is true. The Bitnami subchart used to generate a password silently.
+- Redis persistence is off by default (`redis.persistence.enabled: false`), since Redash only keeps job queues and caches in Redis. A generated Redis password is kept across upgrades.
+
+### Fixed
+
+- Run `manage db upgrade` in the migrations job after `create_db`. `create_db` only builds the schema on an empty database, so until now `helm upgrade` never applied Redash schema migrations to existing installs, although the README said it did.
+- The `NOTES.txt` port-forward command could select a database pod instead of the Redash server; it now filters on `app.kubernetes.io/component=server`.
+- The external PostgreSQL check in `NOTES.txt` referenced values that no longer existed (`postgresql.postgresqlPassword`, `postgresql.existingSecret`) and never failed. It now fails when `postgresql.enabled` is false and neither `externalPostgreSQL` nor `externalPostgreSQLSecret` is set.
+
 ## 4.3.0
 
 ### Added

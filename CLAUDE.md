@@ -8,27 +8,24 @@ A single community Helm chart (`charts/redash`) that deploys [Redash](https://gi
 
 ## Commands
 
-Dependencies must be fetched before `helm template`/`install` will work (`helm lint` only warns):
+The chart has no dependencies (since 5.0.0), so there is no `helm dependency build` step.
 
 ```bash
-helm repo add bitnami https://charts.bitnami.com/bitnami
-cd charts/redash && helm dependency build .
+helm lint charts/redash --set postgresql.auth.password=test                 # required to pass by CONTRIBUTING
+helm template test charts/redash --set postgresql.auth.password=test
 ```
 
-```bash
-helm lint charts/redash                 # required to pass by CONTRIBUTING
-helm template test charts/redash        # renders fine with stock values.yaml
-```
-
-Nothing gates rendering with default values — `values.yaml` ships placeholder `redash.secretKey: test` / `cookieSecret: test`, and the `required` guard in `NOTES.txt` is effectively defanged (its `or` chain falls through to the empty `externalPostgreSQLSecret` dict, and `required` only rejects nil and the empty string, so `{}` passes). Values are required for a *working install*, not for rendering. The canonical minimal working value set is the `test-values.yaml` heredoc in `.github/workflows/ci.yml`.
+Stock `values.yaml` does not render on its own: `postgresql.auth.password` is `required` in `templates/postgresql.yaml` whenever the bundled PostgreSQL is enabled and `postgresql.auth.existingSecret` is unset (`helm lint` only warns about it). The Redash secrets ship as placeholders (`redash.secretKey: test` / `cookieSecret: test`). The canonical minimal working value set is the `test-values.yaml` heredoc in `.github/workflows/ci.yml`.
 
 Full functional test = the minikube flow in `.github/workflows/ci.yml` (install → `helm test` → delete → reinstall → upgrade → `helm test`, across four Kubernetes minor versions). To reproduce one iteration locally you need a cluster; then follow that same sequence.
 
 Regenerating the chart README (see the trap below):
 
 ```bash
-cd charts/redash && helm-docs --dry-run | prettier --parser markdown > README.md
+cd charts/redash && helm-docs --dry-run > README.md
 ```
+
+The committed README is raw helm-docs output; piping it through prettier re-pads every table and buries the real diff.
 
 ## Docs are generated — do not hand-edit
 
@@ -47,13 +44,14 @@ The root `README.md` deliberately uses absolute GitHub URLs because it is synced
 
 ## Architecture
 
-Five workloads render from one shared env helper:
+Five Redash workloads render from one shared env helper, next to two optional databases:
 
 - `server-deployment.yaml` — the web server, fronted by `service.yaml` / optional `ingress.yaml`.
 - `worker-deployment.yaml` — **one Deployment per key under `workers.*`** (`adhoc`, `scheduled`, `generic`), produced by a single `range`. Each worker's config is `mergeOverwrite (deepCopy .Values.worker) $config`, so `worker.*` holds shared defaults and `workers.<name>.*` overrides them. Adding a worker means adding a values key, not a template.
 - `scheduler-deployment.yaml` — `strategy: Recreate`, single instance.
-- `hook-migrations-job.yaml` — a `post-install,post-upgrade` hook Job running `create_db`; this is how schema migrations happen.
+- `hook-migrations-job.yaml` — a `post-install,post-upgrade` hook Job running `create_db` then `manage db upgrade`. `create_db` only builds the schema on an empty database (and stamps it as current); `db upgrade` is what applies migrations to an existing one.
 - `tests/test-connection.yaml` — the `helm test` pod, curls the service and greps for "Welcome to Redash".
+- `postgresql.yaml` / `redis.yaml` — gated on `postgresql.enabled` / `redis.enabled`: a Secret, a ClusterIP Service and a single-replica StatefulSet each, on the official `postgres` / `redis` images. Objects are named `<fullname>-postgres` / `<fullname>-redis`, deliberately not `<release>-postgresql` / `<release>-redis-master`, which were the pre-5.0.0 Bitnami subchart objects. The Redis password is generated when unset and kept across upgrades via `lookup`; the PostgreSQL password is `required`, because the official image only applies it when it initialises an empty data directory.
 
 ### `redash.env` in `_helpers.tpl`
 
@@ -66,12 +64,11 @@ An ~80-entry block mapping `redash.*` values to `REDASH_*` env vars, shared by e
 
 ### The connection-string snippet is duplicated 4×
 
-When the bundled `postgresql` / `redis` subcharts are enabled, `REDASH_DATABASE_URL` and `REDASH_REDIS_URL` are assembled from their component parts by an inline `/bin/sh -c` block in the container `args`. That identical snippet appears in **server, worker, scheduler, and migrations** templates. Any change to connection handling must be applied to all four.
+When the bundled PostgreSQL / Redis are enabled, `REDASH_DATABASE_URL` and `REDASH_REDIS_URL` are assembled from their component parts by an inline `/bin/sh -c` block in the container `args`. That identical snippet appears in **server, worker, scheduler, and migrations** templates. Any change to connection handling must be applied to all four.
 
 ## Conventions and gotchas
 
-- `Chart.yaml` is `apiVersion: v1` with a separate `requirements.yaml`/`requirements.lock`. This is the legacy Helm 2 layout but still supported and intentional — don't "modernize" it to `apiVersion: v2` with inline `dependencies` without a deliberate decision.
-- Subchart versions use caret ranges (`^18.2.0`), so `requirements.lock` drifts from `requirements.yaml`; regenerate the lock with `helm dependency update`.
-- There is no `values.schema.json`. What validation exists is `required` calls inside templates (`secrets.yaml`, `NOTES.txt`).
+- `Chart.yaml` is `apiVersion: v2` with no dependencies. 5.0.0 dropped the Bitnami subcharts (and `requirements.yaml`/`requirements.lock`) after Bitnami stopped publishing free versioned images.
+- There is no `values.schema.json`. What validation exists is `required`/`fail` calls inside templates (`secrets.yaml`, `postgresql.yaml`, `NOTES.txt`).
 - `redash.fullname` truncates at 43 chars, not the usual 63, to leave room for the component suffixes appended by `redash.worker.fullname` and friends.
 - `extraObjects` (rendered by `extra-manifests.yaml`) accepts raw manifests as strings or maps and runs them through `tpl`, so entries may contain Helm template syntax.
