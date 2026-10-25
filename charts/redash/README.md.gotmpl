@@ -16,7 +16,7 @@ Current chart version is `{{ template "chart.version" . }}`
 
 - At least 3 GB of RAM available on your cluster
 - Kubernetes 1.31+ - chart is tested with latest 6 stable versions (1.31-1.36)
-- Helm 3 (Helm 2 deprecated)
+- Helm 3.14+ (for `helm upgrade --reset-then-reuse-values`; Helm 2 is not supported)
 - PV provisioner support in the underlying infrastructure
 
 ## Installing the Chart
@@ -84,16 +84,86 @@ The following table lists the configurable parameters of the Redash chart and th
 - See [the changelog](CHANGELOG.md) for major changes in each release
 - The project will use the [semver specification](http://semver.org) for chart version numbers (chart versions will not match Redash versions, since we may need to update the chart more than once for the same Redash release)
 - Always back up your database before upgrading!
-- Schema migrations will be run automatically after each upgrade
+- Schema migrations will be run automatically after each upgrade (from 5.0.0; earlier chart versions only created the schema on a fresh install)
 
 To upgrade a release named `my-release`:
 
 ```bash
 helm repo update
-helm upgrade --reuse-values my-release redash/redash
+helm upgrade --reset-then-reuse-values my-release redash/redash
 ```
 
 Below are notes on manual configuration changes or steps needed for major chart version updates.
+
+### From 4.x to 5.0
+
+5.0.0 replaces the Bitnami PostgreSQL and Redis subcharts with chart-owned StatefulSets on the official `postgres` and `redis` images, and upgrades Redash from v25.8.0 to v26.9.0. The new PostgreSQL starts with an empty data directory, so a release that uses the bundled PostgreSQL (`postgresql.enabled: true`, the default) has to dump its data before upgrading and restore it afterwards. Both sides run PostgreSQL 18, so a plain-SQL `pg_dump` restores as-is.
+
+Releases that use an external PostgreSQL (`postgresql.enabled: false`) only need the values changes in step 1. Redis holds no data that needs moving.
+
+Plan a maintenance window: Redash is stopped from step 2 until step 6. Replace `<release>` and `<namespace>` below. `<fullname>` is `<release>-redash`, or just `<release>` when the release name already contains `redash` (it also follows `nameOverride`/`fullnameOverride`).
+
+**1. Update your values file**
+
+- Make sure it sets `postgresql.auth.password`, which 5.0.0 requires. If you relied on the Bitnami chart generating it, copy the current one: `kubectl get secret <release>-postgresql -n <namespace> -o jsonpath='{.data.password}' | base64 -d`. Pick it carefully: the official image only applies the password when it creates the database, so changing it later needs an `ALTER USER` first (see `postgresql.auth.password`).
+- Rename `postgresql.primary.service.ports.postgresql` → `postgresql.service.port`, `redis.master.service.ports.redis` → `redis.service.port`, and `redis.existingSecret` → `redis.auth.existingSecret`.
+- Remove other Bitnami subchart settings (`postgresql.primary.*`, `redis.master.*`, `redis.replica.*`, `redis.architecture`, and any `postgresql.image`/`redis.image` overrides such as `bitnamilegacy/*`). Set the equivalent `postgresql.*`/`redis.*` values from [values.yaml](values.yaml) instead, e.g. `postgresql.persistence.size`.
+- If you use custom JavaScript charts, set `REDASH_FEATURE_ALLOW_CUSTOM_JS_VISUALIZATIONS: "true"` in `env` — Redash v26.9.0 disables them by default. Read the rest of its [upgrade notes](https://github.com/getredash/redash/blob/master/CHANGELOG.md#2690) too.
+
+**2. Stop Redash, keeping the databases running**
+
+```bash
+kubectl scale deploy -n <namespace> -l app.kubernetes.io/instance=<release> --replicas=0
+```
+
+With `server.knative.enabled`, this only stops the workers and scheduler: the Knative web server keeps running. That does not affect the dump, but keep users away from Redash until step 6 (for example by removing its route), because between steps 4 and 5 it serves an empty database.
+
+**3. Dump the database from the Bitnami PostgreSQL**
+
+Set `PG_USER`/`PG_DB` to your `postgresql.auth.username`/`postgresql.auth.database`; steps 3 and 5 use them.
+
+```bash
+PG_USER=redash
+PG_DB=redash
+PG_PASS=$(kubectl get secret <release>-postgresql -n <namespace> -o jsonpath='{.data.password}' | base64 -d)
+kubectl exec -n <namespace> <release>-postgresql-0 -- \
+  env PGPASSWORD="$PG_PASS" pg_dump -U "$PG_USER" -d "$PG_DB" --no-owner --no-acl > redash.sql
+```
+
+Check that `redash.sql` is not empty before continuing. If `query_results` is very large, it is only a cache and can be left out with `--exclude-table-data=query_results`, but then the `queries_latest_query_data_id_fkey` constraint fails on restore — handle it as in the [4.0.0 notes](https://github.com/getredash/contrib-helm-chart/blob/master/CHANGELOG.md#400).
+
+**4. Upgrade the chart**
+
+Pass your values file explicitly, or use `--reset-then-reuse-values`. Plain `--reuse-values` does not pick up the new chart defaults and fails to render.
+
+```bash
+helm upgrade <release> redash/redash --version 5.0.0 -n <namespace> -f my-values.yaml --wait
+```
+
+Helm removes the Bitnami StatefulSets and starts `<fullname>-postgres` with a fresh database. The old PersistentVolumeClaims (`data-<release>-postgresql-0`, `redis-data-<release>-redis-master-0`) are kept.
+
+**5. Stop Redash again and restore the dump into the new PostgreSQL**
+
+```bash
+kubectl scale deploy -n <namespace> -l app.kubernetes.io/instance=<release> --replicas=0
+kubectl exec -n <namespace> <fullname>-postgres-0 -- \
+  psql -U "$PG_USER" -d postgres -c "DROP DATABASE \"$PG_DB\" WITH (FORCE)" -c "CREATE DATABASE \"$PG_DB\""
+kubectl exec -i -n <namespace> <fullname>-postgres-0 -- \
+  psql -U "$PG_USER" -d "$PG_DB" -v ON_ERROR_STOP=1 -q < redash.sql > /dev/null
+```
+
+**6. Start Redash**
+
+Run the same upgrade again. It restores the replica counts, and the migrations job applies any pending Redash schema migrations to the restored database. If an HPA or KEDA owns the Deployment replicas (`server.replicaCount`, `worker.replicaCount` or `workers.<name>.replicaCount` set to `null`), the chart does not set replicas, so this step does not bring them back. Pause KEDA before step 2 (`autoscaling.keda.sh/paused: "true"` on each ScaledObject) so it does not scale Redash up mid-migration, then after this step scale the Deployments to at least 1 (`kubectl scale deploy ... --replicas=1`, since an HPA does not scale up from 0) and remove the pause annotation.
+
+```bash
+helm upgrade <release> redash/redash --version 5.0.0 -n <namespace> -f my-values.yaml --wait
+```
+
+**7. Clean up**
+
+- If a Redash data source points at the bundled database by its old hostname (`<release>-postgresql`), change it to `<fullname>-postgres`.
+- Once Redash works, delete the old volumes: `kubectl delete pvc -n <namespace> data-<release>-postgresql-0 redis-data-<release>-redis-master-0`
 
 ### From 3.0 to 3.1
 

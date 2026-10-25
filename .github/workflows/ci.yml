@@ -11,21 +11,18 @@ concurrency:
 jobs:
   lint:
     if: github.event_name == 'pull_request'
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 1
-      - uses: azure/setup-helm@v4
+      - uses: azure/setup-helm@v5
       - name: lint and render the chart
         run: |
-          helm repo add bitnami https://charts.bitnami.com/bitnami
-          helm repo update
           cd charts/redash
-          helm dependency build .
-          helm lint .
-          helm template test . > /dev/null
-          helm template test . --set server.knative.enabled=true > /dev/null
+          helm lint . --set postgresql.auth.password=test
+          helm template test . --set postgresql.auth.password=test > /dev/null
+          helm template test . --set postgresql.auth.password=test --set server.knative.enabled=true > /dev/null
   test-on-minikube:
     if: github.event_name == 'pull_request'
     timeout-minutes: 45
@@ -39,23 +36,20 @@ jobs:
           - v1.34
           - v1.35
           - v1.36
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: medyagh/setup-minikube@v0.0.21
         with:
           kubernetes-version: ${{ matrix.k8s }}
           cpus: 4
           memory: 8192
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 1
-      - uses: azure/setup-helm@v4
+      - uses: azure/setup-helm@v5
       - name: testing helm chart
         run: |
-          helm repo add bitnami https://charts.bitnami.com/bitnami
-          helm repo update
           cd charts/redash
-          helm dependency build .
           cat > test-values.yaml <<- EOM
             redash:
               cookieSecret: $(openssl rand -base64 32)
@@ -67,7 +61,6 @@ jobs:
                 password: $(openssl rand -base64 32)
             redis:
               auth:
-                enabled: true
                 password: $(openssl rand -base64 32)
             worker:
               env:
@@ -102,20 +95,16 @@ jobs:
           minikube logs -n10 || true
   publish-chart:
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - name: configure git
         run: |
           git config user.name "$GITHUB_ACTOR"
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
-      - uses: azure/setup-helm@v4
-      - name: add helm repos
-        run: |
-          helm repo add bitnami https://charts.bitnami.com/bitnami
-          helm repo update
-      - uses: helm/chart-releaser-action@v1.6.0
+      - uses: azure/setup-helm@v5
+      - uses: helm/chart-releaser-action@v1.7.0
         env:
           CR_TOKEN: ${{ secrets.GITHUB_TOKEN }}

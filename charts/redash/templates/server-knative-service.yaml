@@ -52,16 +52,7 @@ spec:
             - /bin/sh
             - -c
             - |
-              {{- if .Values.redis.enabled }}
-              if [ -n "${REDASH_REDIS_PASSWORD}" ]; then
-                export REDASH_REDIS_URL="redis://:${REDASH_REDIS_PASSWORD}@${REDASH_REDIS_HOSTNAME}:${REDASH_REDIS_PORT}/${REDASH_REDIS_NAME}"
-              else
-                export REDASH_REDIS_URL="redis://${REDASH_REDIS_HOSTNAME}:${REDASH_REDIS_PORT}/${REDASH_REDIS_NAME}"
-              fi
-              {{- end }}
-              {{- if .Values.postgresql.enabled }}
-              export REDASH_DATABASE_URL="postgresql://${REDASH_DATABASE_USER}:${REDASH_DATABASE_PASSWORD}@${REDASH_DATABASE_HOSTNAME}:${REDASH_DATABASE_PORT}/${REDASH_DATABASE_NAME}"
-              {{- end }}
+              {{- include "redash.connectionUrls" . | nindent 14 }}
               exec /app/bin/docker-entrypoint server
           {{- else }}
             - server

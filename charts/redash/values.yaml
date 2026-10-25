@@ -603,7 +603,7 @@ migrations:
   priorityClassName:
 
 
-# externalPostgreSQL -- External PostgreSQL configuration. To use an external PostgreSQL instead of the automatically deployed postgresql chart: set postgresql.enabled to false then uncomment and configure the externalPostgreSQL connection URL (e.g. postgresql://user:pass@host:5432/database)
+# externalPostgreSQL -- External PostgreSQL configuration. To use an external PostgreSQL instead of the bundled PostgreSQL server: set postgresql.enabled to false then uncomment and configure the externalPostgreSQL connection URL (e.g. postgresql://user:pass@host:5432/database)
 externalPostgreSQL:
 # externalPostgreSQLSecret -- Read external PostgreSQL configuration from a secret. This should point at a secret file with a single key which specifies the connection string.
 externalPostgreSQLSecret:
@@ -614,28 +614,75 @@ externalPostgreSQLSecret:
 # envSecretName -- DEPRECATED, use externalPostgreSQLSecret/externalRedisSecret instead. Contents of this secret will be loaded as environment variables into the container. Useful e.g. to set to set PostgreSQL password in externalPostgreSQL parameter: postgresql://user:$(POSTGRESQL_PASSWORD)@host:5432/database [ref](https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/#using-environment-variables-inside-of-your-config)
 # envSecretName:
 
-## Configuration values for the postgresql dependency. This PostgreSQL instance is used by default for all Redash state storage [ref](https://github.com/bitnami/charts/blob/main/bitnami/postgresql/README.md)
+## Configuration values for the bundled PostgreSQL server: a single-instance StatefulSet running the official postgres image. This PostgreSQL instance is used by default for all Redash state storage.
 postgresql:
   # postgresql.enabled -- Whether to deploy a PostgreSQL server to satisfy the applications database requirements. To use an external PostgreSQL set this to false and configure the externalPostgreSQL parameter.
   enabled: true
-  primary:
-    service:
-      ports:
-        postgresql: 5432
+  image:
+    registry: docker.io
+    # postgresql.image.repo -- PostgreSQL image name [ref](https://hub.docker.com/_/postgres)
+    repo: library/postgres
+    # postgresql.image.tag -- PostgreSQL image tag. Keep the major version unless you migrate the data yourself.
+    tag: "18.6"
+    # postgresql.image.pullPolicy -- PostgreSQL image pull policy
+    pullPolicy: IfNotPresent
+  service:
+    # postgresql.service.port -- PostgreSQL service port
+    port: 5432
   auth:
-    # postgresql.auth.username -- PostgreSQL username for redash user (when postgresql chart enabled)
+    # postgresql.auth.username -- PostgreSQL username for redash user (when postgresql is enabled). The official image makes this user the database superuser.
     username: redash
-    # postgresql.auth.password -- REQUIRED: PostgreSQL password for redash user (when postgresql chart enabled)
+    # postgresql.auth.password -- REQUIRED: PostgreSQL password for redash user (when postgresql is enabled). PostgreSQL only applies it when it initialises an empty data directory; to change it later, run `ALTER USER <username> PASSWORD '<new>'` in the database first, then update this value.
     password:
-    # postgresql.auth.existingSecret -- Name of an existing secret holding the PostgreSQL password. Takes precedence over postgresql.auth.password, and is read by both the postgresql subchart and Redash.
+    # postgresql.auth.existingSecret -- Name of an existing secret holding the PostgreSQL password. Takes precedence over postgresql.auth.password, and is read by both PostgreSQL and Redash.
     existingSecret: ""
     secretKeys:
       # postgresql.auth.secretKeys.userPasswordKey -- Key inside postgresql.auth.existingSecret holding the redash user password
       userPasswordKey: password
-  # postgresql.auth.database -- PostgreSQL database name (when postgresql chart enabled)
+    # postgresql.auth.database -- PostgreSQL database name (when postgresql is enabled)
     database: redash
+  persistence:
+    # postgresql.persistence.enabled -- Store PostgreSQL data on a PersistentVolumeClaim. When false, data lives in an emptyDir and is lost with the pod.
+    enabled: true
+    # postgresql.persistence.existingClaim -- Use an existing PersistentVolumeClaim instead of creating one
+    existingClaim: ""
+    # postgresql.persistence.storageClass -- Storage class of the created PersistentVolumeClaim. Unset uses the cluster default; "-" sets an empty storageClassName.
+    storageClass:
+    # postgresql.persistence.accessModes -- Access modes of the created PersistentVolumeClaim
+    accessModes:
+      - ReadWriteOnce
+    # postgresql.persistence.size -- Size of the created PersistentVolumeClaim
+    size: 8Gi
+  # postgresql.resources -- PostgreSQL resource requests and limits [ref](http://kubernetes.io/docs/user-guide/compute-resources/)
+  resources: {}
+  # postgresql.podSecurityContext -- Security context for the PostgreSQL pod. 999 is the postgres user of the official image.
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 999
+    runAsGroup: 999
+    fsGroup: 999
+    seccompProfile:
+      type: RuntimeDefault
+  # postgresql.securityContext -- Security context for the PostgreSQL container
+  securityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+  # postgresql.podLabels -- Labels for the PostgreSQL pod
+  podLabels: {}
+  # postgresql.podAnnotations -- Annotations for the PostgreSQL pod
+  podAnnotations: {}
+  # postgresql.nodeSelector -- Node labels for PostgreSQL pod assignment
+  nodeSelector: {}
+  # postgresql.tolerations -- Tolerations for PostgreSQL pod assignment
+  tolerations: []
+  # postgresql.affinity -- Affinity for PostgreSQL pod assignment
+  affinity: {}
+  # postgresql.priorityClassName -- Priority class name for the PostgreSQL pod
+  priorityClassName:
 
-# externalRedis -- External Redis configuration. To use an external Redis instead of the automatically deployed redis chart: set redis.enabled to false then uncomment and configure the externalRedis connection URL (e.g. redis://user:pass@host:6379/database).
+# externalRedis -- External Redis configuration. To use an external Redis instead of the bundled Redis server: set redis.enabled to false then uncomment and configure the externalRedis connection URL (e.g. redis://user:pass@host:6379/database).
 externalRedis:
 # externalRedisSecret -- Read external Redis configuration from a secret. This should point at a secret file with a single key which specifies the connection string.
 externalRedisSecret:
@@ -643,17 +690,70 @@ externalRedisSecret:
   # name: redash-redis
   # key: connectionString
 
-## Configuration values for the redis dependency. This Redis instance is used by default for caching and temporary storage [ref](https://github.com/bitnami/charts/blob/main/bitnami/redis/README.md)
+## Configuration values for the bundled Redis server: a single-instance StatefulSet running the official redis image. This Redis instance is used by default for caching and temporary storage.
 redis:
   # redis.enabled -- Whether to deploy a Redis server to satisfy the applications database requirements. To use an external Redis set this to false and configure the externalRedis parameter.
   enabled: true
+  # redis.database -- Redis database number used by Redash
   database: 0
-  master:
-    service:
-      ports:
-        redis: 6379
-  replica:
-    replicaCount: 0
+  image:
+    registry: docker.io
+    # redis.image.repo -- Redis image name [ref](https://hub.docker.com/_/redis)
+    repo: library/redis
+    # redis.image.tag -- Redis image tag
+    tag: "7.4.11-alpine"
+    # redis.image.pullPolicy -- Redis image pull policy
+    pullPolicy: IfNotPresent
+  service:
+    # redis.service.port -- Redis service port
+    port: 6379
+  auth:
+    # redis.auth.password -- Redis password. When empty, the chart generates one and keeps it across upgrades. Set it explicitly when rendering with `helm template` (e.g. Argo CD, Flux), which cannot look up the existing one.
+    password: ""
+    # redis.auth.existingSecret -- Name of an existing secret holding the Redis password. Takes precedence over redis.auth.password.
+    existingSecret: ""
+    # redis.auth.existingSecretPasswordKey -- Key inside redis.auth.existingSecret holding the Redis password
+    existingSecretPasswordKey: redis-password
+  persistence:
+    # redis.persistence.enabled -- Store Redis data on a PersistentVolumeClaim. Redash only keeps job queues and caches in Redis, so the default emptyDir is usually enough.
+    enabled: false
+    # redis.persistence.existingClaim -- Use an existing PersistentVolumeClaim instead of creating one
+    existingClaim: ""
+    # redis.persistence.storageClass -- Storage class of the created PersistentVolumeClaim. Unset uses the cluster default; "-" sets an empty storageClassName.
+    storageClass:
+    # redis.persistence.accessModes -- Access modes of the created PersistentVolumeClaim
+    accessModes:
+      - ReadWriteOnce
+    # redis.persistence.size -- Size of the created PersistentVolumeClaim
+    size: 8Gi
+  # redis.resources -- Redis resource requests and limits [ref](http://kubernetes.io/docs/user-guide/compute-resources/)
+  resources: {}
+  # redis.podSecurityContext -- Security context for the Redis pod. 999/1000 are the redis user and group of the official image.
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 999
+    runAsGroup: 1000
+    fsGroup: 1000
+    seccompProfile:
+      type: RuntimeDefault
+  # redis.securityContext -- Security context for the Redis container
+  securityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+  # redis.podLabels -- Labels for the Redis pod
+  podLabels: {}
+  # redis.podAnnotations -- Annotations for the Redis pod
+  podAnnotations: {}
+  # redis.nodeSelector -- Node labels for Redis pod assignment
+  nodeSelector: {}
+  # redis.tolerations -- Tolerations for Redis pod assignment
+  tolerations: []
+  # redis.affinity -- Affinity for Redis pod assignment
+  affinity: {}
+  # redis.priorityClassName -- Priority class name for the Redis pod
+  priorityClassName:
 
 # extraObjects -- Additional kubernetes manifests to deploy alongside the chart. Useful to include external secrets for dependencies.
 extraObjects: []
