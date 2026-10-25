@@ -7,7 +7,9 @@ metadata:
     {{- include "redash.labels" . | nindent 4 }}
     app.kubernetes.io/component: server
 spec:
+  {{- if not (kindIs "invalid" .Values.server.replicaCount) }}
   replicas: {{ .Values.server.replicaCount }}
+  {{- end }}
   selector:
     matchLabels:
       {{- include "redash.selectorLabels" . | nindent 6 }}
@@ -28,6 +30,9 @@ spec:
       imagePullSecrets: {{ toYaml . | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ include "redash.serviceAccountName" . }}
+      {{- if not (kindIs "invalid" .Values.server.terminationGracePeriodSeconds) }}
+      terminationGracePeriodSeconds: {{ .Values.server.terminationGracePeriodSeconds }}
+      {{- end }}
       securityContext: {{ toYaml .Values.server.podSecurityContext | nindent 8 }}
       {{- $initContainers := concat .Values.initContainers .Values.server.initContainers }}
       {{- with $initContainers }}

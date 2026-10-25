@@ -8,7 +8,9 @@ metadata:
   name: {{ include "redash.worker.fullname" $context }}
   labels: {{ include "redash.labels" $context | nindent 4 }}
 spec:
+  {{- if not (kindIs "invalid" $workerConfig.replicaCount) }}
   replicas: {{ $workerConfig.replicaCount }}
+  {{- end }}
   selector:
     matchLabels: {{ include "redash.selectorLabels" $context | nindent 6 }}
   template:
@@ -26,6 +28,9 @@ spec:
       imagePullSecrets: {{ toYaml . | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ include "redash.serviceAccountName" $context }}
+      {{- if not (kindIs "invalid" $workerConfig.terminationGracePeriodSeconds) }}
+      terminationGracePeriodSeconds: {{ $workerConfig.terminationGracePeriodSeconds }}
+      {{- end }}
       securityContext: {{ toYaml $workerConfig.podSecurityContext | nindent 8 }}
       {{- with concat $.Values.initContainers $workerConfig.initContainers }}
       initContainers: {{ toYaml . | nindent 8 }}
